@@ -7,6 +7,26 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.gui.OnscreenImage import OnscreenImage
 from direct.task import Task
 
+RESTFUL=0
+TIRED=1
+EXHAUSTED=2
+
+STOPPED=0
+WALKING=1
+RUNNING=2
+
+breathrates = {
+	(RESTFUL  , STOPPED) :  1.0 /  60,
+	(RESTFUL  , WALKING) :  1.0 /  80,
+	(RESTFUL  , RUNNING) : -1.0 /  45,
+	(TIRED    , STOPPED) :  1.0 /  90,
+	(TIRED    , WALKING) :  1.0 / 120,
+	(TIRED    , RUNNING) : -1.0 /  30,
+	(EXHAUSTED, STOPPED) :  1.0 / 120,
+	(EXHAUSTED, WALKING) :  1.0 / 160,
+	(EXHAUSTED, RUNNING) : -1.0 /  15,
+}
+
 class HUD(DirectObject):
 	#TODO: Preload all images
 	#TODO: Find out how many sprites are available
@@ -27,26 +47,30 @@ class HUD(DirectObject):
 		self.breath = 1.0
 		self.fear   = 0.0
 
-		self.breathrate = 1.0 / 30
+		#self.breathrate = 1.0 / 30
 		self.fearrate   = -1.0 / 60
 
-		self.accept('mouse1', self.decreaseBreath)
-		self.accept('mouse3', self.increaseFear  )
+		self.accept('w', self.walk)
+		#self.accept('w-repeat', self.walk)
+		self.accept('shift-w', self.run)
+		self.accept('w-up', self.stop)
+
+		self.updateState(RESTFUL, STOPPED)
+
 		taskMgr.add(self, 'HUD')
 
-	#TODO
-	def walk():
-		pass
+	def updateState(self, breath, movement):
+		self.state = (breath, movement)
+		self.breathrate = breathrates[self.state]
 
-	#TODO
-	def run():
-		pass
+	def stop(self):
+		self.updateState(self.state[0], STOPPED)
 
-	def decreaseBreath(self):
-		self.breath = 0.0
+	def walk(self):
+		self.updateState(self.state[0], WALKING)
 
-	def increaseFear(self):
-		self.fear = 1.0;
+	def run(self):
+		self.updateState(self.state[0], RUNNING)
 
 	def __call__(self, task):
 		timelapse = task.time - self.lasttime
@@ -60,12 +84,20 @@ class HUD(DirectObject):
 
 		heartampl = self.heartmax - self.heartmin
 		deltaaccum = timelapse * (self.heartmin + heartampl * (1 - (oldbreath + self.breath) / 2))
+		bpm = (1 - self.breath) * heartampl + self.heartmin
 		self.heartaccum += deltaaccum
 		self.heartframe = int(8 * self.heartaccum / 60) % 8
 		self.heartimage.setImage(self.heartbasis % (self.heartframe + 1,))
 		self.heartimage.setTransparency(TransparencyAttrib.MAlpha)
 
-		self.text.setText('Breath: %f\nFear  : %f' % (self.breath, self.fear))
+		if self.breath > self.fear:
+			self.updateState(RESTFUL  , self.state[1])
+		elif self.breath > 0:
+			self.updateState(TIRED    , self.state[1])
+		else:
+			self.updateState(EXHAUSTED, self.state[1])
+
+		self.text.setText('%d BPM' % (bpm, ))
 		return task.cont
 
 class HUDTest(ShowBase):
