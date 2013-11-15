@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from panda3d.core import *
 import sys,os
 loadPrcFileData("", "prefer-parasite-buffer #f")
