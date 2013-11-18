@@ -5,8 +5,6 @@ import scene_obj
 
 class SceneActor(scene_obj.SceneObj):
 
-
-
     def __init__(self, name, model_path, pos, scale, animations, source = render):
         '''
         Constructor

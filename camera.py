@@ -5,15 +5,10 @@ from pandac.PandaModules import Vec3
 from direct.task import Task
 from direct.interval.IntervalGlobal import *
 
-def initCamera(pos = Vec3(0,0,0)):
-    base.cam.reparentTo(render)
-    base.cam.setPos(pos)
-
 class CameraControls(DirectObject):
     '''
     classdocs
     '''
-
 
     def __init__(self):
         # Set the current viewing target
@@ -29,15 +24,18 @@ class CameraControls(DirectObject):
         # User controls
     
         self.accept('escape',sys.exit)    
-        self.accept("w", self.setKeys, [0, 1])#forward
         self.accept("w-up", self.setKeys, [0, 0])
-        self.accept("s", self.setKeys, [1, 1])#back
         self.accept("s-up", self.setKeys, [1, 0])
-        self.accept("a", self.setKeys, [2, 1])#strafe left
         self.accept("a-up", self.setKeys, [2, 0])
-        self.accept("d", self.setKeys, [3, 1])#strafe right
         self.accept("d-up", self.setKeys, [3, 0])
-        
+        self.accept("w", self.setKeys, [0, 1])
+        self.accept("s", self.setKeys, [1, 1])
+        self.accept("a", self.setKeys, [2, 1])
+        self.accept("d", self.setKeys, [3, 1])
+        self.accept("shift-w", self.setKeys, [0, 2])
+        self.accept("shift-s", self.setKeys, [1, 2])
+        self.accept("shift-a", self.setKeys, [2, 2])
+        self.accept("shift-d", self.setKeys, [3, 2])
         
     def toggleInterval(self, ival):
         if (ival.isPlaying()):
@@ -60,22 +58,22 @@ class CameraControls(DirectObject):
         if (self.keys[0]):
             dir = avatar.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
             dir.setZ(0)
-            self.focus = self.focus + dir * elapsed*40
+            self.focus = self.focus + dir * elapsed*40 * self.keys[0]
             avatar.setFluidPos(self.focus )
         if (self.keys[1]):
             dir = avatar.getMat().getRow3(1)
             dir.setZ(0)
-            self.focus = self.focus - dir * elapsed*40
+            self.focus = self.focus - dir * elapsed*40 * self.keys[1]
             avatar.setFluidPos(self.focus)
         if (self.keys[2]):
             dir = avatar.getMat().getRow3(0)
             dir.setZ(0)
-            self.focus = self.focus - dir * elapsed*20
+            self.focus = self.focus - dir * elapsed*20 * self.keys[2]
             avatar.setFluidPos(self.focus)
         if (self.keys[3]):
             dir = avatar.getMat().getRow3(0)
             dir.setZ(0)
-            self.focus = self.focus + dir * elapsed*20
+            self.focus = self.focus + dir * elapsed*20 * self.keys[3]
             avatar.setFluidPos(self.focus)
         
         # positions the flashlight with the player 
@@ -109,5 +107,5 @@ class CameraControls(DirectObject):
 
     def stop(self):
         taskMgr.remove("camera-task")
-        taskMgr.remove("camera-mpve")
+        taskMgr.remove("camera-move")
         

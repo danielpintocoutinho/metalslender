@@ -10,6 +10,10 @@ from direct.showbase.DirectObject import DirectObject
 from direct.actor import Actor
 from direct.task.Task import Task
 from random import *
+
+from hud import HUD
+from player import Player
+
 import camera
 import scene_obj
 import scene_actor
@@ -18,9 +22,6 @@ import interface
 import lighting
 import collisionSystem
 
-camera.initCamera(Vec3(-30,45,26))
-cons = camera.CameraControls()
-cons.start()
 menu = interface.Interface()
 lights = lighting.Lighting()
 
@@ -58,12 +59,8 @@ class MetalSlender(DirectObject):
         self.pandaAxis.setObjCollision()
         self.pandaAxis.setFloorCollision(FLOOR_MASK, BitMask32.allOff())
         
-        self.avatar=scene_obj.SceneObj(name = "avatar", pos = Vec3(-30,45,126))
-        self.avatar.setObjCollision()
-        self.avatar.setFloorCollision(FLOOR_MASK, BitMask32.allOff())
-        self.avatar.setWallCollision(WALL_MASK, BitMask32.allOff())
-        base.cam.reparentTo(self.avatar.getNodePath())
-        base.cam.setPos(Vec3(0,0,5))
+        self.avatar=Player(name = "avatar", pos = Vec3(-30,45,126))
+        self.hud = HUD(self.avatar)
         
         self.teapot=scene_obj.SceneObj("teapot","teapot", Vec3(0,-20,10), 1)  
         self.teapotMovement = self.teapot.setHprInterval(10,Point3(0,0,0),Point3(0,360,360), False)
@@ -78,7 +75,6 @@ class MetalSlender(DirectObject):
 
         # Important! Enable the shader generator.
         render.setShaderAuto()
-
     
 # end of __init__
 
@@ -96,8 +92,6 @@ class MetalSlender(DirectObject):
         
     def addCommands(self):
         self.accept('escape',sys.exit)
-        self.accept("space",self.avatarjump, [self.avatar])
-        #self.accept("f", frustum_toggle)
         self.accept("p", self.toggleInterval, [self.pandaWalk])
         self.accept("t", self.toggleInterval, [self.teapotMovement])
         
@@ -119,9 +113,6 @@ class MetalSlender(DirectObject):
             ival.pause()
         else:
             ival.resume()
-            
-    def avatarjump(self, obj):
-        if obj.getFloorHandler().isOnGround(): obj.getFloorHandler().addVelocity(40)
     
     def set_siren(v):
         if v:
