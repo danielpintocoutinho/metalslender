@@ -14,6 +14,11 @@ class HUD(DirectObject):
 	def __init__(self,player):
 		self.player = player
 
+		self.heartmax = 160
+		self.heartmin = 80
+		self.heartbpm = self.heartmin
+		self.heartaccum = 0
+		self.last = 0
 		self.heartbasis = 'assets/images/heartbeat2-%d.png'
 		self.heartframe = 0
 		self.heartimage = OnscreenImage(self.heartbasis % (1,), scale=(0.1,1,0.1), pos=(0,1,-0.8))
@@ -22,23 +27,35 @@ class HUD(DirectObject):
 		taskMgr.add(self.update, 'hud')
 
 	def update(self, task):
-		if self.player.breath == -1:
+		if self.player.isAlive():
+			elapsed = task.time - self.last
+			self.last = task.time
+
+			# After a certain point, it should be cleared
+			# Fear must also increase heartbeat
+
+			f, b = self.player.fear, self.player.breath
+			bpm = 80 + 200 * (0.75 + 0.25 * f) * (1 - b) + 40 * f
+
+			self.heartaccum += elapsed * (bpm + self.heartbpm) / 2.0
+			self.heartbpm = bpm
+			self.heartframe = int(8 * self.heartaccum / 60) % 8
+			self.heartimage.setImage(self.heartbasis % (self.heartframe + 1,))
+			self.heartimage.setTransparency(TransparencyAttrib.MAlpha)
+
+			#TODO: Update parameters
+			heartampl = self.heartmax - self.heartmin
+			if self.heartbpm < self.heartmax:
+				s = float(self.heartbpm - self.heartmin) / heartampl
+				self.text.setFg((s,1,0,1))
+			else:
+				s = float(self.heartbpm - self.heartmax) / heartampl
+				self.text.setFg((1,1-s,0,1))
+
+			self.text.setText('%d BPM' % (self.heartbpm,))
+			return task.cont
+		else:
 			self.text.setFg((1,1,1,1))
 			self.text.setText('0 BPM')
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
 			return task.done
-		else:
-			self.heartframe = int(8 * self.player.heartaccum / 60) % 8
-			self.heartimage.setImage(self.heartbasis % (self.heartframe + 1,))
-			self.heartimage.setTransparency(TransparencyAttrib.MAlpha)
-
-			heartampl = self.player.heartmax - self.player.heartmin
-			if self.player.heartbpm < self.player.heartmax:
-				s = float(self.player.heartbpm - self.player.heartmin) / heartampl
-				self.text.setFg((s,1,0,1))
-			else:
-				s = float(self.player.heartbpm - self.player.heartmax) / heartampl
-				self.text.setFg((1,1-s,0,1))
-
-			self.text.setText('%d BPM' % (self.player.heartbpm,))
-			return task.again

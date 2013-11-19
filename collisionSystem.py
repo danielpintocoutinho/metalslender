@@ -36,7 +36,7 @@ class Stage(DirectObject):
         sentinel.setCollideMask(BitMask32.allOff())
         sentinel.reparentTo(render)
         sentinel.setPos((7.83, -25.31, 24))
-        avatar_in_sight=False
+        player_in_sight=False
         # we create a spotlight that will be the sentinel's eye and will be used to fire the inView method
         slight = Spotlight('slight')
         slight.setColor((1, 1, 1, 1))
@@ -45,11 +45,11 @@ class Stage(DirectObject):
         slight.setLens(lens)
         slnp = sentinel.attachNewNode(slight)
         render.setLight(slnp)
-        # this is important: as we said the inView method don't cull geometry but take everything is in sight frustum - therefore to simulate an hide and seek feature we gotta cheat a little: this ray is masked to collide with walls and so if the avatar is behind a wall the ray will be 'deflected' (we'll see how later in the sent_traverse function) - so we know who's behind a wall but we fake we can't see it.
+        # this is important: as we said the inView method don't cull geometry but take everything is in sight frustum - therefore to simulate an hide and seek feature we gotta cheat a little: this ray is masked to collide with walls and so if the player is behind a wall the ray will be 'deflected' (we'll see how later in the sent_traverse function) - so we know who's behind a wall but we fake we can't see it.
         sentraygeom = CollisionRay(0, 0, 0, 0, 1, 0)
         sentinelRay = sentinel.attachNewNode(CollisionNode('sentinelray'))
         sentinelRay.node().addSolid(sentraygeom)
-        # we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
+        # we set to the ray a cumulative masking using the or operator to detect either the player's body and the wall geometry
         sentinelRay.node().setFromCollideMask(SENTINEL_MASK|WALL_MASK)
         sentinelRay.node().setIntoCollideMask(BitMask32.allOff())
         # we add the ray to the sentinel collider and now it is ready to go
@@ -58,13 +58,13 @@ class Stage(DirectObject):
         a=-30
         sentrotival = sentinel.hprInterval(8, (630,a,0), startHpr=(270,a,0))
         
-        #** the floor handler need to know what it got to handle: the avatar and its floor ray
-        avatarFloorHandler.addCollider(avatarRay, avatarNP)
-        # ...then add the avatar collide sphere and the wall handler
-        wallHandler.addCollider(avatarCollider, avatarNP)
+        #** the floor handler need to know what it got to handle: the player and its floor ray
+        playerFloorHandler.addCollider(playerRay, playerNP)
+        # ...then add the player collide sphere and the wall handler
+        wallHandler.addCollider(playerCollider, playerNP)
         # let's start'em up
-        base.cTrav.addCollider(avatarRay, avatarFloorHandler)
-        base.cTrav.addCollider(avatarCollider, wallHandler)
+        base.cTrav.addCollider(playerRay, playerFloorHandler)
+        base.cTrav.addCollider(playerCollider, wallHandler)
         
         #** this is a siren, just for the show (and to annoy ppl)
         siren=snipstuff.load3Dimage('textures/siren.png')

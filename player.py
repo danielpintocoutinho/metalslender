@@ -21,7 +21,7 @@ EXHAUSTED=2
 
 STOPPED=0
 WALKING=1
-RUNNING=2
+RUNNING=4
 
 breathrates = {
 	(RESTFUL  , STOPPED) :  1.0 /  60,
@@ -35,19 +35,19 @@ breathrates = {
 	(EXHAUSTED, RUNNING) : -1.0 /   5,
 }
 
+#TODO: Make this class
+class Flashlight(DirectObject):
+	pass
+
+#TODO: Refactor things to improve SceneObj
 class Player(SceneObj):
 	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source=render,actor=False):
 		SceneObj.__init__(self, name, model_path, pos, scale, source, actor)
 
-		self.heartmax = 160
-		self.heartmin = 80
-		self.heartbpm = self.heartmin
-		self.heartaccum = 0
-
 		self.breath = 1.0
 		self.fear   = 0.0
 
-		self.fearrate   = -1.0 / 60
+		self.fearrate   = -1.0 / 360
 
 		self.last = 0
 		self.keys = [STOPPED] * 4
@@ -59,9 +59,8 @@ class Player(SceneObj):
 		self.setWallCollision(collisionSystem.WALL_MASK, BitMask32.allOff())
 
 		base.cam.reparentTo(self.getNodePath())
-		base.cam.setPos(Vec3(0,0,5))
 		#BUG: Shadows are cast with a positive offset on the z-axis
-		#base.cam.setPos(pos + Vec3(0,0,25))
+		base.cam.setPos(Vec3(0,0,25))
 
 		self.accept("w-up", self.setKeys, [0, STOPPED])
 		self.accept("s-up", self.setKeys, [1, STOPPED])
@@ -82,15 +81,6 @@ class Player(SceneObj):
 		#TODO: Must taks your breath, also
 		self.accept("space", self.jump)
 
-		#self.cons = CameraControls()
-		#self.cons.start()
-
-		self.focus = Vec3(55,-55,20)
-		self.xrot = 180
-		self.yrot = 0
-
-		#TODO: Rename tasks
-		taskMgr.add(self.taskAim, "player/aim")
 		taskMgr.add(self.taskMove, "player/move")
 
 	def isTired(self):
@@ -99,8 +89,14 @@ class Player(SceneObj):
 	def isExhausted(self):
 		return self.state == EXHAUSTED
 
+	def isAlive(self):
+		return self.breath > -1
+
 	#TODO: Other methods like isDead()
 	
+	#TODO: If movement validation is enabled, the player must stop once it is
+	# exhausted, which means it cannot run and die of fear. But if it isn't, the
+	# player can continue running after it is tired.
 	def validateMovement(self):
 		if self.isExhausted():
 			self.keys = [min(k, WALKING) for k in self.keys]
@@ -115,39 +111,39 @@ class Player(SceneObj):
 		self.validateMovement()
 				
 	def taskMove(self, task):
-		avatar = self.getNodePath()
-		self.focus = avatar.getPos()
+		player = self.getNodePath()
+		self.focus = player.getPos()
 		#TODO: Bad code! Make the flashlight a child of the player
-		flashlight = render.find("Spot")
+		#flashlight = render.find("Spot")
 
 		elapsed = task.time - self.last
 		self.last = task.time
 
 		if (self.keys[0]):
-				dir = avatar.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
+				dir = player.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
 				dir.setZ(0)
 				self.focus = self.focus + dir * elapsed*40 * self.keys[0]
-				avatar.setFluidPos(self.focus )
+				player.setFluidPos(self.focus)
 		if (self.keys[1]):
-				dir = avatar.getMat().getRow3(1)
+				dir = player.getMat().getRow3(1)
 				dir.setZ(0)
 				self.focus = self.focus - dir * elapsed*40 * self.keys[1]
-				avatar.setFluidPos(self.focus)
+				player.setFluidPos(self.focus)
 		if (self.keys[2]):
-				dir = avatar.getMat().getRow3(0)
+				dir = player.getMat().getRow3(0)
 				dir.setZ(0)
 				self.focus = self.focus - dir * elapsed*20 * self.keys[2]
-				avatar.setFluidPos(self.focus)
+				player.setFluidPos(self.focus)
 		if (self.keys[3]):
-				dir = avatar.getMat().getRow3(0)
+				dir = player.getMat().getRow3(0)
 				dir.setZ(0)
 				self.focus = self.focus + dir * elapsed*20 * self.keys[3]
-				avatar.setFluidPos(self.focus)
+				player.setFluidPos(self.focus)
 		
 		# positions the flashlight with the player 
-		flashlight.setFluidPos(avatar.getPos())
-		flashlight.setZ(flashlight.getZ() + 4)
-		flashlight.setHpr( avatar.getHpr())
+		#flashlight.setFluidPos(player.getPos())
+		#flashlight.setZ(flashlight.getZ() + 4)
+		#flashlight.setHpr( player.getHpr())
 
 		oldbreath   = self.breath
 		deltabreath = self.breathrate * elapsed
@@ -155,18 +151,7 @@ class Player(SceneObj):
 		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
 		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
 
-		if self.breath == -1:
-			self.heartbpm = 0
-			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
-			return task.done
-		else:
-			heartampl = self.heartmax - self.heartmin
-			deltaaccum = elapsed * (self.heartmin + heartampl * (1 - (oldbreath + self.breath) / 2))
-
-			# After a certain point, it should be cleared
-			# Fear must also increase heartbeat
-			self.heartaccum += deltaaccum
-			self.heartbpm = (1 - self.breath) * heartampl + self.heartmin
+		if self.isAlive():
 
 			if self.breath > self.fear:
 				self.updateState(RESTFUL)
@@ -179,21 +164,9 @@ class Player(SceneObj):
 				pass
 
 			return task.cont
-
-	def taskAim(self, task):
-		md = base.win.getPointer(0)
-		x = md.getX()
-		y = md.getY()
-
-		if base.win.movePointer(0, 100, 100):
-			#TODO: Refactor these constants to a mouse sensitivity configuration screen
-			self.xrot -= (x - 100) * 0.2
-			self.yrot -= (y - 100) * 0.2
-			self.yrot  = min(90, max(-90, self.yrot))
-
-		self.getNodePath().setHpr(self.xrot, self.yrot, 0)
-		
-		return task.cont
+		else:
+			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
+			return task.done
 	
 	def jump(self):
 		if self.getFloorHandler().isOnGround(): 

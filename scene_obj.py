@@ -43,14 +43,14 @@ class SceneObj(DirectObject):
         self.modelCollider.node().addSolid(solid)
     
     def setFloorCollision(self, fromMask, intoMask):
-        # the avatar's ray collider for ground collision detection
+        # the player's ray collider for ground collision detection
         raygeometry = CollisionRay(0, 0, 1, 0, 0, -1)
         self.modelRay = self.modelNP.attachNewNode(CollisionNode(self.name + 'Ray'))
         self.modelRay.node().addSolid(raygeometry)
         self.modelRay.node().setFromCollideMask(fromMask)
         self.modelRay.node().setIntoCollideMask(intoMask)
         self.floorHandler.addCollider(self.modelRay, self.modelNP)
-        # ...then add the avatar collide sphere and the wall handler
+        # ...then add the player collide sphere and the wall handler
         base.cTrav.addCollider(self.modelRay, self.floorHandler)
         
         
@@ -62,11 +62,11 @@ class SceneObj(DirectObject):
         base.cTrav.addCollider(self.modelCollider, self.wallHandler)
     
     def setOtherCollision(self, fromMask, intoMask, handler):
-        self.avatarBody = avatar.attachNewNode(CollisionNode('smileybody'))
-        self.avatarBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
-        self.avatarBody.node().setFromCollideMask(fromMask)
-        self.avatarBody.node().setIntoCollideMask(intoMask)
-        base.cTrav.addCollider(self.avatarBody, handler)
+        self.playerBody = player.attachNewNode(CollisionNode('smileybody'))
+        self.playerBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
+        self.playerBody.node().setFromCollideMask(fromMask)
+        self.playerBody.node().setIntoCollideMask(intoMask)
+        base.cTrav.addCollider(self.playerBody, handler)
         
     def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
         self.floorcollider=self.model.find(floorPath)
