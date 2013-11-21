@@ -1,11 +1,9 @@
 #!/usr/bin/ppython
 import panda3d
 from panda3d.core import TransparencyAttrib
-from direct.showbase.ShowBase import ShowBase
 from direct.showbase.DirectObject import DirectObject
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.OnscreenImage import OnscreenImage
-from direct.task import Task
 
 class HUD(DirectObject):
 	#TODO: Preload all images
