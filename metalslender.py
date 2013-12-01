@@ -8,6 +8,7 @@ from direct.showbase.DirectObject import DirectObject
 from hud import HUD
 from player import Player
 from camera import CameraControls
+from eventsManager import EventManager
 
 #TODO: Review these files
 import scene_obj
@@ -44,6 +45,8 @@ class MetalSlender(DirectObject):
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 		
+		EventManager(self.player).start()
+		
 		# User controls
 		self.addCommands()
 		
@@ -61,6 +64,7 @@ class MetalSlender(DirectObject):
 		base.camLens.setFov(75)
 
 		base.disableMouse()
+		base.win.movePointer(0, 100, 100)
 
 		props = WindowProperties()
 		props.setCursorHidden(True)

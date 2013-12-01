@@ -15,7 +15,7 @@ EXHAUSTED=2
 
 STOPPED=0
 WALKING=1
-RUNNING=4
+RUNNING=2.5
 
 breathrates = {
 	(RESTFUL  , STOPPED) :  1.0 /  60,
@@ -41,6 +41,19 @@ class Player(SceneObj):
 
 		self.last = 0
 		self.keys = [STOPPED] * 4
+		
+		#sounds of the player
+		self.actualstep = 0;
+		self.step_vel = 0.7
+		step1 = loader.loadSfx("assets/sounds/player/step1.mp3")
+		step2 = loader.loadSfx("assets/sounds/player/step2.mp3")
+		step3 = loader.loadSfx("assets/sounds/player/step3.mp3")
+		step4 = loader.loadSfx("assets/sounds/player/step4.mp3")        
+		self.footsteps = [step1,step2,step3,step4]
+		
+		self.screams = loader.loadSfx("assets/sounds/player/scream_low1.mp3")
+		self.breathing = loader.loadSfx("assets/sounds/player/breathing.mp3")
+		self.breath_vol = 0.01
 		
 		self.updateState(RESTFUL)
 
@@ -72,6 +85,11 @@ class Player(SceneObj):
 		self.accept("space", self.jump)
 
 		taskMgr.add(self.taskMove, "player/move")
+		
+		self.breathing.setVolume(self.breath_vol)
+		self.breathing.setPlayRate(0.6)
+		self.breathing.setLoop(True)
+		self.breathing.play()
 
 	def isTired(self):
 		return self.state == TIRED
@@ -130,6 +148,15 @@ class Player(SceneObj):
 				self.focus = self.focus + dir * elapsed*20 * self.keys[3]
 				player.setFluidPos(self.focus)
 		
+		#step sounds of the player
+		if (self.keys[0] or self.keys[1] or self.keys[2] or self.keys[3]):
+			if (self.getFloorHandler().isOnGround() and \
+				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
+				
+				self.actualstep += 1
+				self.footsteps[self.actualstep%4].setPlayRate(self.step_vel)
+				self.footsteps[self.actualstep%4].play()
+				
 		# positions the flashlight with the player 
 		#flashlight.setFluidPos(player.getPos())
 		#flashlight.setZ(flashlight.getZ() + 4)
@@ -161,3 +188,6 @@ class Player(SceneObj):
 	def jump(self):
 		if self.getFloorHandler().isOnGround(): 
 			self.getFloorHandler().addVelocity(25)
+	
+	def scream(self):
+		self.screams.play()

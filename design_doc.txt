@@ -1,0 +1,96 @@
+MetalSlender
+
+------ Cenário -------
+
+Estudante da UFRJ de Mestrado que ficou até tarde no LCG para finalizar um tabalho. De repente, há uma queda de energia e você começa a escutar barulhos estranhos, 
+logo mais sangue começa a joorar de algum lugar (a definir).
+
+Você procura, a lanterna (ela está ligada). Ao obter ela, um monstro (encapuzado?) aparece (situação parecida quando você acha o primeiro zumbi no Resident Evil). 
+Você escapa, já que não tem como enfrentar o monstro.
+
+------ Objetivo ------
+
+Ao sair do LCG, você vê a mensagem "Vá para o Bloco A". Você terá que passar por todo o CT, do bloco H até o A, já que o estacionamento virou um mar de sangue que contém monstros que te matam instataneamente.
+
+------ Progressão ------
+
+Como dito antes, o jogador tem que ir do bloco H até o A. Seria interessante que cada bloco adicionasse desafios novos para supreender o jogador. Para avançar para o próximo bloco o jogador 
+tem que achar um item que destrava o portão para o próximo bloco.
+
+------ Ações do jogador ------
+
+Ligar e desligar lanterna
+esconder em armários
+Fazer barulho intencional.
+Corre e agachar.
+Atirar objetos.
+
+------ Inimigos ------
+
+O inimigo principal é o encapuzado. Devido a nossas limitações técnicas, para termos inimigos diferentes podemos ter encapuzados com cores diferentes. Por exemplo:
+
+Preto: O normal. Reage a sons e tem um campo de visão médio. Velocidade de perseguição média.
+
+Azul: Similar como um Hunter do Resdient Evil. Quando te vê, ele vai pra cima de você a uma velocidade incrível. Você pode atrair ele a paredes que ao bater nelas, ele fica tonto.
+
+Verde: Fica parado em um ponto, como se você um turret. Ao te ver, ele começa a disparar contra você.
+
+Roxo: Ao te ver, começa a gritar atraindo outros encapuzados no ponto onde le está. Para calar ele, você pode atirar alguma coisa nele. O grito dura uma porção de tempo 
+e ele perde a visão de você.
+
+Vermelho: Não tem visão. Porém extremamente sensível a sons, passa paredes até achar a localização do som.
+
+Preto com efeito de fantasma e olhos vermelho brilhantes (Super): É um normal só que com todas as características no máximo, é paralizado por um tempo se atingido pela luz da lanterna.
+
+Gigante: Ocupa muito espaço porém é lento. Se ele enconsta em outros encapuzados, ele os absorve. Se ele absorver o super encapuzado...
+
+Branco: Iluminam o ambiente. Se você estiver utilizando sua lanterna e ele estiver por perto, ele absorve a bateria.
+
+Amarelo: Especial. Foge de você se te vê. Tente capturá-lo...
+	* Hahaha, é quase um pote de ouro
+
+Pode haver armadilhas:
+
+- Paredes falsas
+	* Podem servir de escondeirijos
+	* Pode conter power-ups (quais?)
+
+- Paredes com uma cara que cospe alguma coisa : Aplica uma textura na parede com uma cara assustadora.
+
+- Chão com algum líquido que te faz escorregar, te deixa mais lento ou faz barulho.
+	* Pra ficar convincente, seria legal usar shaders pros líquidos
+
+- Cabeças de pessoas.
+
+------ NPC ------
+
+A discutir
+
+------ História por trás ------
+
+Na verdade, você está muito pressionado pelo trabalho e você está tendo um grande pesadelo. Dependendo, de como você morre no jog, refletirá seu Game Over.
+
+Por exemplo, se você for pro mar vermelho, você morrerá por atropelamento na vida real.
+
+Se você morre por queda, você comete suicídio ao pular do andar mais alto.
+
+Se você for pego por um encapuzado. Você vai pra uma sala, que contém todos os tipos de encapuzados formando uma banca. E uma voz sinistra dizendo "Morra".
+
+Se você escapar da UFRJ, você acorda no laboratório de frente pro computador. Porém ao virar pro lado, você ve o super encapuzado. e o jogo acaba.
+
+Se você escapar da UFRJ e pegar os itens especiais. Você acorda no laboratório e consegue a inspiração para acabar o trabalho. A você vai para banca de professores e consegue a aprovação.
+
+Os encapuzados representam os professores do curso e os itens especiais seriam o conhecimento escondido na sua mente. O pesadelo seria o desafio interno do aluno para conseguir 
+fazer o trabalho crucial para seu curso demonstrando o stress que alunos de gradução passam..
+
+------ Fase: LCG ------
+
+Jogador começa na sala de reunião. Luz acaba, jogador pega lanterna do lado.
+Porta está trancada. Jogador vai pegar chave no banheiro. Música de tensão toca ao jogador se aproximar do banheiro.
+Jogador pega chave. Música intensifica. Jogador encontra encapuzado saindo da sala de reunião. Slow motion quando o encapuzado grita ou o jogador olha para ele.
+Jogador escapa do LCG. Jogador tranca chave do LCG (automático)
+
+------ Fase: Fora do LCG ------
+
+Ele encontra uma mensagem em sangue dizendo "Vá para o bloco A". Estacionamento virou um mar de sangue que é mortífero por alguma razão (a definir).
+Cheio de encapuzado no corredor de fora. Colunas tem que ser usadas para escapar deles e entrar no bloco H que é unica via de saída. Restaurante pode ser usado no futuro.
