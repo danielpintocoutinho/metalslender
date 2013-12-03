@@ -8,17 +8,16 @@ from direct.showbase.DirectObject import DirectObject
 from hud import HUD
 from player import Player
 from camera import CameraControls
+from lighting import Flashlight
 
 #TODO: Review these files
 import scene_obj
 import scene_actor
 import animation_data
 import interface
-import lighting
 import collisionSystem
 
 menu = interface.Interface()
-lights = lighting.Lighting()
 
 floorHandler = collisionSystem.floorHandler
 wallHandler = collisionSystem.wallHandler
@@ -47,8 +46,9 @@ class MetalSlender(DirectObject):
 		# User controls
 		self.addCommands()
 		
-		lights.setAmbientlight()
-		lights.addSpotlight("Spot", base.cam)
+		base.setBackgroundColor(0,0,0)
+		self.setAmbientlight()
+		Flashlight("Spot", base.cam)
 
 		render.setShaderAuto()
 
@@ -83,6 +83,12 @@ class MetalSlender(DirectObject):
 		self.inst_h = menu.addInstructions(0.80 , 'F: increase fear' )
 
 		return True
+	
+	def setAmbientlight(self, color = Vec4(0.01, 0.01, 0.01, 1)):
+		alight = AmbientLight("Ambient")
+		alight.setColor(color)
+		alight = render.attachNewNode(alight)
+		render.setLight(alight)
 
 MetalSlender()
 run()
