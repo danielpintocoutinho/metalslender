@@ -8,7 +8,7 @@ from direct.showbase.DirectObject import DirectObject
 from hud import HUD
 from player import Player
 from camera import CameraControls
-from lighting import Flashlight
+from eventsManager import EventManager
 
 #TODO: Review these files
 import scene_obj
@@ -43,12 +43,13 @@ class MetalSlender(DirectObject):
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 		
+		EventManager(self.player).start()
+		
 		# User controls
 		self.addCommands()
 		
 		base.setBackgroundColor(0,0,0)
 		self.setAmbientlight()
-		Flashlight("Spot", base.cam)
 
 		render.setShaderAuto()
 
@@ -61,6 +62,7 @@ class MetalSlender(DirectObject):
 		base.camLens.setFov(75)
 
 		base.disableMouse()
+		base.win.movePointer(0, 100, 100)
 
 		props = WindowProperties()
 		props.setCursorHidden(True)
@@ -72,7 +74,7 @@ class MetalSlender(DirectObject):
 		self.accept('f', self.actionKeys, ['f'])
 
 	def actionKeys(self, key):
-		if key == 'f':
+		if key == 'i':
 			self.player.fear = min(self.player.fear + 0.1, 1.0)
 		
 	#TODO: Verify if video features are supported
@@ -80,7 +82,8 @@ class MetalSlender(DirectObject):
 		self.inst_m = menu.addInstructions(0.95 , '[WASD]: walk')
 		self.inst_h = menu.addInstructions(0.90 , 'SPACE: jump')
 		self.inst_h = menu.addInstructions(0.85 , 'SHIFT+[WASD]: run' )
-		self.inst_h = menu.addInstructions(0.80 , 'F: increase fear' )
+		self.inst_h = menu.addInstructions(0.80 , 'F: Flashlight On/Off')
+		self.inst_h = menu.addInstructions(0.75 , 'I: increase fear' )
 
 		return True
 	

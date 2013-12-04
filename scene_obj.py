@@ -13,7 +13,7 @@ from random import *
 class SceneObj(DirectObject):
 
 	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source = render,actor=False):
-		self.modelNP =source.attachNewNode(name)
+		self.modelNP = source.attachNewNode(name)
 		self.name = name
 		if (actor == False):
 			if (model_path):
@@ -75,7 +75,7 @@ class SceneObj(DirectObject):
 		return self.floorHandler
 	
 	def getPos(self):
-		return self.model.getPos()
+		return self.modelNP.getPos()
 	
 	def setModelPos(self,pos):
 		self.model.setPos(pos)

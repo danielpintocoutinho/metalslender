@@ -1,6 +1,7 @@
 from pandac.PandaModules import Vec3
 from panda3d.core import BitMask32
 
+from lighting import Flashlight
 from camera import CameraControls
 from scene_obj import SceneObj
 from hud import HUD
@@ -8,14 +9,18 @@ from hud import HUD
 import collisionSystem
 
 from direct.showbase.DirectObject import DirectObject
+from direct.interval.LerpInterval import LerpPosInterval
 
 RESTFUL=0
 TIRED=1
 EXHAUSTED=2
 
-STOPPED=0
-WALKING=1
-RUNNING=4
+STOPPED=0.0
+WALKING=1.0
+RUNNING=2.0
+
+NORMAL   = 1.0
+CRAWLING = 0.5
 
 breathrates = {
 	(RESTFUL  , STOPPED) :  1.0 /  60,
@@ -34,13 +39,31 @@ class Player(SceneObj):
 	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source=render,actor=False):
 		SceneObj.__init__(self, name, model_path, pos, scale, source, actor)
 
-		self.breath = 1.0
-		self.fear   = 0.0
+		self.cam = base.cam
+		self.breath  = 1.0
+		self.fear    = 0.0
+		self.speed   = 1.0
+		self.stopped = 1.0
+		self.pace = NORMAL
+		self.flashlight = Flashlight('spot', self)
 
 		self.fearrate   = -1.0 / 360
 
 		self.last = 0
 		self.keys = [STOPPED] * 4
+		
+		#sounds of the player
+		self.actualstep = 0;
+		self.step_vel = 0.7
+		step1 = loader.loadSfx("assets/sounds/player/step1.mp3")
+		step2 = loader.loadSfx("assets/sounds/player/step2.mp3")
+		step3 = loader.loadSfx("assets/sounds/player/step3.mp3")
+		step4 = loader.loadSfx("assets/sounds/player/step4.mp3")        
+		self.footsteps = [step1,step2,step3,step4]
+		
+		self.screams = loader.loadSfx("assets/sounds/player/scream_low1.mp3")
+		self.breathing = loader.loadSfx("assets/sounds/player/breathing.mp3")
+		self.breath_vol = 1.07
 		
 		self.updateState(RESTFUL)
 
@@ -52,26 +75,32 @@ class Player(SceneObj):
 		#BUG: Shadows are cast with a positive offset on the z-axis
 		base.cam.setPos(Vec3(0,0,25))
 
-		self.accept("w-up", self.setKeys, [0, STOPPED])
-		self.accept("s-up", self.setKeys, [1, STOPPED])
-		self.accept("a-up", self.setKeys, [2, STOPPED])
-		self.accept("d-up", self.setKeys, [3, STOPPED])
-		self.accept("shift-w-up", self.setKeys, [0, STOPPED])
-		self.accept("shift-s-up", self.setKeys, [1, STOPPED])
-		self.accept("shift-a-up", self.setKeys, [2, STOPPED])
-		self.accept("shift-d-up", self.setKeys, [3, STOPPED])
-		self.accept("w", self.setKeys, [0, WALKING])
-		self.accept("s", self.setKeys, [1, WALKING])
-		self.accept("a", self.setKeys, [2, WALKING])
-		self.accept("d", self.setKeys, [3, WALKING])
-		self.accept("shift-w", self.setKeys, [0, RUNNING])
-		self.accept("shift-s", self.setKeys, [1, RUNNING])
-		self.accept("shift-a", self.setKeys, [2, RUNNING])
-		self.accept("shift-d", self.setKeys, [3, RUNNING])
+		self.accept("w-up", self.setKeys, [0, 0])
+		self.accept("w-up", self.setKeys, [0, 0])
+		self.accept("s-up", self.setKeys, [1, 0])
+		self.accept("a-up", self.setKeys, [2, 0])
+		self.accept("d-up", self.setKeys, [3, 0])
+		self.accept("w", self.setKeys, [0, 1])
+		self.accept("s", self.setKeys, [1, 1])
+		self.accept("a", self.setKeys, [2, 1])
+		self.accept("d", self.setKeys, [3, 1])
+		self.accept("shift-w", self.setKeys, [0, 1])
+		self.accept("shift-s", self.setKeys, [1, 1])
+		self.accept("shift-a", self.setKeys, [2, 1])
+		self.accept("shift-d", self.setKeys, [3, 1])
+		self.accept("shift-up", self.setSpeed, [WALKING])
+		self.accept("shift", self.setSpeed, [RUNNING])
 		#TODO: Must taks your breath, also
 		self.accept("space", self.jump)
+		self.accept("c", self.crouch, [CRAWLING])
+		self.accept("c-up", self.crouch, [NORMAL])
 
-		taskMgr.add(self.taskMove, "player/move")
+		taskMgr.add(self.taskUpdate, "player/update")
+		
+		self.breathing.setVolume(self.breath_vol - self.breath)
+		self.breathing.setPlayRate(0.6)
+		self.breathing.setLoop(True)
+		self.breathing.play()
 
 	def isTired(self):
 		return self.state == TIRED
@@ -98,13 +127,14 @@ class Player(SceneObj):
 				 
 	def setKeys(self, btn, value):
 		self.keys[btn] = value
-		self.validateMovement()
+		#self.validateMovement()
+		
+	def setSpeed(self, value):
+		self.speed = value
 				
-	def taskMove(self, task):
+	def taskUpdate(self, task):
 		player = self.getNodePath()
 		self.focus = player.getPos()
-		#TODO: Bad code! Make the flashlight a child of the player
-		#flashlight = render.find("Spot")
 
 		elapsed = task.time - self.last
 		self.last = task.time
@@ -112,34 +142,45 @@ class Player(SceneObj):
 		if (self.keys[0]):
 				dir = player.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
 				dir.setZ(0)
-				self.focus = self.focus + dir * elapsed*40 * self.keys[0]
+				self.focus = self.focus + dir * elapsed*40 * self.speed * self.pace
 				player.setFluidPos(self.focus)
 		if (self.keys[1]):
 				dir = player.getMat().getRow3(1)
 				dir.setZ(0)
-				self.focus = self.focus - dir * elapsed*40 * self.keys[1]
+				self.focus = self.focus - dir * elapsed*40 * self.speed * self.pace
 				player.setFluidPos(self.focus)
 		if (self.keys[2]):
 				dir = player.getMat().getRow3(0)
 				dir.setZ(0)
-				self.focus = self.focus - dir * elapsed*20 * self.keys[2]
+				self.focus = self.focus - dir * elapsed*20 * self.speed * self.pace
 				player.setFluidPos(self.focus)
 		if (self.keys[3]):
 				dir = player.getMat().getRow3(0)
 				dir.setZ(0)
-				self.focus = self.focus + dir * elapsed*20 * self.keys[3]
+				self.focus = self.focus + dir * elapsed*20 * self.speed * self.pace
 				player.setFluidPos(self.focus)
 		
-		# positions the flashlight with the player 
-		#flashlight.setFluidPos(player.getPos())
-		#flashlight.setZ(flashlight.getZ() + 4)
-		#flashlight.setHpr( player.getHpr())
+		#Step sound
+		if (any(self.keys)):
+			self.stopped = 0
+			if (self.getFloorHandler().isOnGround() and \
+				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
+				
+				self.actualstep += 1
+				self.footsteps[self.actualstep%4].setPlayRate(self.step_vel * self.speed * self.pace)
+				self.footsteps[self.actualstep%4].play()
+		else:
+			self.stopped = 1
 
 		oldbreath   = self.breath
 		deltabreath = self.breathrate * elapsed
 		deltafear   = self.fearrate   * elapsed
-		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
+		self.fear   = min(1.0, max(   0.00001, self.fear   + deltafear  ))
 		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
+		
+		#Breathing sound
+		self.breathing.setVolume(max(self.breath_vol-1,self.breath_vol - self.breath))
+		self.breathing.setPlayRate(min(1.0,0.6 * (1/self.breath)))
 
 		if self.isAlive():
 
@@ -158,6 +199,19 @@ class Player(SceneObj):
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
 			return task.done
 	
+	#TODO: The Jump effect is very lousy
 	def jump(self):
 		if self.getFloorHandler().isOnGround(): 
 			self.getFloorHandler().addVelocity(25)
+
+	#TODO: Model must also be adjusted to get shorter / taller
+	def crouch(self, pace):
+		if self.getFloorHandler().isOnGround():
+			self.pace = pace
+			if pace == NORMAL:
+				LerpPosInterval(base.cam, 0.2, (0,0,25)).start()
+			else:
+				LerpPosInterval(base.cam, 0.2, (0,0,10)).start()
+	
+	def scream(self):
+		self.screams.play()

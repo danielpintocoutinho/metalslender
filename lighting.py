@@ -6,18 +6,19 @@ from math import sin, pi
 spotlight1s = {}
 alight1 = None
 
-POWER_MIN  = 0.01
-POWER_RATE = -1/30.0
+POWER_MIN  = 0.03
+POWER_RATE = -1/120.0
 
 class Flashlight(DirectObject):
-	def __init__(self, name, source, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.01, far = 100):
+	def __init__(self, name, owner, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.01, far = 100):
 		self.color = color
 		self.power = 1.0
 		self.last  = 0.0
 		self.on    = True
+		self.owner = owner
 
-		self.node1 = render.attachNewNode(Spotlight(name + 'wide'))
-		self.node1.reparentTo(base.cam)
+		self.node1 = owner.modelNP.attachNewNode(Spotlight(name + 'wide'))
+		self.node1.reparentTo(owner.cam)
 		self.node1.setPos((5, 2, -5))
 		self.node1.setHpr((5,5,0))
 
