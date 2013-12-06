@@ -1,8 +1,10 @@
 from pandac.PandaModules import Vec3
 from panda3d.core import BitMask32
 
+from math import sin,pi
+from random import random
+
 from lighting import Flashlight
-from camera import CameraControls
 from scene_obj import SceneObj
 from hud import HUD
 
@@ -10,6 +12,11 @@ import collisionSystem
 
 from direct.showbase.DirectObject import DirectObject
 from direct.interval.LerpInterval import LerpPosInterval
+from direct.interval.LerpInterval import LerpHprInterval
+from direct.interval.IntervalGlobal import Sequence
+
+FLASH_FEAR_TIME = 0.1
+FLASH_FEAR_AMP  = 1.5
 
 RESTFUL=0
 TIRED=1
@@ -41,13 +48,27 @@ class Player(SceneObj):
 
 		self.cam = base.cam
 		self.breath  = 1.0
-		self.fear    = 0.0
+		self.fear    = 1.0
 		self.speed   = 1.0
 		self.stopped = 1.0
 		self.pace = NORMAL
 		self.flashlight = Flashlight('spot', self)
+		
+		self.flashinterval = LerpHprInterval(self.flashlight.node1, 0.2, (5, 5, 0))
+		self.flashinterval.start()
+# 		bangUp   = LerpHprInterval(self.flashlight.node1, 0.3, (5, 6.5, 0))
+# 		bangDown = LerpHprInterval(self.flashlight.node1, 0.3, (5, 3.5, 0))
+# 		self.flashwalksequence = Sequence(bangUp, bangDown)
+# 		self.flashwalksequence.loop()
+# 		self.flashwalksequence.pause()
+		
+# 		bangUp   = LerpHprInterval(self.flashlight.node1, 0.25, (5, 7.5, 0))
+# 		bangDown = LerpHprInterval(self.flashlight.node1, 0.25, (5, 2.5, 0))
+# 		self.flashwalksequence = Sequence(bangUp, bangDown)
+# 		self.flashwalksequence.loop()
+# 		self.flashwalksequence.pause()
 
-		self.fearrate   = -1.0 / 360
+		self.fearrate   = -1.0 / 30
 
 		self.last = 0
 		self.keys = [STOPPED] * 4
@@ -75,19 +96,19 @@ class Player(SceneObj):
 		#BUG: Shadows are cast with a positive offset on the z-axis
 		base.cam.setPos(Vec3(0,0,25))
 
-		self.accept("w-up", self.setKeys, [0, 0])
-		self.accept("w-up", self.setKeys, [0, 0])
-		self.accept("s-up", self.setKeys, [1, 0])
-		self.accept("a-up", self.setKeys, [2, 0])
-		self.accept("d-up", self.setKeys, [3, 0])
-		self.accept("w", self.setKeys, [0, 1])
-		self.accept("s", self.setKeys, [1, 1])
-		self.accept("a", self.setKeys, [2, 1])
-		self.accept("d", self.setKeys, [3, 1])
-		self.accept("shift-w", self.setKeys, [0, 1])
-		self.accept("shift-s", self.setKeys, [1, 1])
-		self.accept("shift-a", self.setKeys, [2, 1])
-		self.accept("shift-d", self.setKeys, [3, 1])
+		self.accept("W-up", self.setKeys, [0, 0, STOPPED])
+		self.accept("w-up", self.setKeys, [0, 0, STOPPED])
+		self.accept("s-up", self.setKeys, [1, 0, STOPPED])
+		self.accept("a-up", self.setKeys, [2, 0, STOPPED])
+		self.accept("d-up", self.setKeys, [3, 0, STOPPED])
+		self.accept("w", self.setKeys, [0, 1, WALKING])
+		self.accept("s", self.setKeys, [1, 1, WALKING])
+		self.accept("a", self.setKeys, [2, 1, WALKING])
+		self.accept("d", self.setKeys, [3, 1, WALKING])
+		self.accept("shift-w", self.setKeys, [0, 1, RUNNING])
+		self.accept("shift-s", self.setKeys, [1, 1, RUNNING])
+		self.accept("shift-a", self.setKeys, [2, 1, RUNNING])
+		self.accept("shift-d", self.setKeys, [3, 1, RUNNING])
 		self.accept("shift-up", self.setSpeed, [WALKING])
 		self.accept("shift", self.setSpeed, [RUNNING])
 		#TODO: Must taks your breath, also
@@ -125,8 +146,9 @@ class Player(SceneObj):
 		self.validateMovement()
 		self.breathrate = breathrates[(self.state, max(self.keys))]
 				 
-	def setKeys(self, btn, value):
+	def setKeys(self, btn, value, speed):
 		self.keys[btn] = value
+		self.speed = speed
 		#self.validateMovement()
 		
 	def setSpeed(self, value):
@@ -138,6 +160,23 @@ class Player(SceneObj):
 
 		elapsed = task.time - self.last
 		self.last = task.time
+		
+# 		base.camLens.setFov(90 + 35 * sin(2 * task.time * pi / 10))
+		if self.flashinterval.isStopped():
+			self.flashinterval.finish()
+			hprx = 5 * (1 + FLASH_FEAR_AMP * self.fear * random())
+			hpry = 5 * (1 + FLASH_FEAR_AMP * self.fear * random())
+			hpr = (hprx, hpry, 0)
+			self.flashinterval = LerpHprInterval(self.flashlight.node1, FLASH_FEAR_TIME, hpr)
+			self.flashinterval.start()
+			
+# 		if self.speed == WALKING or self.speed == RUNNING:
+# 			if not self.flashwalksequence.isPlaying():
+# 				self.flashwalksequence.resume()
+# 		elif self.speed == STOPPED:
+# 			if self.flashwalksequence.isPlaying():
+# 				self.flashwalksequence.pause()
+# 		self.flashlight.setHpr((5 * (1 + self.fear * random()), 5 * (1 + self.fear * random()), 0))
 
 		if (self.keys[0]):
 				dir = player.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,

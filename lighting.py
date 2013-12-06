@@ -54,3 +54,6 @@ class Flashlight(DirectObject):
 		self.light1.setAttenuation((0.5, 0.001, 0.0001 / self.power))
 
 		return task.cont
+	
+	def setHpr(self, vec):
+		self.node1.setHpr(vec)

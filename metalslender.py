@@ -37,9 +37,9 @@ class MetalSlender(ShowBase):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "temp/stairs", self.render)	
+		self.room = scene_obj.SceneObj("room", "temp/stairs", self.render, scale=3.0)	
 # 		self.room.setTerrainCollision("**/ExtWalls","**/Floor", WALL_MASK,FLOOR_MASK)
-		self.room.setTerrainCollision("**/ExtWalls","**/Ramp", WALL_MASK,FLOOR_MASK)
+		self.room.setTerrainCollision("**/ExtWalls","**/Ramp.*", WALL_MASK,FLOOR_MASK)
 		
 		self.player  = Player("player", '', self.render)
 		self.camctrl = CameraControls(self.player)
@@ -81,7 +81,6 @@ class MetalSlender(ShowBase):
 		
 	#TODO: Verify if video features are supported
 	def initMessages(self):
-		pass
 # 		self.inst_m = menu.addInstructions(0.95 , '[WASD]: walk')
 # 		self.inst_h = menu.addInstructions(0.90 , 'SPACE: jump')
 # 		self.inst_h = menu.addInstructions(0.85 , 'SHIFT+[WASD]: run' )

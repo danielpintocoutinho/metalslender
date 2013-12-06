@@ -64,7 +64,7 @@ class SceneObj(DirectObject):
 		
 	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
 		self.floorcollider = self.model.find(floorPath)
-		self.wallcollider  = self.model.find(wallPath)
+# 		self.wallcollider  = self.model.find(wallPath)
 # 		if not self.floorcollider.is_empty:
 		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.floorcollider.node().setIntoCollideMask(floorMask)
