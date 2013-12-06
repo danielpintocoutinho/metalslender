@@ -17,7 +17,6 @@ from panda3d.ai import *
 import math
 import time
 
-import snipstuff
 
 
 FLOOR_MASK=BitMask32.bit(1)
@@ -82,14 +81,13 @@ class Hooded(AICharacter):
     #to update the AIWorld    
     def update(self):
         captured = self.sent_detect()
-
         if (captured):
             if (self.currentStatus != 1):
                 self.currentStatus = 1
                 self.getAiBehaviors().pauseAi("all")
             self.lostTarget = False
             self.resetTimer()
-            print "To vendo"
+            #print "To vendo"
         elif (self.currentStatus == 1 and self.lostTarget == False and self.goingBack == False):
             self.startTimer(1.5)
             hasFinished = self.timer()
@@ -98,11 +96,11 @@ class Hooded(AICharacter):
                 self.getAiBehaviors().pauseAi("all")
                 #self.currentStatus = 4
                 self.pursueTarget = self.TargetPos
-                print "perdi mesmo? "
+                #print "perdi mesmo? "
             else:
                 self.lostTarget = False
-                print "perdi, mas to procurando"
-        print "status: ", self.currentStatus
+                #print "perdi, mas to procurando"
+        #print "status: ", self.currentStatus
         if self.currentStatus == 0:
             self.patrol()
         elif self.currentStatus == 1:
@@ -115,7 +113,7 @@ class Hooded(AICharacter):
     def patrol(self):
         distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
         self.goingBack = False
-        print "distance: ", distance
+        #print "distance: ", distance
         if (distance < 1.0):
             self.startTimer(3)
             self.getAiBehaviors().pauseAi("all")
@@ -135,15 +133,16 @@ class Hooded(AICharacter):
                 self.getAiBehaviors().resumeAi("seek")
 
     def pathfind(self):
-        print self.getAiBehaviors().behaviorStatus("pathfollow")
+        #print self.getAiBehaviors().behaviorStatus("pathfollow")
         if (not self.getAiBehaviors().behaviorStatus("pathfollow") in ["active", "done"]):
             self.getAiBehaviors().initPathFind("models/navmesh.csv")
-            print "to entrando aqui", self.lostTarget
+            #print "to entrando aqui", self.lostTarget
             self.getAiBehaviors().pauseAi("all")
-            print "vai coisar aqui de novo"
+            #print "vai coisar aqui de novo"
             self.getAiBehaviors().pathFindTo(self.pursueTarget)
-            print "mas aqui nao"
+            #print "mas aqui nao"
             if (isinstance(self.pursueTarget, NodePath)):
+                print "aqui?"
                 print self.pursueTarget.getPos(render)
             else:
                 print self.pursueTarget
@@ -162,7 +161,7 @@ class Hooded(AICharacter):
             #print "done"
 
         distance = self.distance(currentPos, self.TargetPos)
-        print distance
+        #print distance
 
         #if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
             
@@ -197,7 +196,7 @@ class Hooded(AICharacter):
 
 
     def wander(self):
-        print "wander - ", self.lostTarget
+        #print "wander - ", self.lostTarget
         if (self.getAiBehaviors().behaviorStatus("wander") != "active"):
             print "entrei aqui uma unica vez"
             self.getAiBehaviors().pauseAi("all")
@@ -221,7 +220,7 @@ class Hooded(AICharacter):
                 self.getAiBehaviors().pauseAi("all")
 
                 #self.getAiBehaviors().seek(self.PatrolPos[self.currentTarget])
-                print "vai voltar pro pathfinding ", self.currentStatus
+                #print "vai voltar pro pathfinding ", self.currentStatus
         
 
 

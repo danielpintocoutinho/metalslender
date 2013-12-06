@@ -4,7 +4,6 @@ from panda3d.core import BitMask32
 from camera import CameraControls
 from scene_obj import SceneObj
 from hud import HUD
-
 import collisionSystem
 
 from direct.showbase.DirectObject import DirectObject

@@ -20,7 +20,7 @@ class Lighting(DirectObject):
 	def getSpotlight(self, name):
 		return spotlights[name]
 	
-	def setAmbientlight(self, color = Vec4(0.03, 0.03, 0.03, 1)):
+	def setAmbientlight(self, color = Vec4(0.1, 0.1, 0.1, 1)):
 		alight = render.attachNewNode(AmbientLight("Ambient"))
-		alight.node().setColor(Vec4(0.01, 0.01, 0.01, 1))
+		alight.node().setColor(Vec4(0.1, 0.1, 0.1, 1))
 		render.setLight(alight)
