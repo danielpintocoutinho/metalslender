@@ -1,7 +1,6 @@
-from panda3d.core import *
+import panda3d
 import sys,os
 
-import direct.directbase.DirectStart
 from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
 from pandac.PandaModules import Vec3
 from direct.interval.IntervalGlobal import *
@@ -12,12 +11,12 @@ from random import *
 
 class SceneObj(DirectObject):
 
-	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source = render,actor=False):
+	def __init__(self, name, model, source, pos=Vec3(0,0,0), scale=1.0, actor=False):
 		self.modelNP = source.attachNewNode(name)
 		self.name = name
 		if (actor == False):
-			if (model_path):
-				self.model = loader.loadModel(model_path)
+			if (model):
+				self.model = loader.loadModel(model)
 				self.model.reparentTo(self.modelNP)
 				self.setModelPos(Vec3(0,0,0))
 				self.model.setScale(scale)
@@ -64,12 +63,15 @@ class SceneObj(DirectObject):
 		base.cTrav.addCollider(self.playerBody, handler)
 		
 	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
-		self.floorcollider=self.model.find(floorPath)
+		self.floorcollider = self.model.find(floorPath)
+		self.wallcollider  = self.model.find(wallPath)
+# 		if not self.floorcollider.is_empty:
 		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.floorcollider.node().setIntoCollideMask(floorMask)
-		self.wallcollider=self.model.find(wallPath)
-		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
-		self.wallcollider.node().setIntoCollideMask(wallMask)
+			
+# 		if not self.wallcollider.is_empty:
+# 		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
+# 		self.wallcollider.node().setIntoCollideMask(wallMask)
 		
 	def getFloorHandler(self):
 		return self.floorHandler

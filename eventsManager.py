@@ -20,9 +20,9 @@ class EventManager(DirectObject):
 		self.draw = 1
 		
 		self.point  = Vec3(0,20,-10)
-		self.point0 = scene_obj.SceneObj("point0","assets/models/sphere", self.point, 1)
-		self.point1 = scene_obj.SceneObj("point1","assets/models/sphere", Vec3(250,30,15), 1)
-		self.point2 = scene_obj.SceneObj("point2","assets/models/sphere", Vec3(100,25,10), 1)
+		self.point0 = scene_obj.SceneObj("point0","assets/models/sphere", render, self.point, 1)
+		self.point1 = scene_obj.SceneObj("point1","assets/models/sphere", render, Vec3(250,30,15), 1)
+		self.point2 = scene_obj.SceneObj("point2","assets/models/sphere", render, Vec3(100,25,10), 1)
 		
 		self.scared  = 0
 		self.vol     = 1

@@ -36,8 +36,8 @@ breathrates = {
 
 #TODO: Refactor things to improve SceneObj
 class Player(SceneObj):
-	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source=render,actor=False):
-		SceneObj.__init__(self, name, model_path, pos, scale, source, actor)
+	def __init__(self, name, model, source, pos=Vec3(0,0,0), scale=1.0, actor=False):
+		SceneObj.__init__(self, name, model, source, pos, scale, actor)
 
 		self.cam = base.cam
 		self.breath  = 1.0
