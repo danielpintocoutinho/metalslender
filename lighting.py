@@ -31,13 +31,13 @@ class Flashlight(DirectObject):
 		self.light1.setColor(color)
 		self.light1.setExponent(40)
 		self.light1.setLens(lens1)
-		self.light1.setAttenuation((0.5,0.001,0.0001))
+		#self.light1.setAttenuation((0.5,0.001,0.0001))
 
 		render.setLight(self.node1)
 
-		self.accept('l', self.toggle)
+		self.accept('f', self.toggle)
 
-		taskMgr.add(self.updatePower, 'flashlight1/update')
+		#taskMgr.add(self.updatePower, 'flashlight1/update')
 
 	def toggle(self):
 		self.on = not self.on

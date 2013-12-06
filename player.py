@@ -36,13 +36,16 @@ breathrates = {
 
 #TODO: Refactor things to improve SceneObj
 class Player(SceneObj):
-	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source=render,actor=False):
+	def __init__(self,actMng, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source=render,actor=False):
 		SceneObj.__init__(self, name, model_path, pos, scale, source, actor)
 
 		self.cam = base.cam
+		self.actMng = actMng
+		self.actMng.setPlayer(self)
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 1.0
+		self.height  = 35.0
 		self.stopped = 1.0
 		self.pace = NORMAL
 		self.flashlight = Flashlight('spot', self)
@@ -73,7 +76,7 @@ class Player(SceneObj):
 
 		base.cam.reparentTo(self.getNodePath())
 		#BUG: Shadows are cast with a positive offset on the z-axis
-		base.cam.setPos(Vec3(0,0,25))
+		base.cam.setPos(Vec3(0,0,self.height))
 
 		self.accept("w-up", self.setKeys, [0, 0])
 		self.accept("w-up", self.setKeys, [0, 0])
@@ -94,6 +97,8 @@ class Player(SceneObj):
 		self.accept("space", self.jump)
 		self.accept("c", self.crouch, [CRAWLING])
 		self.accept("c-up", self.crouch, [NORMAL])
+		
+		self.accept("e", self.action)
 
 		taskMgr.add(self.taskUpdate, "player/update")
 		
@@ -209,9 +214,13 @@ class Player(SceneObj):
 		if self.getFloorHandler().isOnGround():
 			self.pace = pace
 			if pace == NORMAL:
-				LerpPosInterval(base.cam, 0.2, (0,0,25)).start()
+				LerpPosInterval(base.cam, 0.2, (0,0,self.height)).start()
 			else:
 				LerpPosInterval(base.cam, 0.2, (0,0,10)).start()
 	
 	def scream(self):
 		self.screams.play()
+		
+	def action(self):
+		#base.door1.open()
+		self.actMng.act()

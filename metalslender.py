@@ -8,7 +8,9 @@ from direct.showbase.DirectObject import DirectObject
 from hud import HUD
 from player import Player
 from camera import CameraControls
+from door import Door
 from eventsManager import EventManager
+from actionsManager import ActionManager
 
 #TODO: Review these files
 import scene_obj
@@ -36,14 +38,17 @@ class MetalSlender(DirectObject):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "lcg12")	
-		self.room.setTerrainCollision("**/ExtWalls","**/Floor", WALL_MASK,FLOOR_MASK)
+		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg13")	
+		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
+		self.blocoh = scene_obj.SceneObj("blocoh", "assets/chicken/blocoh")
+		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
 		
-		self.player  = Player(name = "player", pos = Vec3(-30,45,126))
+		self.actions = ActionManager(self.room.getNodePath())
+		self.player  = Player(actMng = self.actions, name = "player", pos = Vec3(90,90,12))
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 		
-		EventManager(self.player).start()
+		EventManager(self.player, self.actions).start()
 		
 		# User controls
 		self.addCommands()
@@ -58,7 +63,7 @@ class MetalSlender(DirectObject):
 	
 		base.setBackgroundColor(0,0,0.2,1)
 	
-		base.camLens.setNearFar(0.001,1000)
+		#base.camLens.setNearFar(0.001,1000)
 		base.camLens.setFov(75)
 
 		base.disableMouse()
