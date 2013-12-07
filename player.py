@@ -102,6 +102,7 @@ class Player(SceneObj):
 	def taskMove(self, task):
 		player = self.getNodePath()
 		self.focus = player.getPos()
+		#print player.getPos()
 		#TODO: Bad code! Make the flashlight a child of the player
 		#flashlight = render.find("Spot")
 

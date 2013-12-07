@@ -70,7 +70,7 @@ class Hooded(AICharacter):
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
         self.increment = 1
-        self.getAiBehaviors().seek(self.PatrolPos[0])
+        #self.getAiBehaviors().seek(self.PatrolPos[0])
       
 
     def distance(self, p1, p2):
@@ -80,6 +80,7 @@ class Hooded(AICharacter):
         
     #to update the AIWorld    
     def update(self):
+        self.currentStatus = 5
         captured = self.sent_detect()
         if (captured):
             if (self.currentStatus != 1):
@@ -113,7 +114,7 @@ class Hooded(AICharacter):
     def patrol(self):
         distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
         self.goingBack = False
-        #print "distance: ", distance
+        print "distance: ", distance
         if (distance < 1.0):
             self.startTimer(3)
             self.getAiBehaviors().pauseAi("all")
@@ -154,7 +155,7 @@ class Hooded(AICharacter):
             self.TargetPos = self.pursueTarget.getPos(render)
         else:
             self.TargetPos = self.pursueTarget
-        print currentPos, self.TargetPos
+        #print currentPos, self.TargetPos
         #print self.TargetPos
 
         #if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
@@ -249,9 +250,11 @@ class Hooded(AICharacter):
 
     #** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
     def sent_detect(self):
-        intruders=base.render.findAllMatches("**/ralph*")
+        intruders=base.render.findAllMatches("**/coelho*")
+        print "numero de intruders: ", len(intruders)
         for o in intruders:
         # query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
+            print o.getPos(render)
             if self.slnp.node().isInView(o.getPos(self.slnp)):
                 self.get_node_path().lookAt(o)
                 if self.sent_traverse(o):

@@ -25,6 +25,10 @@ lights = lighting.Lighting()
 floorHandler = collisionSystem.floorHandler
 wallHandler = collisionSystem.wallHandler
 
+wp = WindowProperties()
+wp.setSize(1280, 1024)
+base.win.requestProperties(wp)
+
 #** Collision masks
 FLOOR_MASK=collisionSystem.FLOOR_MASK
 WALL_MASK=collisionSystem.WALL_MASK
@@ -39,10 +43,10 @@ class MetalSlender(DirectObject):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "lcg12")	
-		self.room.setTerrainCollision("**/ExtWalls","**/Floor", WALL_MASK,FLOOR_MASK)
+		self.room = scene_obj.SceneObj("room", "lcg13")	
+		self.room.setTerrainCollision("**/LCG_walls_ext","**/LCG_floor", WALL_MASK,FLOOR_MASK)
 
-		self.player  = Player(name = "player", model_path = "models/ralph", pos = Vec3(-30,45,126), scale = 3)
+		self.player  = Player(name = "player", model_path = "models/coelho", pos = Vec3(268.953, -6.29758, -14.0991), scale = 3)
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 
@@ -52,10 +56,18 @@ class MetalSlender(DirectObject):
 		self.target1.setPos(-76.1808, -52.1483, -14.4758)
 		self.target1.setScale(5)
 		self.target1.reparentTo(render)
+
+
+		self.target1 = loader.loadModel("models/arrow")
+		self.target1.setColor(1,0,0)
+		self.target1.setPos(23.3466,  30.4134, -14.4758)
+		self.target1.setScale(5)
+		self.target1.reparentTo(render)
+
 		# Target2
 		self.target2 = loader.loadModel("models/arrow")
 		self.target2.setColor(0,1,0)
-		self.target2.setPos(-40,50,-15)
+		self.target2.setPos(23.3466, -85.0269, -14.4758)
 		self.target2.setScale(5)
 		self.target2.reparentTo(render)
 
@@ -86,7 +98,7 @@ class MetalSlender(DirectObject):
 	
 		base.setBackgroundColor(0,0,0.2,1)
 	
-		base.camLens.setNearFar(0.001,1000)
+		#base.camLens.setNearFar(0.001,1000)
 		base.camLens.setFov(75)
 
 		base.disableMouse()
