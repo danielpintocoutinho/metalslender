@@ -7,8 +7,8 @@ from direct.showbase.DirectObject import DirectObject
 from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
 
 floorHandler = CollisionHandlerGravity()
-floorHandler.setGravity(9.81+50)
-floorHandler.setMaxVelocity(100)
+floorHandler.setGravity(9.81+26)
+# floorHandler.setMaxVelocity(100)
 
 wallHandler = CollisionHandlerPusher()
 

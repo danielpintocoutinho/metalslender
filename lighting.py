@@ -9,6 +9,7 @@ alight1 = None
 POWER_MIN  = 0.03
 POWER_RATE = -1/120.0
 
+#TODO: Think about it: should all task management be setup in MetalSlender class?
 class Flashlight(DirectObject):
 	def __init__(self, name, owner, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.01, far = 100):
 		self.color = color
@@ -34,9 +35,6 @@ class Flashlight(DirectObject):
 		self.light1.setAttenuation((0.5,0.001,0.0001))
 
 		render.setLight(self.node1)
-
-		self.accept('l', self.toggle)
-
 		taskMgr.add(self.updatePower, 'flashlight1/update')
 
 	def toggle(self):

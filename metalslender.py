@@ -8,6 +8,7 @@ from hud import HUD
 from player import Player
 from camera import CameraControls
 from eventsManager import EventManager
+from controls import PlayerControls
 
 #TODO: Review these files
 import scene_obj
@@ -37,13 +38,16 @@ class MetalSlender(ShowBase):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "temp/stairs", self.render, scale=3.0)	
-# 		self.room.setTerrainCollision("**/ExtWalls","**/Floor", WALL_MASK,FLOOR_MASK)
-		self.room.setTerrainCollision("**/ExtWalls","**/Ramp.*", WALL_MASK,FLOOR_MASK)
+		self.room = scene_obj.SceneObj("room", "lcg12", self.render)	
+		self.room.setTerrainCollision("**/ExtWalls*","**/Floor*", WALL_MASK,FLOOR_MASK)
 		
-		self.player  = Player("player", '', self.render)
+		#TODO: Separate plyaer controls
+		self.player  = Player('player', '', self.render)
+		self.controls = PlayerControls(self.player)
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
+		
+		self.taskMgr.add(self.player.updateAll, "player/update")
 		
 		EventManager(self.player).start()
 		
@@ -73,7 +77,7 @@ class MetalSlender(ShowBase):
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
-		self.accept('f', self.actionKeys, ['f'])
+		self.accept('i', self.actionKeys, ['i'])
 
 	def actionKeys(self, key):
 		if key == 'i':

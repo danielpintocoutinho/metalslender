@@ -27,8 +27,8 @@ class SceneObj(DirectObject):
 		self.modelCollider = None
 		self.modelRay = None
 		self.floorHandler = CollisionHandlerGravity()
-		self.floorHandler.setGravity(9.81+25)
-		self.floorHandler.setMaxVelocity(100)
+		self.floorHandler.setGravity(9.81+55)
+# 		self.floorHandler.setMaxVelocity(100)
 		#BUG: The player cannot walk through a wall, but he may run through it!
 		self.wallHandler = CollisionHandlerPusher()
 	
@@ -64,14 +64,14 @@ class SceneObj(DirectObject):
 		
 	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
 		self.floorcollider = self.model.find(floorPath)
-# 		self.wallcollider  = self.model.find(wallPath)
+		self.wallcollider  = self.model.find(wallPath)
 # 		if not self.floorcollider.is_empty:
 		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.floorcollider.node().setIntoCollideMask(floorMask)
 			
 # 		if not self.wallcollider.is_empty:
-# 		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
-# 		self.wallcollider.node().setIntoCollideMask(wallMask)
+		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
+		self.wallcollider.node().setIntoCollideMask(wallMask)
 		
 	def getFloorHandler(self):
 		return self.floorHandler
