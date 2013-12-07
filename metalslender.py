@@ -18,6 +18,7 @@ import interface
 import lighting
 import collisionSystem
 from panda3d.ai import *
+import snipstuff
 
 menu = interface.Interface()
 lights = lighting.Lighting()
@@ -33,12 +34,14 @@ base.win.requestProperties(wp)
 FLOOR_MASK=collisionSystem.FLOOR_MASK
 WALL_MASK=collisionSystem.WALL_MASK
 
+splash=snipstuff.splashCard()
+
 class MetalSlender(DirectObject):
 		
 	def __init__(self):
 		# Preliminary capabilities check.
-		if not self.initMessages(): 
-			return
+		#if not self.initMessages(): 
+		#	return
 
 		self.initConfig()
 
@@ -70,6 +73,11 @@ class MetalSlender(DirectObject):
 		self.target2.setPos(23.3466, -85.0269, -14.4758)
 		self.target2.setScale(5)
 		self.target2.reparentTo(render)
+
+		self.banana = loader.loadModel("models/banana")
+		self.banana.setScale(20)
+		self.banana.setPos(23.3466, -85.0269, -14.4758)
+		self.banana.reparentTo(render)
 
 		#self.target1.hide()
 		#self.target2.hide()
@@ -117,11 +125,11 @@ class MetalSlender(DirectObject):
 			self.player.fear = min(self.player.fear + 0.1, 1.0)
 		
 	#TODO: Verify if video features are supported
-	def initMessages(self):
-		self.inst_m = menu.addInstructions(0.95 , '[WASD]: walk')
-		self.inst_h = menu.addInstructions(0.90 , 'SPACE: jump')
-		self.inst_h = menu.addInstructions(0.85 , 'SHIFT+[WASD]: run' )
-		self.inst_h = menu.addInstructions(0.80 , 'F: increase fear' )
+	#def initMessages(self):
+	#	self.inst_m = menu.addInstructions(0.95 , '[WASD]: walk')
+	#	self.inst_h = menu.addInstructions(0.90 , 'SPACE: jump')
+	#	self.inst_h = menu.addInstructions(0.85 , 'SHIFT+[WASD]: run' )
+	#	self.inst_h = menu.addInstructions(0.80 , 'F: increase fear' )
 
 		return True
 
@@ -130,6 +138,6 @@ class MetalSlender(DirectObject):
 		self.AIworld.update()            
 		return task.cont
 
-
+splash.destroy()
 MetalSlender()
 run()
