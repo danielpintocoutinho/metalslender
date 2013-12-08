@@ -18,7 +18,7 @@ import interface
 import lighting
 import collisionSystem
 from panda3d.ai import *
-import snipstuff
+from MainMenu import MainMenu
 
 menu = interface.Interface()
 lights = lighting.Lighting()
@@ -26,15 +26,19 @@ lights = lighting.Lighting()
 floorHandler = collisionSystem.floorHandler
 wallHandler = collisionSystem.wallHandler
 
+
 wp = WindowProperties()
-wp.setSize(1280, 1024)
+wp.setFullscreen(1)
+wp.setSize(1920, 1080)
+base.openMainWindow()
 base.win.requestProperties(wp)
+base.graphicsEngine.openWindows()
+
 
 #** Collision masks
 FLOOR_MASK=collisionSystem.FLOOR_MASK
 WALL_MASK=collisionSystem.WALL_MASK
 
-splash=snipstuff.splashCard()
 
 class MetalSlender(DirectObject):
 		
@@ -90,6 +94,10 @@ class MetalSlender(DirectObject):
 		self.AIworld.addAiChar(self.enemy.getHooded())
 
 
+		self.mainMenu = MainMenu(self)
+		#self.mainMenu.hide()
+
+
 		taskMgr.add(self.AIUpdate,"AIUpdate")
 
 		# User controls
@@ -101,6 +109,7 @@ class MetalSlender(DirectObject):
 
 		render.setShaderAuto()
 
+
 	def initConfig(self):
 		base.cTrav = CollisionTraverser()
 	
@@ -111,10 +120,12 @@ class MetalSlender(DirectObject):
 
 		base.disableMouse()
 
-		props = WindowProperties()
-		props.setCursorHidden(True)
+		self.props = WindowProperties()
+		self.props.setCursorHidden(False)
+		wp.setMouseMode(self.props.M_absolute)
 
-		base.win.requestProperties(props)
+		base.win.requestProperties(self.props)
+
 		
 	def addCommands(self):
 		self.accept('escape', sys.exit)
@@ -138,6 +149,17 @@ class MetalSlender(DirectObject):
 		self.AIworld.update()            
 		return task.cont
 
-splash.destroy()
+	def exit(self):
+		self.mainMenu.__del__()
+		exit()
+
+	def newGame(self):
+		self.camctrl.setMouseMovement(True)
+		self.hud.showHud(True)
+		self.props.setCursorHidden(True)
+		base.win.requestProperties(self.props)
+		self.mainMenu.hide()
+
+
 MetalSlender()
 run()

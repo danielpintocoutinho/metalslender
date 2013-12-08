@@ -250,7 +250,7 @@ class Hooded(AICharacter):
 
     #** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
     def sent_detect(self):
-        intruders=base.render.findAllMatches("**/coelho*")
+        intruders=base.render.findAllMatches("**/ralph*")
         print "numero de intruders: ", len(intruders)
         for o in intruders:
         # query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
