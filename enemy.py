@@ -14,7 +14,6 @@ class Enemy:
 		self.hooded.initialize()
 		self.hooded.setPatrolPos(patrolPos)
 
-
 	def getHooded(self):
 		return self.hooded
 

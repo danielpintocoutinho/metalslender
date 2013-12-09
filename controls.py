@@ -3,8 +3,9 @@ from player import WALKING, STOPPED, RUNNING, CRAWLING, NORMAL
 
 class PlayerControls(DirectObject):
 	#TODO: Player controls may be customized via an options screen or startup file
-	def __init__(self, player):
+	def __init__(self, player, actMng):
 		self.player = player
+		self.actMng = actMng
 		
 		self.accept("w-up", self.player.setSpeed, [STOPPED, 0, False])
 		self.accept("s-up", self.player.setSpeed, [STOPPED, 1, False])
@@ -29,5 +30,5 @@ class PlayerControls(DirectObject):
 		
 		self.accept("c"    , self.player.crouch, [CRAWLING])
 		self.accept("c-up" , self.player.crouch, [NORMAL  ])
-		self.accept("e", self.player.action)
 		self.accept('f', self.player.flashlight.toggle)
+		self.accept("e", self.actMng.act)

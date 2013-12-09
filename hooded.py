@@ -1,20 +1,11 @@
-# PANDAI BASIC TUTORIAL
-# Author: Srinavin Nair
-
-#for most bus3d stuff
 from pandac.PandaModules import *
-#for directx object support
 from direct.showbase.DirectObject import DirectObject
-#for tasks
 from direct.task import Task
-#for Actors
 from direct.actor.Actor import Actor
-#for Pandai
 from panda3d.ai import *
 
 import math
 import time
-
 
 FLOOR_MASK=BitMask32.bit(1)
 WALL_MASK=BitMask32.bit(2)
@@ -62,18 +53,15 @@ class Hooded(AICharacter):
 
 
     def setPatrolPos(self, PatrolPos):
-        
         self.currentTarget = 0
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
         self.increment = 1
         #self.getAiBehaviors().seek(self.PatrolPos[0])
-      
 
     def distance(self, p1, p2):
         d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
         return math.sqrt(d)
-
         
     #to update the AIWorld    
     def update(self):

@@ -9,7 +9,8 @@ class HUD(DirectObject):
 	#TODO: Preload all images
 	#TODO: Find out how many sprites are available
 	#TODO: Parameters to againrol screen resolution?
-	def __init__(self,player):
+	def __init__(self, base, player):
+		self.base   = base
 		self.player = player
 
 		self.heartmax = 160
@@ -19,11 +20,10 @@ class HUD(DirectObject):
 		self.last = 0
 		self.heartbasis = 'assets/images/heartbeat2-%d.png'
 		self.heartframe = 0
-		self.show = False
 		self.heartimage = OnscreenImage(self.heartbasis % (1,), scale=(0.1,1,0.1), pos=(0,1,-0.8))
 		self.text = OnscreenText('', pos=(0, -0.975), scale=0.05, fg=(0,1,0,1),	bg=(0,0,0,1))
 
-		taskMgr.add(self.update, 'hud')
+		self.base.taskMgr.add(self.update, 'hud')
 
 	def update(self, task):
 		if self.player.isAlive():
@@ -32,7 +32,6 @@ class HUD(DirectObject):
 
 			# After a certain point, it should be cleared
 			# Fear must also increase heartbeat
-
 			f, b = self.player.fear, self.player.breath
 			bpm = 80 + 200 * (0.75 + 0.25 * f) * (1 - b) + 40 * f
 
@@ -41,8 +40,6 @@ class HUD(DirectObject):
 			self.heartframe = int(8 * self.heartaccum / 60) % 8
 			self.heartimage.setImage(self.heartbasis % (self.heartframe + 1,))
 			self.heartimage.setTransparency(TransparencyAttrib.MAlpha)
-
-			
 
 			#TODO: Update parameters
 			heartampl = self.heartmax - self.heartmin
@@ -60,14 +57,7 @@ class HUD(DirectObject):
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
 			#return task.done
 
-		if (self.show):
-			self.heartimage.show()
-			self.text.show()
-		else:
-			self.heartimage.hide()
-			self.text.hide()
+		self.heartimage.show()
+		self.text.show()
 
 		return task.cont
-
-	def showHud(self, show):
-		self.show = show

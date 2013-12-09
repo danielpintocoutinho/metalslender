@@ -28,6 +28,9 @@ RUNNING=2.0
 NORMAL   = 1.0
 CRAWLING = 0.5
 
+PLAYER_HEIGHT = 35.0
+PLAYER_CROUCHED_HEIGHT = 10.0
+
 breathrates = {
 	(RESTFUL  , STOPPED) :  1.0 /  60,
 	(RESTFUL  , WALKING) :  1.0 /  80,
@@ -42,22 +45,20 @@ breathrates = {
 
 FEAR_RATE = -1.0 / 30
 
-#TODO: Names that come from Showbase: taskMgr, loader 
-
 #TODO: Refactor things to improve SceneObj
 class Player(SceneObj):
 
-	def __init__(self, name, parent, actMng, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObj.__init__(self, name, model, parent, pos, scale, False)
+	def __init__(self, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
+		SceneObj.__init__(self, name, model, scene, pos, scale, False)
 
-		self.actMng = actMng
-		self.actMng.setPlayer(self)
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
-		self.height  = 35.0
 		self.stopped = 1.0
 		self.pace = NORMAL
+		
+		#TODO: Should be moved to SceneObj
+		self.scene = scene
 		
 		self.setupCamera()
 		self.setupFlashlight()
@@ -70,18 +71,18 @@ class Player(SceneObj):
 		
 	#TODO: Move this to flashlight class?
 	def setupFlashlight(self):
-		self.flashlight = Flashlight('spot', self)
+		self.flashlight = Flashlight('spot', self, self.scene)
 		
-		self.flashfearbang = LerpHprInterval(self.flashlight.node1, 0.2, (5, 5, 0), bakeInStart=False)
+		self.flashfearbang = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
 
-		bangUp   = LerpHprInterval(self.flashlight.node1, 0.3, (5, 6.5, 0), bakeInStart=False)
-		bangDown = LerpHprInterval(self.flashlight.node1, 0.3, (5, 3.5, 0), bakeInStart=False)
+		bangUp   = LerpHprInterval(self.flashlight.nodepath, 0.3, (5, 6.5, 0), bakeInStart=False)
+		bangDown = LerpHprInterval(self.flashlight.nodepath, 0.3, (5, 3.5, 0), bakeInStart=False)
 		self.flashwalkbang = Sequence(bangUp, bangDown)
 		self.flashwalkbang.loop()
 		self.flashwalkbang.pause()
 		
-		bangUp   = LerpHprInterval(self.flashlight.node1, 0.25, (5, 7.5, 0), bakeInStart=False)
-		bangDown = LerpHprInterval(self.flashlight.node1, 0.25, (5, 2.5, 0), bakeInStart=False)
+		bangUp   = LerpHprInterval(self.flashlight.nodepath, 0.25, (5, 7.5, 0), bakeInStart=False)
+		bangDown = LerpHprInterval(self.flashlight.nodepath, 0.25, (5, 2.5, 0), bakeInStart=False)
 		self.flashrunbang = Sequence(bangUp, bangDown)
 		self.flashrunbang.loop()
 		self.flashrunbang.pause()
@@ -93,7 +94,7 @@ class Player(SceneObj):
 	def setupCamera(self):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
-		self.cam.setPos(Vec3(0,0,25))
+		self.cam.setPos(Vec3(0,0,PLAYER_HEIGHT))
 		
 	def setupCollistion(self):
 		self.setObjCollision()
@@ -212,14 +213,16 @@ class Player(SceneObj):
 		
 		#Breathing sound
 		self.breathing.setVolume(max(self.breath_vol-1,self.breath_vol - self.breath))
-		self.breathing.setPlayRate(min(1.0,0.6 * (1/self.breath)))
+		self.breathing.setPlayRate(min(1.0, 0.6 * (1/self.breath)))
 		
 	def updateBreath(self, elapsed):
 		oldbreath   = self.breath
+		
 		deltabreath = self.breathrate * elapsed
-		deltafear   = FEAR_RATE   * elapsed
-		self.fear   = min(1.0, max(   0.00001, self.fear   + deltafear  ))
+		deltafear   = FEAR_RATE       * elapsed
+
 		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
+		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
 				
 	def updateAll(self, task):
 		elapsed = task.time - self.last
@@ -257,13 +260,9 @@ class Player(SceneObj):
 		if self.getFloorHandler().isOnGround():
 			self.pace = pace
 			if pace == NORMAL:
-				LerpPosInterval(base.cam, 0.2, (0,0,self.height)).start()
+				LerpPosInterval(base.cam, 0.2, (0,0,PLAYER_HEIGHT)).start()
 			else:
-				LerpPosInterval(base.cam, 0.2, (0,0,10)).start()
+				LerpPosInterval(base.cam, 0.2, (0,0,PLAYER_CROUCHED_HEIGHT)).start()
 	
 	def scream(self):
 		self.screams.play()
-		
-	def action(self):
-		#base.door1.open()
-		self.actMng.act()
