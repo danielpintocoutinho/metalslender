@@ -53,32 +53,32 @@ class MetalSlender(DirectObject):
 		self.room = scene_obj.SceneObj("room", "lcg13")	
 		self.room.setTerrainCollision("**/LCG_walls_ext","**/LCG_floor", WALL_MASK,FLOOR_MASK)
 
-		self.player  = Player(name = "player", model_path = "models/coelho", pos = Vec3(268.953, -6.29758, -14.0991), scale = 3)
+		self.player  = Player(name = "player", model_path = "assets/chicken/coelho", pos = Vec3(268.953, -6.29758, -14.0991), scale = 3)
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 
 
-		self.target1 = loader.loadModel("models/arrow")
+		self.target1 = loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
 		self.target1.setPos(-76.1808, -52.1483, -14.4758)
 		self.target1.setScale(5)
 		self.target1.reparentTo(render)
 
 
-		self.target1 = loader.loadModel("models/arrow")
+		self.target1 = loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
 		self.target1.setPos(23.3466,  30.4134, -14.4758)
 		self.target1.setScale(5)
 		self.target1.reparentTo(render)
 
 		# Target2
-		self.target2 = loader.loadModel("models/arrow")
+		self.target2 = loader.loadModel("assets/chicken/arrow")
 		self.target2.setColor(0,1,0)
 		self.target2.setPos(23.3466, -85.0269, -14.4758)
 		self.target2.setScale(5)
 		self.target2.reparentTo(render)
 
-		self.banana = loader.loadModel("models/banana")
+		self.banana = loader.loadModel("assets/chicken/banana")
 		self.banana.setScale(20)
 		self.banana.setPos(23.3466, -85.0269, -14.4758)
 		self.banana.reparentTo(render)

@@ -61,7 +61,7 @@ class Hooded(AICharacter):
         # we add the ray to the sentinel collider and now it is ready to go
         base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
         
-        self.screechsound = loader.loadSfx("sounds/anazgul_scream.mp3")
+        self.screechsound = loader.loadSfx("assets/sounds/enemies/nazgul_scream.mp3")
 
 
     def setPatrolPos(self, PatrolPos):
@@ -136,7 +136,7 @@ class Hooded(AICharacter):
     def pathfind(self):
         #print self.getAiBehaviors().behaviorStatus("pathfollow")
         if (not self.getAiBehaviors().behaviorStatus("pathfollow") in ["active", "done"]):
-            self.getAiBehaviors().initPathFind("models/navmesh.csv")
+            self.getAiBehaviors().initPathFind("assets/navmesh.csv")
             #print "to entrando aqui", self.lostTarget
             self.getAiBehaviors().pauseAi("all")
             #print "vai coisar aqui de novo"
