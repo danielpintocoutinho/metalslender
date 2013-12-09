@@ -47,13 +47,16 @@ FEAR_RATE = -1.0 / 30
 
 #TODO: Refactor things to improve SceneObj
 class Player(SceneObj):
-	def __init__(self, name, model, source, pos=Vec3(0,0,0), scale=1.0, actor=False):
-		SceneObj.__init__(self, name, model, source, pos, scale, actor)
 
-		self.breath   =  1.0
-		self.fear     =  1.0
-		
-		self.speed   = 1.0
+	def __init__(self, name, parent, actMng, model='', pos=Vec3(0,0,0), scale=1.0):
+		SceneObj.__init__(self, name, model, parent, pos, scale, False)
+
+		self.actMng = actMng
+		self.actMng.setPlayer(self)
+		self.breath  = 1.0
+		self.fear    = 0.0
+		self.speed   = 0.0
+		self.height  = 35.0
 		self.stopped = 1.0
 		self.pace = NORMAL
 		
@@ -90,8 +93,8 @@ class Player(SceneObj):
 	#TODO: Create my own camera and put it into base.cam
 	def setupCamera(self):
 		self.cam = base.cam
-		base.cam.reparentTo(self.getNodePath())
-		base.cam.setPos(Vec3(0,0,25))
+		self.cam.reparentTo(self.getNodePath())
+		self.cam.setPos(Vec3(0,0,25))
 		
 	def setupCollistion(self):
 		self.setObjCollision()
@@ -255,9 +258,13 @@ class Player(SceneObj):
 		if self.getFloorHandler().isOnGround():
 			self.pace = pace
 			if pace == NORMAL:
-				LerpPosInterval(base.cam, 0.2, (0,0,25)).start()
+				LerpPosInterval(base.cam, 0.2, (0,0,self.height)).start()
 			else:
 				LerpPosInterval(base.cam, 0.2, (0,0,10)).start()
 	
 	def scream(self):
 		self.screams.play()
+		
+	def action(self):
+		#base.door1.open()
+		self.actMng.act()

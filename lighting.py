@@ -1,5 +1,4 @@
 from panda3d.core import *
-from direct.showbase.DirectObject import DirectObject
 
 from math import sin, pi
 
@@ -10,7 +9,7 @@ POWER_MIN  = 0.03
 POWER_RATE = -1/120.0
 
 #TODO: Think about it: should all task management be setup in MetalSlender class?
-class Flashlight(DirectObject):
+class Flashlight:
 	def __init__(self, name, owner, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.01, far = 100):
 		self.color = color
 		self.power = 1.0
@@ -32,10 +31,9 @@ class Flashlight(DirectObject):
 		self.light1.setColor(color)
 		self.light1.setExponent(40)
 		self.light1.setLens(lens1)
-		self.light1.setAttenuation((0.5,0.001,0.0001))
+		#self.light1.setAttenuation((0.5,0.001,0.0001))
 
 		render.setLight(self.node1)
-		taskMgr.add(self.updatePower, 'flashlight1/update')
 
 	def toggle(self):
 		self.on = not self.on

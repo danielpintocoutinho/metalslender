@@ -7,8 +7,10 @@ from direct.showbase.ShowBase import ShowBase
 from hud import HUD
 from player import Player
 from camera import CameraControls
+from door import Door
 from eventsManager import EventManager
 from controls import PlayerControls
+from actionsManager import ActionManager
 
 #TODO: Review these files
 import scene_obj
@@ -38,24 +40,28 @@ class MetalSlender(ShowBase):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "lcg12", self.render)	
-		self.room.setTerrainCollision("**/ExtWalls*","**/Floor*", WALL_MASK,FLOOR_MASK)
+		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg13", self.render)
+		self.blocoh = scene_obj.SceneObj("blocoh", "assets/chicken/blocoh", self.render)
+		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
+		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
 		
-		#TODO: Separate plyaer controls
-		self.player  = Player('player', '', self.render)
+		self.actions = ActionManager(self, self.room.getNodePath())
+		self.player  = Player(actMng = self.actions, name = "player", pos = Vec3(90,90,12), model='', parent=self.render)
 		self.controls = PlayerControls(self.player)
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
 		
 		self.taskMgr.add(self.player.updateAll, "player/update")
+		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
 		
-		EventManager(self.player).start()
+		EventManager(self, self.player, self.actions).start()
 		
 		# User controls
 		self.addCommands()
 		
 		self.setBackgroundColor(0,0,0)
-		self.setAmbientlight((0.4, 0.4, 0.4, 1.0))
+# 		self.setAmbientlight((0.4, 0.4, 0.4, 1.0))
+		self.setAmbientlight()
 
 		self.render.setShaderAuto()
 
