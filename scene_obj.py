@@ -8,6 +8,8 @@ from direct.showbase.DirectObject import DirectObject
 from direct.actor import Actor
 from direct.task.Task import Task
 from random import *
+from collisionSystem import *
+
 
 class SceneObj(DirectObject):
 
@@ -22,6 +24,12 @@ class SceneObj(DirectObject):
 				self.model.setScale(scale)
 				self.model.setCollideMask(BitMask32.allOff())
 				self.hasModel = True
+
+				self.modelBody = self.model.attachNewNode(CollisionNode('ralph'))
+				self.modelBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
+				self.modelBody.node().setFromCollideMask(BitMask32.allOff())
+				self.modelBody.node().setIntoCollideMask(SENTINEL_MASK)
+
 			else: self.hasModel = False
 			self.setNodePathPos(pos)
 		self.modelCollider = None
@@ -56,7 +64,7 @@ class SceneObj(DirectObject):
 		base.cTrav.addCollider(self.modelCollider, self.wallHandler)
 	
 	def setOtherCollision(self, fromMask, intoMask, handler):
-		self.playerBody = player.attachNewNode(CollisionNode('smileybody'))
+		self.playerBody = player.attachNewNode(CollisionNode('smiley'))
 		self.playerBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
 		self.playerBody.node().setFromCollideMask(fromMask)
 		self.playerBody.node().setIntoCollideMask(intoMask)

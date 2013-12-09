@@ -19,6 +19,7 @@ class HUD(DirectObject):
 		self.last = 0
 		self.heartbasis = 'assets/images/heartbeat2-%d.png'
 		self.heartframe = 0
+		self.show = False
 		self.heartimage = OnscreenImage(self.heartbasis % (1,), scale=(0.1,1,0.1), pos=(0,1,-0.8))
 		self.text = OnscreenText('', pos=(0, -0.975), scale=0.05, fg=(0,1,0,1),	bg=(0,0,0,1))
 
@@ -41,6 +42,8 @@ class HUD(DirectObject):
 			self.heartimage.setImage(self.heartbasis % (self.heartframe + 1,))
 			self.heartimage.setTransparency(TransparencyAttrib.MAlpha)
 
+			
+
 			#TODO: Update parameters
 			heartampl = self.heartmax - self.heartmin
 			if self.heartbpm < self.heartmax:
@@ -51,9 +54,20 @@ class HUD(DirectObject):
 				self.text.setFg((1,1-s,0,1))
 
 			self.text.setText('%d BPM' % (self.heartbpm,))
-			return task.cont
 		else:
 			self.text.setFg((1,1,1,1))
 			self.text.setText('0 BPM')
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
-			return task.done
+			#return task.done
+
+		if (self.show):
+			self.heartimage.show()
+			self.text.show()
+		else:
+			self.heartimage.hide()
+			self.text.hide()
+
+		return task.cont
+
+	def showHud(self, show):
+		self.show = show

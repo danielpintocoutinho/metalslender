@@ -7,7 +7,6 @@ from random import random
 from lighting import Flashlight
 from scene_obj import SceneObj
 from hud import HUD
-
 import collisionSystem
 
 from direct.showbase.DirectObject import DirectObject
