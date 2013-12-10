@@ -2,8 +2,8 @@ from direct.gui.DirectGui import *
 
 class MainMenu:
   def __init__(self, parent):
-    playimg = ("textures/PlayButton2.png")
-    exitimg = ("textures/ExitButton.png")
+    playimg = ("assets/images/PlayButton.png")
+    exitimg = ("assets/images/ExitButton.png")
 
     self.mainFrame = DirectFrame(
                                  frameColor=(1,0,0,0.0),
@@ -29,7 +29,7 @@ class MainMenu:
                              scale=.05,
                              command=parent.exit)
 
-    self.image = self.load2Dimage("loading.png")
+    self.image = self.load2Dimage("assets/images/Loading.png")
         
   def load2Dimage(self, imagepath):
     img=OnscreenImage(image=imagepath, pos = (0, 0, 0),

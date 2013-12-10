@@ -1,37 +1,29 @@
 #!/usr/bin/ppython
-from pandac.PandaModules import AmbientLight, Vec3, Vec4, CollisionTraverser, WindowProperties
-# loadPrcFileData("", "prefer-parasite-buffer #f")
-
 from direct.showbase.ShowBase import ShowBase
+from pandac.PandaModules import AmbientLight, Vec3, Vec4, CollisionTraverser, \
+	WindowProperties
 
-from hud import HUD
-from player import Player
-from camera import CameraControls
-from door import Door
-from eventsManager import EventManager
-from controls import PlayerControls
-from actionsManager import ActionManager
-from enemy import Enemy
-
-#TODO: Review these files
-import scene_obj
-import scene_actor
-import animation_data
-import interface
-import collisionSystem
-from panda3d.ai import *
 from MainMenu import MainMenu
+from actionsManager import ActionManager
+from camera import CameraControls
+from controls import PlayerControls
+from door import Door
+from enemy import Enemy
+from eventsManager import EventManager
+from hud import HUD
+import interface
+from panda3d.ai import *
+from player import Player
+from room import Room
 
-# menu = interface.Interface()
-
-floorHandler = collisionSystem.floorHandler
-wallHandler = collisionSystem.wallHandler
-
-#** Collision masks
-FLOOR_MASK=collisionSystem.FLOOR_MASK
-WALL_MASK=collisionSystem.WALL_MASK
+# loadPrcFileData("", "prefer-parasite-buffer #f")
+#TODO: Review these files
+CAM_NEAR=0.1
+CAM_FAR =1000
 
 class MetalSlender(ShowBase):
+	
+	VERSION=0.1
 		
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -43,13 +35,13 @@ class MetalSlender(ShowBase):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg13", self.render)
-		self.blocoh = scene_obj.SceneObj("blocoh", "assets/chicken/blocoh", self.render)
-		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
-		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
+		self.rooms = []
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg13" , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
 		
-		self.actions = ActionManager(self, self.room.getNodePath())
-		self.player  = Player(actMng = self.actions, name = "player", pos = Vec3(90,90,12), model='', parent=self.render)
+		#TODO: Support multiple rooms
+		self.actions = ActionManager(self, self.rooms[0].model)
+		self.player  = Player(self, actMng = self.actions, name = "player", pos = Vec3(90,90,12), model='', parent=self.render)
 		self.controls = PlayerControls(self.player)
 		self.camctrl = CameraControls(self.player)
 		self.hud     = HUD(self.player)
@@ -59,26 +51,26 @@ class MetalSlender(ShowBase):
 		
 		EventManager(self, self.player, self.actions).start()
 
-		self.target1 = loader.loadModel("assets/chicken/arrow")
+		self.target1 = self.loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
 		self.target1.setPos(-76.1808, -52.1483, -14.4758)
 		self.target1.setScale(5)
 		self.target1.reparentTo(render)
 
-		self.target1 = loader.loadModel("assets/chicken/arrow")
+		self.target1 = self.loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
 		self.target1.setPos(23.3466,  30.4134, -14.4758)
 		self.target1.setScale(5)
 		self.target1.reparentTo(render)
 
 		# Target2
-		self.target2 = loader.loadModel("assets/chicken/arrow")
+		self.target2 = self.loader.loadModel("assets/chicken/arrow")
 		self.target2.setColor(0,1,0)
 		self.target2.setPos(23.3466, -85.0269, -14.4758)
 		self.target2.setScale(5)
 		self.target2.reparentTo(render)
 
-		self.banana = loader.loadModel("assets/chicken/banana")
+		self.banana = self.loader.loadModel("assets/chicken/banana")
 		self.banana.setScale(20)
 		self.banana.setPos(23.3466, -85.0269, -14.4758)
 		self.banana.reparentTo(render)
@@ -95,7 +87,7 @@ class MetalSlender(ShowBase):
 		self.mainMenu = MainMenu(self)
 		#self.mainMenu.hide()
 
-		taskMgr.add(self.AIUpdate,"AIUpdate")
+		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 
 		# User controls
 		self.addCommands()
@@ -106,13 +98,12 @@ class MetalSlender(ShowBase):
 
 		self.render.setShaderAuto()
 
-
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()
 	
 		self.setBackgroundColor(0,0,0.2,1)
 	
-		self.camLens.setNearFar(0.001,1000)
+		self.camLens.setNearFar(CAM_NEAR,CAM_FAR)
 		self.camLens.setFov(75)
 
 		self.disableMouse()
@@ -146,7 +137,7 @@ class MetalSlender(ShowBase):
 # 		self.inst_h = menu.addInstructions(0.75 , 'I: increase fear' )
 		return True
 	
-	def setAmbientlight(self, color = Vec4(0.01, 0.01, 0.01, 1)):
+	def setAmbientlight(self, color = Vec4(0.31, 0.31, 0.31, 1)):
 		alight = AmbientLight("Ambient")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -167,6 +158,5 @@ class MetalSlender(ShowBase):
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
 		self.mainMenu.hide()
-
 
 MetalSlender().run()

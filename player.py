@@ -1,18 +1,16 @@
-from pandac.PandaModules import Vec3
-from panda3d.core import BitMask32
-
-from math import sin,pi
+from direct.interval.IntervalGlobal import Sequence
+from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
+# from direct.showbase.DirectObject import DirectObject
+# from math import sin, pi
+from pandac.PandaModules import CollisionSphere, Vec3
 from random import random
 
-from lighting import Flashlight
-from scene_obj import SceneObj
+from collision import CollisionMask as Mask
 from hud import HUD
-import collisionSystem
+from lighting import Flashlight
+from panda3d.core import BitMask32
+from scene_obj import SceneObject
 
-from direct.showbase.DirectObject import DirectObject
-from direct.interval.LerpInterval import LerpPosInterval
-from direct.interval.LerpInterval import LerpHprInterval
-from direct.interval.IntervalGlobal import Sequence
 
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 0.2
@@ -23,7 +21,7 @@ EXHAUSTED=2
 
 STOPPED=0.0
 WALKING=1.0
-RUNNING=2.0
+RUNNING=8.0
 
 NORMAL   = 1.0
 CRAWLING = 0.5
@@ -44,22 +42,23 @@ FEAR_RATE = -1.0 / 30
 
 #TODO: Names that come from Showbase: taskMgr, loader 
 
-#TODO: Refactor things to improve SceneObj
-class Player(SceneObj):
+#TODO: Refactor things to improve SceneObject
+class Player(SceneObject):
+	
+	HEIGHT = 35.0
 
-	def __init__(self, name, parent, actMng, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObj.__init__(self, name, model, parent, pos, scale, False)
+	def __init__(self, base, name, parent, actMng, model='', pos=Vec3(0,0,0), scale=1.0):
+		SceneObject.__init__(self, base, name, model, parent, pos, scale)
 
 		self.actMng = actMng
 		self.actMng.setPlayer(self)
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
-		self.height  = 35.0
 		self.stopped = 1.0
 		self.pace = NORMAL
 		
-		self.setupCamera()
+		self.setupCamera(base)
 		self.setupFlashlight()
 		self.setupKeys()
 		self.setupCollistion()
@@ -67,6 +66,8 @@ class Player(SceneObj):
 		self.updateState(RESTFUL)
 
 		self.last = 0
+		
+	#TODO: add method boo!
 		
 	#TODO: Move this to flashlight class?
 	def setupFlashlight(self):
@@ -90,15 +91,19 @@ class Player(SceneObj):
 		self.keys = [STOPPED] * 4
 
 	#TODO: Create my own camera and put it into base.cam
-	def setupCamera(self):
+	def setupCamera(self, base):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
 		self.cam.setPos(Vec3(0,0,25))
 		
 	def setupCollistion(self):
-		self.setObjCollision()
-		self.setFloorCollision(collisionSystem.FLOOR_MASK, BitMask32.allOff())
-		self.setWallCollision(collisionSystem.WALL_MASK, BitMask32.allOff())
+		#TODO: Use a Polygon, instead
+		self.addCollisionSolid(CollisionSphere(0, 0, 0, Player.HEIGHT / 7))
+# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
+# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
+		self.addCollisionRay()
+		self.setFloorCollision(fromMask=Mask.FLOOR)
+		self.setWallCollision(fromMask=Mask.WALL)
 		
 	def setupSound(self):
 		#sounds of the player
@@ -201,7 +206,7 @@ class Player(SceneObj):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.getFloorHandler().isOnGround() and \
+			if (self.floorHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -248,18 +253,18 @@ class Player(SceneObj):
 			return task.done
 	
 	def jump(self):
-		if self.getFloorHandler().isOnGround(): 
-			self.getFloorHandler().addVelocity(30)
+		if self.floorHandler.isOnGround(): 
+			self.floorHandler.addVelocity(60)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.getFloorHandler().isOnGround():
+		if self.floorHandler.isOnGround():
 			self.pace = pace
 			if pace == NORMAL:
-				LerpPosInterval(base.cam, 0.2, (0,0,self.height)).start()
+				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()
 			else:
-				LerpPosInterval(base.cam, 0.2, (0,0,10)).start()
+				LerpPosInterval(self.cam, 0.2, (0,0,10)).start()
 	
 	def scream(self):
 		self.screams.play()

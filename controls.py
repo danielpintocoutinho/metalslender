@@ -25,9 +25,16 @@ class PlayerControls(DirectObject):
 		self.accept("shift"   , self.player.setSpeed, [RUNNING, None, True, False])
 		
 		#TODO: Must take your breath, also
-		self.accept("space", self.player.jump)
+		self.accept("shift-space"  , self.player.jump)
+		self.accept("space"        , self.player.jump)
 		
-		self.accept("c"    , self.player.crouch, [CRAWLING])
-		self.accept("c-up" , self.player.crouch, [NORMAL  ])
-		self.accept("e", self.player.action)
-		self.accept('f', self.player.flashlight.toggle)
+		self.accept("shift-c"    , self.player.crouch, [CRAWLING])
+		self.accept("c"          , self.player.crouch, [CRAWLING])
+		self.accept("c-up"       , self.player.crouch, [NORMAL  ])
+		self.accept("shift-c-up" , self.player.crouch, [NORMAL  ])
+		
+		self.accept("shift-e" , self.player.action)
+		self.accept("e"       , self.player.action)
+		
+		self.accept('f'      , self.player.flashlight.toggle)
+		self.accept('shift-f', self.player.flashlight.toggle)

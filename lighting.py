@@ -17,7 +17,7 @@ class Flashlight:
 		self.on    = True
 		self.owner = owner
 
-		self.node1 = owner.modelNP.attachNewNode(Spotlight(name + 'wide'))
+		self.node1 = owner.root.attachNewNode(Spotlight(name + 'wide'))
 		self.node1.reparentTo(owner.cam)
 		self.node1.setPos((5, 2, -5))
 		self.node1.setHpr((5,5,0))
