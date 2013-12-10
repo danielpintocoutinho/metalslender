@@ -9,8 +9,8 @@ class Flashlight:
 	POWER_GAIN_RATE  =  1/480.0
 	
 	ATT_CONST = 0.5
-	ATT_LIN   = 0.001
-	ATT_QUAD  = 0.0001
+	ATT_LIN   = 0.0001
+	ATT_QUAD  = 0.00001
 	
 	def __init__(self, name, owner, scene, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100):
 		self.owner = owner

@@ -4,75 +4,55 @@ import sys,os
 from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
 from pandac.PandaModules import Vec3
 from direct.interval.IntervalGlobal import *
-from direct.showbase.DirectObject import DirectObject
 from direct.actor import Actor
 from direct.task.Task import Task
 from random import *
 from collisionSystem import *
 
+class Room:
 
-class Room(DirectObject):
-
-	def __init__(self, name, model, source, pos=Vec3(0,0,0), scale=1.0, actor=False):
-		self.modelNP = source.attachNewNode(name)
-		self.name = name
-		if (actor == False):
-			if (model):
-				self.model = loader.loadModel(model)
-				self.model.reparentTo(self.modelNP)
-				self.setModelPos(Vec3(0,0,0))
-				self.model.setScale(scale)
-				self.model.setCollideMask(BitMask32.allOff())
-				self.hasModel = True
-
-				self.modelBody = self.model.attachNewNode(CollisionNode('ralph'))
-				self.modelBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
-				self.modelBody.node().setFromCollideMask(BitMask32.allOff())
-				self.modelBody.node().setIntoCollideMask(SENTINEL_MASK)
-
-			else: self.hasModel = False
-			self.setNodePathPos(pos)
-		self.modelCollider = None
-		self.modelRay = None
+	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
+		self.base = base
+		
+		#TODO: The modelpath could be the model itself
+		self.modelNP = scene.attachNewNode(name)
+		self.model = base.loader.loadModel(model)
+		self.model.reparentTo(self.modelNP)
+		
+		self.modelNP.setPos(pos)
+		self.modelNP.setScale(scale)
+		
+		self.model.setCollideMask(BitMask32.allOff())
+				
+# 		self.modelCollider = None
+# 		self.modelRay = None
+		self.wallHandler = CollisionHandlerPusher()
 		self.floorHandler = CollisionHandlerGravity()
 		self.floorHandler.setGravity(9.81+55)
-# 		self.floorHandler.setMaxVelocity(100)
-		#BUG: The player cannot walk through a wall, but he may run through it!
-		self.wallHandler = CollisionHandlerPusher()
+		self.floorHandler.setMaxVelocity(100)
 	
-	def setObjCollision(self, solid = CollisionSphere(0, 0, 0, 2)):
-		self.modelCollider = self.modelNP.attachNewNode(CollisionNode(self.name + 'cnode'))
-		self.modelCollider.node().addSolid(solid)
-	
-	def setFloorCollision(self, fromMask, intoMask):
-		# the player's ray collider for ground collision detection
-		raygeometry = CollisionRay(0, 0, 1, 0, 0, -1)
-		self.modelRay = self.modelNP.attachNewNode(CollisionNode(self.name + 'Ray'))
-		self.modelRay.node().addSolid(raygeometry)
-		self.modelRay.node().setFromCollideMask(fromMask)
-		self.modelRay.node().setIntoCollideMask(intoMask)
-		self.floorHandler.addCollider(self.modelRay, self.modelNP)
-		# ...then add the player collide sphere and the wall handler
-		base.cTrav.addCollider(self.modelRay, self.floorHandler)
-		
-		
-	def setWallCollision(self, fromMask, intoMask):
-		self.modelCollider.node().setFromCollideMask(fromMask)
-		self.modelCollider.node().setIntoCollideMask(intoMask)
-		self.wallHandler.addCollider(self.modelCollider, self.modelNP)
-		
-		base.cTrav.addCollider(self.modelCollider, self.wallHandler)
-	
-	def setOtherCollision(self, fromMask, intoMask, handler):
-		self.playerBody = player.attachNewNode(CollisionNode('smiley'))
-		self.playerBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
-		self.playerBody.node().setFromCollideMask(fromMask)
-		self.playerBody.node().setIntoCollideMask(intoMask)
-		base.cTrav.addCollider(self.playerBody, handler)
+# 	def setFloorCollision(self, fromMask, intoMask):
+# 		# the player's ray collider for ground collision detection
+# 		raygeometry = CollisionRay(0, 0, 1, 0, 0, -1)
+# 		self.modelRay = self.modelNP.attachNewNode(CollisionNode(self.name + 'Ray'))
+# 		self.modelRay.node().addSolid(raygeometry)
+# 		self.modelRay.node().setFromCollideMask(fromMask)
+# 		self.modelRay.node().setIntoCollideMask(intoMask)
+# 		self.floorHandler.addCollider(self.modelRay, self.modelNP)
+# 		# ...then add the player collide sphere and the wall handler
+# 		self.base.cTrav.addCollider(self.modelRay, self.floorHandler)	
+# 		
+# 	def setWallCollision(self, fromMask, intoMask):
+# 		self.modelCollider.node().setFromCollideMask(fromMask)
+# 		self.modelCollider.node().setIntoCollideMask(intoMask)
+# 		self.wallHandler.addCollider(self.modelCollider, self.modelNP)
+# 		
+# 		self.base.cTrav.addCollider(self.modelCollider, self.wallHandler)
 		
 	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
 		self.floorcollider = self.model.find(floorPath)
 		self.wallcollider  = self.model.find(wallPath)
+		
 # 		if not self.floorcollider.is_empty:
 		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.floorcollider.node().setIntoCollideMask(floorMask)
@@ -112,4 +92,3 @@ class Room(DirectObject):
 	
 	def getNodePath(self):
 		return self.modelNP
-		

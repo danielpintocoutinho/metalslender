@@ -13,7 +13,7 @@ from actionsManager import ActionManager
 from enemy import Enemy
 from room import Room
 
-from panda3d.core import Texture, TextureStage
+from panda3d.core import AntialiasAttrib, Fog, Texture, TextureStage
 
 #TODO: Review these files
 import scene_obj
@@ -44,10 +44,13 @@ class MetalSlender(ShowBase):
 		#if not self.initMessages(): 
 		#	return
 		self.initConfig()
+		self.setupEnvironment()
 
+		#TODO: Many things are only done once the game is started
 		# Load the scene.
-		self.room   = Room("room", "assets/chicken/lcg13", self.render)
-		self.blocoh = Room("blocoh", "assets/chicken/blocoh", self.render)
+		#TODO: Correct model scaling
+		self.room   = Room(self, "room", "temp/lcg", self.render)
+		self.blocoh = Room(self, "blocoh", "temp/blocoh", self.render)
 		
 		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
 		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
@@ -55,10 +58,9 @@ class MetalSlender(ShowBase):
 		self.player   = Player(name = "player", pos = Vec3(90,90,12), model='', scene=self.render)
 		self.actions  = ActionManager(self, self.room.getNodePath(), self.player)
 		
-		self.setupSkydome('assets/chicken/skydome')
-		
 		EventManager(self, self.player, self.actions).start()
 
+		#TODO: Only test code
 		self.placeTargets()
 
 		#self.target1.hide()
@@ -79,10 +81,27 @@ class MetalSlender(ShowBase):
 		# User controls
 		self.addCommands()
 		
+	def setupEnvironment(self):
+		#TODO: Not working
+# 		self.render.setAntialias(AntialiasAttrib.MMultisample)
 		self.setBackgroundColor(0,0,0)
-		self.setAmbientlight()
+		self.setupLighting()
+		self.setupFog()
+		self.setupSkydome('assets/chicken/skydome')
+		
+		#TODO: Is it possible to use per-room fog?
+	def setupFog(self):
+		self.fog = Fog("fog")
 
-		self.render.setShaderAuto()
+# 		self.fog.setColor(0.5, 0.1, 0.1)
+		self.fog.setColor(0, 0, 0)
+		self.fog.setExpDensity(0.004)
+
+# 		self.fog.setLinearRange(0,320)
+# 		self.fog.setLinearFallback(45,160,320)
+# 		self.cam.attachNewNode(self.fog)
+
+		self.render.setFog(self.fog)
 		
 	def setupSkydome(self, model):
 		
@@ -97,6 +116,13 @@ class MetalSlender(ShowBase):
 		alight = self.skydome.attachNewNode(alight)
 		
 		self.skydome.setLight(alight)
+		
+# 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
+	def setupLighting(self, color = Vec4(0.05, 0.05, 0.05, 1)):
+		alight = AmbientLight("Ambient")
+		alight.setColor(color)
+		alight = self.render.attachNewNode(alight)
+		self.render.setLight(alight)
 		
 	def placeTargets(self):
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
@@ -125,10 +151,11 @@ class MetalSlender(ShowBase):
 
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()
+		
+		self.render.setShaderAuto()
 	
-		self.setBackgroundColor(0,0,0.2,1)
-	
-		self.camLens.setNearFar(0.001,CAM_FAR)
+		#TODO: Must be moved to player's camera
+		self.camLens.setNearFar(CAM_NEAR,CAM_FAR)
 		self.camLens.setFov(75)
 
 		self.disableMouse()
@@ -161,21 +188,11 @@ class MetalSlender(ShowBase):
 # 		self.inst_h = menu.addInstructions(0.80 , 'F: Flashlight On/Off')
 # 		self.inst_h = menu.addInstructions(0.75 , 'I: increase fear' )
 		return True
-	
-	def setAmbientlight(self, color = Vec4(0.01, 0.01, 0.01, 1)):
-		alight = AmbientLight("Ambient")
-		alight.setColor(color)
-		alight = self.render.attachNewNode(alight)
-		self.render.setLight(alight)
 
 	def AIUpdate(self,task):
 		self.enemy.update()
 		self.AIworld.update()       
 		return task.cont
-
-	def exit(self):
-		self.mainMenu.__del__()
-		exit()
 
 	def newGame(self):
 		self.hud      = HUD(self, self.player)

@@ -27,7 +27,7 @@ class MainMenu:
                              #text = ("Exit"), 
                              pos = (0.0,1,-0.3),
                              scale=.05,
-                             command=parent.exit)
+                             command=parent.userExit)
 
     self.image = self.load2Dimage("assets/images/Loading.png")
         
