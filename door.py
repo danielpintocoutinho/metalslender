@@ -7,7 +7,7 @@ from direct.showbase import Audio3DManager
 from direct.task import Task
 from direct.interval.IntervalGlobal import Sequence
 
-import scene_obj
+from scene_obj import *
 
 class Door(DirectObject):
 	
@@ -23,6 +23,13 @@ class Door(DirectObject):
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+
+
+		self.modelBody = self.model.attachNewNode(CollisionNode("door"))
+		print "door pos: ", pos
+		self.modelBody.node().addSolid(CollisionTube(0, 5, 0, 0, 5, 5, 4))
+		self.modelBody.node().setFromCollideMask(BitMask32.allOff())
+		self.modelBody.node().setIntoCollideMask(WALL_MASK)
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle

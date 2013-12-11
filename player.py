@@ -166,7 +166,7 @@ class Player(SceneObj):
 		focus = self.getNodePath().getPos()
 		
 		np = self.getNodePath()
-		
+		#print np.getPos(render)
 		if (self.keys[0]):
 			dir = np.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
 			dir.setZ(0)

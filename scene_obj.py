@@ -25,7 +25,7 @@ class SceneObj(DirectObject):
 				self.model.setCollideMask(BitMask32.allOff())
 				self.hasModel = True
 
-				self.modelBody = self.model.attachNewNode(CollisionNode('ralph'))
+				self.modelBody = self.model.attachNewNode(CollisionNode(name + 'col'))
 				self.modelBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
 				self.modelBody.node().setFromCollideMask(BitMask32.allOff())
 				self.modelBody.node().setIntoCollideMask(SENTINEL_MASK)

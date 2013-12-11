@@ -1,6 +1,8 @@
 from direct.showbase.DirectObject import DirectObject
 from player import WALKING, STOPPED, RUNNING, CRAWLING, NORMAL
 
+collshow=False
+
 class PlayerControls(DirectObject):
 	#TODO: Player controls may be customized via an options screen or startup file
 	def __init__(self, player):
@@ -31,3 +33,17 @@ class PlayerControls(DirectObject):
 		self.accept("c-up" , self.player.crouch, [NORMAL  ])
 		self.accept("e", self.player.action)
 		self.accept('f', self.player.flashlight.toggle)
+
+		self.accept('t', self.toggle_collisions)
+
+	def toggle_collisions(self):
+	  global collshow
+	  collshow=not collshow
+	  if collshow:
+	    base.cTrav.showCollisions(base.render)
+	    l=base.render.findAllMatches("**/+CollisionNode")
+	    for cn in l: cn.show()
+	  else:
+	    base.cTrav.hideCollisions()
+	    l=base.render.findAllMatches("**/+CollisionNode")
+	    for cn in l: cn.hide()

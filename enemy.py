@@ -20,3 +20,11 @@ class Enemy:
 
 	def update(self):
 		self.hooded.update()
+
+	def defineDynamicObjects(self, objectsPath):
+		self.doors  = self.seeker.findAllMatches(objectsPath)
+		for o in self.doors:
+			self.hooded.addDynamicObject(o)
+
+
+

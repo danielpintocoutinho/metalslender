@@ -30,8 +30,9 @@ class ActionManager(DirectObject):
 					  Door(base, room,Vec3(250, 37, 5.1), Vec3(90, 0, 0), -87), \
 		              Door(base, room,Vec3(249.5, 58.5, 5.1), Vec3(125, 0, 0), -117)]
 		              
-		self.locked_doors = [LockedDoor(base, room,Vec3(35, -45, 0), Vec3(180, 0, 0), -90)]
-		
+		#self.locked_doors = [LockedDoor(base, room,Vec3(35, -45, 0), Vec3(180, 0, 0), -90)]
+		self.locked_doors = []
+
 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 7.32), Vec3(0, 0, 0))]
 		
 		#visualize direction

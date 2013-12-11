@@ -67,7 +67,7 @@ class Hooded(AICharacter):
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
         self.increment = 1
-        #self.getAiBehaviors().seek(self.PatrolPos[0])
+        self.getAiBehaviors().seek(self.PatrolPos[0])
       
 
     def distance(self, p1, p2):
@@ -77,7 +77,7 @@ class Hooded(AICharacter):
         
     #to update the AIWorld    
     def update(self):
-        self.currentStatus = 5
+        #self.currentStatus = 5
         captured = self.sent_detect()
         if (captured):
             if (self.currentStatus != 1):
@@ -111,7 +111,7 @@ class Hooded(AICharacter):
     def patrol(self):
         distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
         self.goingBack = False
-        print "distance: ", distance
+        #print "distance: ", distance
         if (distance < 1.0):
             self.startTimer(3)
             self.getAiBehaviors().pauseAi("all")
@@ -139,11 +139,15 @@ class Hooded(AICharacter):
             #print "vai coisar aqui de novo"
             self.getAiBehaviors().pathFindTo(self.pursueTarget)
             #print "mas aqui nao"
+            #print "source: ", self.get_node_path().getPos(render)
             if (isinstance(self.pursueTarget, NodePath)):
-                print "aqui?"
-                print self.pursueTarget.getPos(render)
+                pass
+                #print "aqui?"
+                #print self.pursueTarget.getPos(render)
             else:
-                print self.pursueTarget
+                #print "ou aqui?"
+                #print self.pursueTarget
+                pass
 
         #self.pathfinding = True
         currentPos = self.get_node_path().getPos(render)
@@ -166,6 +170,13 @@ class Hooded(AICharacter):
 
         if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
             print "entrei?"
+            print self.get_node_path().getPos()
+            if (isinstance(self.pursueTarget, NodePath)):
+                print "aqui?"
+                print self.pursueTarget.getPos(render)
+            else:
+                print "ou aqui?"
+                print self.pursueTarget
             if (self.lostTarget == False):
                 if (self.goingBack == True):
                     print "uhul"
@@ -174,6 +185,7 @@ class Hooded(AICharacter):
                     self.currentStatus = 0
                     self.getAiBehaviors().resumeAi("seek")
                     self.resetTimer()
+                    self.goingBack = False
                 else:
                     self.getAiBehaviors().pauseAi("all")
                     self.currentStatus = 3
@@ -189,9 +201,6 @@ class Hooded(AICharacter):
 
         #print distance
         
-        
-
-
 
     def wander(self):
         #print "wander - ", self.lostTarget
@@ -218,7 +227,7 @@ class Hooded(AICharacter):
                 self.getAiBehaviors().pauseAi("all")
 
                 #self.getAiBehaviors().seek(self.PatrolPos[self.currentTarget])
-                #print "vai voltar pro pathfinding ", self.currentStatus
+                print "vai voltar pro pathfinding ", self.currentStatus
         
 
 
@@ -227,6 +236,7 @@ class Hooded(AICharacter):
         
 
     def sent_traverse(self, o):
+        print ""
         # start the ray traverse
         base.cTrav.traverse(render)
         # align the colliders by order of piercing
@@ -235,11 +245,13 @@ class Hooded(AICharacter):
             entry = self.sentinelHandler.getEntry(0)
             colliderNode = entry.getIntoNode()
             # if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
-            if colliderNode.getName() == 'ralph':
+            #for i in self.sentinelHandler.getEntries():
+                #print i.getIntoNode().getName()
+            if colliderNode.getName() == 'playercol':
                 avatar_in_sight=True
                 if self.detected == False:
                     self.detected = True
-                    self.screechsound = loader.loadSfx("sounds/anazgul_scream.mp3")
+                    self.screechsound = loader.loadSfx("assets/sounds/enemies/anazgul_scream.mp3")
                     self.screechsound.play()
                 return True
         avatar_in_sight=False
@@ -247,16 +259,18 @@ class Hooded(AICharacter):
 
     #** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
     def sent_detect(self):
-        intruders=base.render.findAllMatches("**/ralph*")
-        print "numero de intruders: ", len(intruders)
+        intruders=base.render.findAllMatches("**/player*")
+        #print "numero de intruders: ", len(intruders)
         for o in intruders:
+            #print o.getPos()
         # query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
-            print o.getPos(render)
+            #print o.getPos(render)
             if self.slnp.node().isInView(o.getPos(self.slnp)):
+                #print "Ta no meu campo de visao"
                 self.get_node_path().lookAt(o)
                 if self.sent_traverse(o):
                     self.pursueTarget = o
-                    print "detectando: ", self.pursueTarget.getPos(render)
+                    #print "detectando: ", self.pursueTarget.getPos(render)
                     return True
         return False
 
@@ -278,3 +292,6 @@ class Hooded(AICharacter):
             self.interval = interval
             self.initTimer = False
             self.time = time.time()
+
+    def addDynamicObject(self, object):
+        self.getAiBehaviors().addDynamicObstacle(object)
