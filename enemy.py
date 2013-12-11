@@ -26,5 +26,9 @@ class Enemy:
 		for o in self.doors:
 			self.hooded.addDynamicObject(o)
 
+	def hear(self, noisePos):
+		self.hooded.hear(noisePos)
+
+
 
 

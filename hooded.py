@@ -37,12 +37,14 @@ class Hooded(AICharacter):
         self.slnp = self.get_node_path().attachNewNode(self.slight)
         self.slight.showFrustum()
         self.slnp.setH(self.slnp.getH()-180)
+        self.hearing = 5.0
 
         self.detected = False
         self.pathfinding = False
         self.lostTarget = False
         self.countTime = False
         self.goingBack = False
+        self.heard = False
         self.lastPos = self.get_node_path().getPos(render)
 
 
@@ -84,8 +86,14 @@ class Hooded(AICharacter):
                 self.currentStatus = 1
                 self.getAiBehaviors().pauseAi("all")
             self.lostTarget = False
+            self.heard = False
             self.resetTimer()
             #print "To vendo"
+        elif (self.heard):
+            self.heard = False
+            self.pursueTarget = self.hearingPos
+            self.getAiBehaviors().pauseAi("all")
+            self.currentStatus = 1
         elif (self.currentStatus == 1 and self.lostTarget == False and self.goingBack == False):
             self.startTimer(1.5)
             hasFinished = self.timer()
@@ -295,3 +303,10 @@ class Hooded(AICharacter):
 
     def addDynamicObject(self, object):
         self.getAiBehaviors().addDynamicObstacle(object)
+
+
+    def hear(self, noisePos):
+        dist = distance(self.get_node_path().getPos(), noisePos)
+        if (dist <= self.hearing):
+            self.heard = True
+            self.hearingPos = noisePos
