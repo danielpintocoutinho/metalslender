@@ -5,13 +5,13 @@ import scene_obj
 
 class SceneActor(scene_obj.SceneObj):
 
-	def __init__(self, name, model_path, pos, scale, animations, source = render):
+	def __init__(self, name, model, source, pos, scale, animations):
 		'''
 		Constructor
 		'''
-		scene_obj.SceneObj.__init__(self, name, "", None, None, source, True)
+		scene_obj.SceneObj.__init__(self, name, "", source, None, None, True)
 		
-		self.model=Actor.Actor(model_path, animations)
+		self.model=Actor.Actor(model, animations)
 		self.model.setCollideMask(BitMask32.allOff())
 		self.setNodePathPos(pos)
 		self.setModelPos(Vec3(0,0,0))

@@ -1,7 +1,6 @@
-from panda3d.core import *
+import panda3d
 import sys,os
 
-import direct.directbase.DirectStart
 from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
 from pandac.PandaModules import Vec3
 from direct.interval.IntervalGlobal import *
@@ -14,19 +13,19 @@ from collisionSystem import *
 
 class SceneObj(DirectObject):
 
-	def __init__(self, name, model_path = '' , pos=Vec3(0,0,0), scale=1.0, source = render,actor=False):
-		self.modelNP =source.attachNewNode(name)
+	def __init__(self, name, model, source, pos=Vec3(0,0,0), scale=1.0, actor=False):
+		self.modelNP = source.attachNewNode(name)
 		self.name = name
 		if (actor == False):
-			if (model_path):
-				self.model = loader.loadModel(model_path)
+			if (model):
+				self.model = loader.loadModel(model)
 				self.model.reparentTo(self.modelNP)
 				self.setModelPos(Vec3(0,0,0))
 				self.model.setScale(scale)
 				self.model.setCollideMask(BitMask32.allOff())
 				self.hasModel = True
 
-				self.modelBody = self.model.attachNewNode(CollisionNode('ralph'))
+				self.modelBody = self.model.attachNewNode(CollisionNode(name + 'col'))
 				self.modelBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
 				self.modelBody.node().setFromCollideMask(BitMask32.allOff())
 				self.modelBody.node().setIntoCollideMask(SENTINEL_MASK)
@@ -36,8 +35,8 @@ class SceneObj(DirectObject):
 		self.modelCollider = None
 		self.modelRay = None
 		self.floorHandler = CollisionHandlerGravity()
-		self.floorHandler.setGravity(9.81+25)
-		self.floorHandler.setMaxVelocity(100)
+		self.floorHandler.setGravity(9.81+55)
+# 		self.floorHandler.setMaxVelocity(100)
 		#BUG: The player cannot walk through a wall, but he may run through it!
 		self.wallHandler = CollisionHandlerPusher()
 	
@@ -72,10 +71,13 @@ class SceneObj(DirectObject):
 		base.cTrav.addCollider(self.playerBody, handler)
 		
 	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
-		self.floorcollider=self.model.find(floorPath)
+		self.floorcollider = self.model.find(floorPath)
+		self.wallcollider  = self.model.find(wallPath)
+# 		if not self.floorcollider.is_empty:
 		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.floorcollider.node().setIntoCollideMask(floorMask)
-		self.wallcollider=self.model.find(wallPath)
+			
+# 		if not self.wallcollider.is_empty:
 		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
 		self.wallcollider.node().setIntoCollideMask(wallMask)
 		
@@ -83,7 +85,7 @@ class SceneObj(DirectObject):
 		return self.floorHandler
 	
 	def getPos(self):
-		return self.model.getPos()
+		return self.modelNP.getPos()
 	
 	def setModelPos(self,pos):
 		self.model.setPos(pos)
