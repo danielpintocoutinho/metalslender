@@ -19,3 +19,12 @@ class Enemy:
 
 	def update(self):
 		self.hooded.update()
+
+	def defineDynamicObjects(self, model, objectsPath):
+		self.model = loader.loadModel(model)
+		self.doors  = self.model.findAllMatches(objectsPath)
+		for o in self.doors:
+			self.hooded.addDynamicObject(o)
+
+	def hear(self, noisePos):
+		self.hooded.hear(noisePos)

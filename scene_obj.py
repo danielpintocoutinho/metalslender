@@ -9,11 +9,10 @@ class SceneObject:
 
 		self.root = scene.attachNewNode(name)
 
-		self.root.setPos(pos)
-		self.root.setScale(scale)
+# 				self.modelBody = self.model.attachNewNode(CollisionNode(name + 'col'))
 	
-		self.collSol = self.root.attachNewNode(CollisionNode('Collision.Solid'))
-		self.collRay = self.root.attachNewNode(CollisionNode('Collision.Ray'))
+		self.collSol = self.root.attachNewNode(CollisionNode(name + 'Collision.Solid'))
+		self.collRay = self.root.attachNewNode(CollisionNode(name + 'Collision.Ray'))
 		
 		self.wallHandler  = CollisionHandlerPusher()
 		self.floorHandler = CollisionHandlerGravity()

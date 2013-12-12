@@ -46,9 +46,13 @@ class MetalSlender(ShowBase):
 		self.rooms.append(Room(self, "LCG"    , "temp/lcg13" , self.render))
 		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
 		
+		for enemy in self.enemies:
+			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
+		
 		#TODO: Support multiple rooms
-		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='', scene=self.render)
+		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player)
+# 		print self.player.root.ls()
 		
 		self.taskMgr.add(self.player.updateAll, "player/update")
 		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
@@ -102,7 +106,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.35, 0.35, 0.35, 1)):
+	def setupLighting(self, color = Vec4(0.05, 0.05, 0.05, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -116,28 +120,28 @@ class MetalSlender(ShowBase):
 	def placeTargets(self):
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
-		self.target1.setPos(-76.1808, -52.1483, -14.4758)
+		self.target1.setPos(-76.1808, -52.1483, -14.0991)
 		self.target1.setScale(5)
 		self.target1.reparentTo(self.render)
 
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
-		self.target1.setPos(23.3466,  30.4134, -14.4758)
+		self.target1.setPos(23.3466,  30.4134, -14.0991)
 		self.target1.setScale(5)
 		self.target1.reparentTo(self.render)
 
 		# Target2
 		self.target2 = self.loader.loadModel("assets/chicken/arrow")
 		self.target2.setColor(0,1,0)
-		self.target2.setPos(23.3466, -85.0269, -14.4758)
+		self.target2.setPos(23.3466, -85.0269, -14.0991)
 		self.target2.setScale(5)
 		self.target2.reparentTo(self.render)
 
 		self.banana = self.loader.loadModel("assets/chicken/banana")
 		self.banana.setScale(20)
+
 		self.banana.setPos(23.3466, -85.0269, -14.4758)
 		self.banana.reparentTo(self.render)
-
 
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()

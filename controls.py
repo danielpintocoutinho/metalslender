@@ -1,6 +1,8 @@
 from direct.showbase.DirectObject import DirectObject
 from player import Player
 
+collshow=False
+
 class PlayerControls(DirectObject):
 	#TODO: Player controls may be customized via an options screen or startup file
 	def __init__(self, player, actMng):
@@ -39,3 +41,17 @@ class PlayerControls(DirectObject):
 		
 		self.accept('f'      , self.player.flashlight.toggle)
 		self.accept('shift-f', self.player.flashlight.toggle)
+
+		self.accept('t', self.toggle_collisions)
+
+	def toggle_collisions(self):
+		global collshow
+		collshow=not collshow
+		if collshow:
+			base.cTrav.showCollisions(base.render)
+			l=base.render.findAllMatches("**/+CollisionNode")
+			for cn in l: cn.show()
+		else:
+			base.cTrav.hideCollisions()
+			l=base.render.findAllMatches("**/+CollisionNode")
+			for cn in l: cn.hide()

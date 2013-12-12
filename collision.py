@@ -6,3 +6,5 @@ class CollisionMask:
 	NONE  = BitMask32.allOff()
 	FLOOR = BitMask32.bit(1)
 	WALL  = BitMask32.bit(2)
+	SENTINEL = BitMask32.bit(3)
+	PLAYER = BitMask32(4)

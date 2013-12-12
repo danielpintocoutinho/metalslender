@@ -102,7 +102,7 @@ class Player(SceneObject):
 # 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
 		self.addCollisionRay()
 		self.setFloorCollision(fromMask=Mask.FLOOR)
-		self.setWallCollision(fromMask=Mask.WALL)
+		self.setWallCollision(fromMask=Mask.WALL, intoMask=Mask.SENTINEL)
 		
 	def setupSound(self):
 		#sounds of the player
@@ -170,7 +170,7 @@ class Player(SceneObject):
 		focus = self.getNodePath().getPos()
 		
 		np = self.getNodePath()
-		
+		#print np.getPos(render)
 		if (self.keys[0]):
 			dir = np.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
 			dir.setZ(0)
