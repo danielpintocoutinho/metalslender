@@ -57,7 +57,7 @@ class Hooded(AICharacter):
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
         self.increment = 1
-        #self.getAiBehaviors().seek(self.PatrolPos[0])
+        self.getAiBehaviors().seek(self.PatrolPos[0])
 
     def distance(self, p1, p2):
         d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
@@ -86,7 +86,7 @@ class Hooded(AICharacter):
             else:
                 self.lostTarget = False
                 #print "perdi, mas to procurando"
-        #print "status: ", self.currentStatus
+        print "status: ", self.currentStatus
         if self.currentStatus == 0:
             self.patrol()
         elif self.currentStatus == 1:

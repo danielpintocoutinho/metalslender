@@ -16,7 +16,6 @@ import interface
 from player import Player
 from room import Room
 
-
 # loadPrcFileData("", "prefer-parasite-buffer #f")
 #TODO: Review these files
 CAM_NEAR=0.1
@@ -37,12 +36,14 @@ class MetalSlender(ShowBase):
 		#	return
 		self.initConfig()
 		self.setupEnvironment()
+		
+		self.AIworld = AIWorld(self.render)
+		self.enemies = []
 
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg13" , self.render))
-# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
+		self.rooms.append(Room(self, "LCG"    , "temp/lcg13" , self.render))
 		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
 		
 		#TODO: Support multiple rooms
@@ -57,10 +58,8 @@ class MetalSlender(ShowBase):
 		#TODO: Only test code
 		self.placeTargets()
 
-		self.enemy = Enemy(Vec3(-76.1808, -52.1483, -14.4758), [self.target1, self.target2])
-
-		self.AIworld = AIWorld(self.render)
-		self.AIworld.addAiChar(self.enemy.getHooded())
+# 		self.enemy = Enemy(Vec3(-76.1808, -52.1483, -14.4758), [self.target1, self.target2])
+# 		self.AIworld.addAiChar(self.enemy.getHooded())
 
 		self.mainMenu = MainMenu(self)
 		#self.mainMenu.hide()
@@ -95,25 +94,24 @@ class MetalSlender(ShowBase):
 		self.render.setFog(self.fog)
 		
 	def setupSkydome(self, model):
-		
 		self.skydome = self.loader.loadModel(model)
 		self.skydome.setBin('background', 0)
 		self.skydome.setDepthWrite(False)
 		self.skydome.reparentTo(self.cam)
 		self.skydome.setCompass()
-		
-		alight = AmbientLight("sky-color")
-		alight.setColor((1.0,1.0,1.0,1.0))
-		alight = self.skydome.attachNewNode(alight)
-		
-		self.skydome.setLight(alight)
+		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.05, 0.05, 0.05, 1)):
-		alight = AmbientLight("Ambient")
+	def setupLighting(self, color = Vec4(0.35, 0.35, 0.35, 1)):
+		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
 		self.render.setLight(alight)
+		
+		#This light may be used by shadeless materials
+		alight = AmbientLight("ShadelessLight")
+		alight.setColor((1.0,1.0,1.0,1.0))
+		self.shadeless = self.render.attachNewNode(alight)
 		
 	def placeTargets(self):
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
@@ -182,7 +180,8 @@ class MetalSlender(ShowBase):
 		return True
 
 	def AIUpdate(self,task):
-		self.enemy.update()
+		for enemy in self.enemies:
+			enemy.update()
 		self.AIworld.update()       
 		return task.cont
 

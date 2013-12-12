@@ -20,7 +20,7 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=1.5
+	WALKING=7.5
 	RUNNING=3.5
 	
 	NORMAL   = 1.0
@@ -30,7 +30,7 @@ class Player(SceneObject):
 	CROUCHED_HEIGHT = 10.0
 	FEAR_RATE = -1.0 / 30
 	
-	JUMP_POWER = 30.0
+	JUMP_POWER = 40.0
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -96,7 +96,8 @@ class Player(SceneObject):
 		
 	def setupCollistion(self):
 		#TODO: Use a Polygon, instead
-		self.addCollisionSolid(CollisionSphere(0, 0, 0, Player.HEIGHT / 7))
+# 		self.addCollisionSolid(CollisionSphere(0, 0, 0, Player.HEIGHT / 7))
+		self.addCollisionSolid(CollisionSphere(0, 0, 0, 4))
 # 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
 # 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
 		self.addCollisionRay()
@@ -230,6 +231,9 @@ class Player(SceneObject):
 		elapsed = task.time - self.last
 		self.last = task.time
 		
+		#TODO: Refactor
+		self.cam.node().getLens().setFov(75 + self.fear * 95)
+		
 		self.updateBreath(elapsed)
 		self.updatePosition(elapsed)
 		self.updateFlashBang()
@@ -254,7 +258,7 @@ class Player(SceneObject):
 	
 	def jump(self):
 		if self.floorHandler.isOnGround(): 
-			self.getFloorHandler().addVelocity(Player.JUMP_POWER)
+			self.floorHandler.addVelocity(Player.JUMP_POWER)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller

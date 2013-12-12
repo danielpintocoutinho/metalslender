@@ -2,6 +2,7 @@ from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, Perspecti
 
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
+from enemy import Enemy
 
 class Room(SceneObject):
 
@@ -15,9 +16,23 @@ class Room(SceneObject):
 		self.root.setScale(scale)
 		
 		self.setupLightSources(scene)
+		self.setupCollision()
+		self.setupEnemies(base)
 		
+		for np in self.model.findAllMatches('**/=Hide'):
+			np.hide()
+			
+	def setupEnemies(self, base):
+		for np in self.model.findAllMatches('**/=Patrol'):
+			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
+	 		base.enemies.append(Enemy(np.getPos(), patrol))
+			base.AIworld.addAiChar(base.enemies[-1].getHooded())
+			
+	def setupCollision(self):
 		#TODO: Adjust ramp collision
 		#TODO: Load room objects and triggers
+		self.setCollision("**/=Wall", Mask.WALL)
+		self.setCollision("**/=Floor", Mask.FLOOR)
 		self.setCollision("**/*walls*", Mask.WALL)
 		self.setCollision("**/*floor*", Mask.FLOOR)
 		
@@ -66,7 +81,9 @@ class Room(SceneObject):
 			self.model.setLight(lightNP)
 			
 			if np.getTag('Hide'):
-				np.removeNode()
+				np.hide()
+			else:
+				np.setLight(scene.find('ShadelessLight'))
 		
 	def setCollision(self, pattern, intoMask):
 		for np in self.model.findAllMatches(pattern): 
