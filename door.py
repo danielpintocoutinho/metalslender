@@ -8,6 +8,7 @@ from direct.task import Task
 from direct.interval.IntervalGlobal import Sequence
 
 from scene_obj import *
+from collision import CollisionMask
 
 class Door(DirectObject):
 	
@@ -28,8 +29,8 @@ class Door(DirectObject):
 		self.modelBody = self.model.attachNewNode(CollisionNode("door"))
 		print "door pos: ", pos
 		self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
-		self.modelBody.node().setFromCollideMask(BitMask32.allOff())
-		self.modelBody.node().setIntoCollideMask(WALL_MASK)
+		self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
+		self.modelBody.node().setIntoCollideMask(CollisionMask.WALL)
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle

@@ -16,7 +16,6 @@ class Enemy:
 		self.hooded.initialize()
 		self.hooded.setPatrolPos(patrolPos)
 
-
 	def getHooded(self):
 		return self.hooded
 
@@ -31,7 +30,3 @@ class Enemy:
 
 	def hear(self, noisePos):
 		self.hooded.hear(noisePos)
-
-
-
-

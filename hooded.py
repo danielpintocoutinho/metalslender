@@ -1,24 +1,13 @@
-# PANDAI BASIC TUTORIAL
-# Author: Srinavin Nair
-
-#for most bus3d stuff
 from pandac.PandaModules import *
-#for directx object support
 from direct.showbase.DirectObject import DirectObject
-#for tasks
 from direct.task import Task
-#for Actors
 from direct.actor.Actor import Actor
-#for Pandai
 from panda3d.ai import *
 
 import math
 import time
+from collision import CollisionMask
 
-
-FLOOR_MASK=BitMask32.bit(1)
-WALL_MASK=BitMask32.bit(2)
-SENTINEL_MASK=BitMask32.bit(3)
 
 class Hooded(AICharacter):
 
@@ -57,8 +46,8 @@ class Hooded(AICharacter):
         sentinelRay = self.get_node_path().attachNewNode(CollisionNode('sentinelray'))
         sentinelRay.node().addSolid(sentraygeom)
         # we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
-        sentinelRay.node().setFromCollideMask(SENTINEL_MASK|WALL_MASK)
-        sentinelRay.node().setIntoCollideMask(BitMask32.allOff())
+        sentinelRay.node().setFromCollideMask(CollisionMask.SENTINEL|CollisionMask.WALL)
+        sentinelRay.node().setIntoCollideMask(CollisionMask.NONE)
         # we add the ray to the sentinel collider and now it is ready to go
         base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
         
@@ -66,18 +55,15 @@ class Hooded(AICharacter):
 
 
     def setPatrolPos(self, PatrolPos):
-        
         self.currentTarget = 0
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
         self.increment = 1
         self.getAiBehaviors().seek(self.PatrolPos[0])
-      
 
     def distance(self, p1, p2):
         d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
         return math.sqrt(d)
-
         
     #to update the AIWorld    
     def update(self):
@@ -275,9 +261,9 @@ class Hooded(AICharacter):
             entry = self.sentinelHandler.getEntry(0)
             colliderNode = entry.getIntoNode()
             # if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
-            #for i in self.sentinelHandler.getEntries():
-                #print i.getIntoNode().getName()
-            if colliderNode.getName() == 'playercol':
+            for i in self.sentinelHandler.getEntries():
+                print i.getIntoNode().getName()
+            if colliderNode.getName() == 'playerCollision.Solid':
                 self.isProtected = False
                 if self.detected == False:
                     self.detected = True
@@ -302,7 +288,7 @@ class Hooded(AICharacter):
         # query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
             #print o.getPos(render)
             if self.slnp.node().isInView(o.getPos(self.slnp)):
-                #print "Ta no meu campo de visao"
+                print "Ta no meu campo de visao"
                 self.get_node_path().lookAt(o)
                 if self.sent_traverse(o):
                     self.pursueTarget = o
