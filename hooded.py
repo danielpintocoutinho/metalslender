@@ -38,6 +38,7 @@ class Hooded(AICharacter):
         self.slight.showFrustum()
         self.slnp.setH(self.slnp.getH()-180)
         self.hearing = 5.0
+        self.dynamicObstacles = []
 
         self.detected = False
         self.pathfinding = False
@@ -45,6 +46,7 @@ class Hooded(AICharacter):
         self.countTime = False
         self.goingBack = False
         self.heard = False
+        self.isProtected = False
         self.lastPos = self.get_node_path().getPos(render)
 
 
@@ -82,7 +84,9 @@ class Hooded(AICharacter):
         #self.currentStatus = 5
         captured = self.sent_detect()
         if (captured):
-            if (self.currentStatus != 1):
+            if (self.isProtected):
+                self.currentStatus = 4
+            elif (self.currentStatus != 1):
                 self.currentStatus = 1
                 self.getAiBehaviors().pauseAi("all")
             self.lostTarget = False
@@ -115,6 +119,8 @@ class Hooded(AICharacter):
             self.wander()
         elif self.currentStatus == 3:
             self.kill()
+        elif self.currentStatus == 4:
+            self.pause()
  
     def patrol(self):
         distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
@@ -146,6 +152,8 @@ class Hooded(AICharacter):
             self.getAiBehaviors().pauseAi("all")
             #print "vai coisar aqui de novo"
             self.getAiBehaviors().pathFindTo(self.pursueTarget)
+            for i in self.dynamicObstacles:
+                self.getAiBehaviors().addDynamicObstacle(i)
             #print "mas aqui nao"
             #print "source: ", self.get_node_path().getPos(render)
             if (isinstance(self.pursueTarget, NodePath)):
@@ -178,7 +186,11 @@ class Hooded(AICharacter):
 
         if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
             print "entrei?"
-            print self.get_node_path().getPos()
+            #print self.get_node_path().getPos()
+            if (distance > 3):
+                self.getAiBehaviors().pauseAi("all")
+                return
+
             if (isinstance(self.pursueTarget, NodePath)):
                 print "aqui?"
                 print self.pursueTarget.getPos(render)
@@ -194,6 +206,17 @@ class Hooded(AICharacter):
                     self.getAiBehaviors().resumeAi("seek")
                     self.resetTimer()
                     self.goingBack = False
+                elif (self.heard == True):
+                        if (isinstance(self.pursueTarget, NodePath)):
+                            self.getAiBehaviors().pauseAi("all")
+                            self.currentStatus = 3
+                        else:
+                            self.startTimer(5)
+                            self.countTime = True
+                            self.pathfinding = False
+                            self.currentStatus = 2
+                            self.radius = 5
+                            self.aoe = 10
                 else:
                     self.getAiBehaviors().pauseAi("all")
                     self.currentStatus = 3
@@ -244,7 +267,6 @@ class Hooded(AICharacter):
         
 
     def sent_traverse(self, o):
-        print ""
         # start the ray traverse
         base.cTrav.traverse(render)
         # align the colliders by order of piercing
@@ -256,13 +278,19 @@ class Hooded(AICharacter):
             #for i in self.sentinelHandler.getEntries():
                 #print i.getIntoNode().getName()
             if colliderNode.getName() == 'playercol':
-                avatar_in_sight=True
+                self.isProtected = False
                 if self.detected == False:
                     self.detected = True
                     self.screechsound = loader.loadSfx("assets/sounds/enemies/anazgul_scream.mp3")
                     self.screechsound.play()
                 return True
-        avatar_in_sight=False
+            elif colliderNode.getName() == 'lightarea':
+                newEntry = self.sentinelHandler.getEntry(1)
+                newColliderNode = newEntry.getIntoNode()
+                if (newColliderNode.getName() == 'playercol'):
+                    #check if player is really inside light area
+                    self.isProtected = True
+                    return True
         return False
 
     #** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
@@ -301,8 +329,12 @@ class Hooded(AICharacter):
             self.initTimer = False
             self.time = time.time()
 
-    def addDynamicObject(self, object):
-        self.getAiBehaviors().addDynamicObstacle(object)
+    def addDynamicObject(self, dynamicObject):
+        print "Adding dynamic objects"
+        print dynamicObject.getName()
+        #self.getAiBehaviors().addDynamicObstacle(dynamicObject)
+        self.dynamicObstacles.append(dynamicObject)
+        print "deu pau?" 
 
 
     def hear(self, noisePos):
@@ -310,3 +342,6 @@ class Hooded(AICharacter):
         if (dist <= self.hearing):
             self.heard = True
             self.hearingPos = noisePos
+
+    def pause(self):
+        self.getAiBehaviors().pauseAi("all")

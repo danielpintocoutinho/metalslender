@@ -43,9 +43,9 @@ class MetalSlender(ShowBase):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg13", self.render)
+		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg", self.render)
 		self.blocoh = scene_obj.SceneObj("blocoh", "assets/chicken/blocoh", self.render)
-		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
+		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor", WALL_MASK,FLOOR_MASK)
 		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
 		
 		self.actions = ActionManager(self, self.room.getNodePath())
@@ -87,7 +87,7 @@ class MetalSlender(ShowBase):
 		#self.target2.hide()
 
 		self.enemy = Enemy(Vec3(-76.1808, -52.1483, -14.4758), [self.target1, self.target2])
-		self.enemy.defineDynamicObjects("**/LCG_porta*")
+		self.enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
 
 		self.AIworld = AIWorld(render)
 
