@@ -1,94 +1,73 @@
-import panda3d
-import sys,os
+from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, PerspectiveLens, PointLight, Spotlight, Vec3, Vec4
 
-from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
-from pandac.PandaModules import Vec3
-from direct.interval.IntervalGlobal import *
-from direct.actor import Actor
-from direct.task.Task import Task
-from random import *
-from collisionSystem import *
+from scene_obj import SceneObject
+from collision import CollisionMask as Mask
 
-class Room:
+class Room(SceneObject):
 
 	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
-		self.base = base
+		self.root = scene.attachNewNode(name)
 		
-		#TODO: The modelpath could be the model itself
-		self.modelNP = scene.attachNewNode(name)
 		self.model = base.loader.loadModel(model)
-		self.model.reparentTo(self.modelNP)
+		self.model.reparentTo(self.root)
 		
-		self.modelNP.setPos(pos)
-		self.modelNP.setScale(scale)
+		self.root.setPos(pos)
+		self.root.setScale(scale)
 		
-		self.model.setCollideMask(BitMask32.allOff())
+		self.setupLightSources(scene)
+		
+		#TODO: Adjust ramp collision
+		#TODO: Load room objects and triggers
+		self.setCollision("**/*walls*", Mask.WALL)
+		self.setCollision("**/*floor*", Mask.FLOOR)
+		
+	def setupLightSources(self, scene):
+		self.lights = []
+		
+		for np in self.model.findAllMatches('**/=Light'):
+			if np.getTag('Light') == 'Point':
+				light = PointLight('PointLight.%d' % (len(self.lights) + 1,))
+			elif np.getTag('Light') == 'Spot':
+				light = Spotlight('Spotlight.%d' % (len(self.lights) + 1,))
 				
-# 		self.modelCollider = None
-# 		self.modelRay = None
-		self.wallHandler = CollisionHandlerPusher()
-		self.floorHandler = CollisionHandlerGravity()
-		self.floorHandler.setGravity(9.81+55)
-		self.floorHandler.setMaxVelocity(100)
-	
-# 	def setFloorCollision(self, fromMask, intoMask):
-# 		# the player's ray collider for ground collision detection
-# 		raygeometry = CollisionRay(0, 0, 1, 0, 0, -1)
-# 		self.modelRay = self.modelNP.attachNewNode(CollisionNode(self.name + 'Ray'))
-# 		self.modelRay.node().addSolid(raygeometry)
-# 		self.modelRay.node().setFromCollideMask(fromMask)
-# 		self.modelRay.node().setIntoCollideMask(intoMask)
-# 		self.floorHandler.addCollider(self.modelRay, self.modelNP)
-# 		# ...then add the player collide sphere and the wall handler
-# 		self.base.cTrav.addCollider(self.modelRay, self.floorHandler)	
-# 		
-# 	def setWallCollision(self, fromMask, intoMask):
-# 		self.modelCollider.node().setFromCollideMask(fromMask)
-# 		self.modelCollider.node().setIntoCollideMask(intoMask)
-# 		self.wallHandler.addCollider(self.modelCollider, self.modelNP)
-# 		
-# 		self.base.cTrav.addCollider(self.modelCollider, self.wallHandler)
-		
-	def setTerrainCollision(self, wallPath, floorPath, wallMask, floorMask):
-		self.floorcollider = self.model.find(floorPath)
-		self.wallcollider  = self.model.find(wallPath)
-		
-# 		if not self.floorcollider.is_empty:
-		self.floorcollider.node().setFromCollideMask(BitMask32.allOff())
-		self.floorcollider.node().setIntoCollideMask(floorMask)
+				fov = np.getTag('Fov')
+				if fov:
+					light.getLens().setFov(float(fov))
+					
+				nf = np.getTag('NearFar').split(',')
+				if len(nf) > 1:
+					light.getLens().setNearFar(float(nf[0]), float(nf[1]))
+				
+				exp = np.getTag('Exponent')
+				if exp:
+					light.setExponent(float(exp))
+					
+			elif np.getTag('Light') == 'Directional':
+				light = DirectionalLight('DirectionalLight.%d' % (len(self.lights) + 1,))	
 			
-# 		if not self.wallcollider.is_empty:
-		self.wallcollider.node().setFromCollideMask(BitMask32.allOff())
-		self.wallcollider.node().setIntoCollideMask(wallMask)
+			materials = np.findAllMaterials()
+			if len(materials) > 0:
+				light.setColor(materials[0].getDiffuse())
+			
+			attenuation = np.getTag('Attenuation').split(',')
+			if len(attenuation) > 0 and not isinstance(light, DirectionalLight):
+				light.setAttenuation(tuple([float(a) for a in attenuation]))
+				
+			if np.getTag('Shadow'):
+# 				self.model.setShaderAuto()
+				light.setShadowCaster(True)
+			
+			self.lights.append(light)
+			
+			lightNP = self.model.attachNewNode(light)
+			lightNP.setPos(np.getPos())
+			lightNP.setHpr(np.getHpr())
+# 			lightNP.setCompass()
+			self.model.setLight(lightNP)
+			
+			if np.getTag('Hide'):
+				np.removeNode()
 		
-	def getFloorHandler(self):
-		return self.floorHandler
-	
-	def getPos(self):
-		return self.modelNP.getPos()
-	
-	def setModelPos(self,pos):
-		self.model.setPos(pos)
-		
-	def setNodePathPos(self,pos):
-		self.modelNP.setPos(pos)
-	
-	def getScale(self):
-		return self.model.getScale()
-	
-	def setScale(self,scale):
-		self.model.setScale(scale)
-	
-	def setPosInterval(self, time, startPos, finalPos, onAxis = True):
-		if (onAxis): return self.modelNP.posInterval(time,finalPos,startPos)
-		else: return self.model.posInterval(time,finalPos,startPos)
-	
-	def setHprInterval(self, time, startAngle, finalAngle, onAxis = True):
-		if (onAxis): return self.modelNP.hprInterval(time,finalAngle,startAngle)
-		else: return self.model.hprInterval(time,finalAngle,startAngle)
-	
-	def getModel(self):
-		return self.model
-	
-	def getNodePath(self):
-		return self.modelNP
+	def setCollision(self, pattern, intoMask):
+		for np in self.model.findAllMatches(pattern): 
+			np.node().setIntoCollideMask(intoMask)

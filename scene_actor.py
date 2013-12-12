@@ -3,19 +3,30 @@ from pandac.PandaModules import Vec3
 from pandac.PandaModules import ActorNode, CollisionHandlerQueue, CollisionHandlerGravity, CollisionHandlerPusher, CollisionNode, CollisionSphere, CollisionTraverser, BitMask32, CollisionRay
 import scene_obj
 
-class SceneActor(scene_obj.SceneObj):
+#TODO: Class may be improved by adding animations
+class SceneActor(scene_obj.SceneObject):
 
-	def __init__(self, name, model, source, pos, scale, animations):
+	def __init__(self, name, model, scene, pos, scale, animations):
 		'''
 		Constructor
 		'''
-		scene_obj.SceneObj.__init__(self, name, "", source, None, None, True)
+		scene_obj.SceneObject.__init__(self, name, "", scene, None, None, True)
+		
+		if (model):
+			self.model = base.loader.loadModel(model)
+			self.model.reparentTo(self.root)
+			self.model.setCollideMask(BitMask32.allOff())
+
+			self.modelBody = self.model.attachNewNode(CollisionNode('ralph'))
+			self.modelBody.node().addSolid(CollisionSphere(0, 0, 0, 1.2))
+			self.modelBody.node().setFromCollideMask(BitMask32.allOff())
+			self.modelBody.node().setIntoCollideMask(SENTINEL_MASK)
 		
 		self.model=Actor.Actor(model, animations)
 		self.model.setCollideMask(BitMask32.allOff())
 		self.setNodePathPos(pos)
 		self.setModelPos(Vec3(0,0,0))
-		self.model.reparentTo(self.modelNP)
+		self.model.reparentTo(self.root)
 		self.setScale(scale)
 		self.intervals = {}
 		self.hasModel = True

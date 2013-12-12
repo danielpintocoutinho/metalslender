@@ -1,4 +1,5 @@
-from math import sin, pi
+from panda3d.core import PerspectiveLens, Spotlight, Vec4
+
 
 from panda3d.core import *
 

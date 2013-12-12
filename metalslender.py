@@ -1,41 +1,33 @@
 #!/usr/bin/ppython
-from pandac.PandaModules import AmbientLight, Vec3, Vec4, CollisionTraverser, WindowProperties
-
 from direct.showbase.ShowBase import ShowBase
+from panda3d.ai import *
+from panda3d.core import AmbientLight, Vec3, Vec4, CollisionTraverser, \
+	WindowProperties, AntialiasAttrib, Fog, Texture, TextureStage
 
-from hud import HUD
-from player import Player
-from camera import CameraControls
-from door import Door
-from eventsManager import EventManager
-from controls import PlayerControls
+from MainMenu import MainMenu
 from actionsManager import ActionManager
+from camera import CameraControls
+from controls import PlayerControls
+from door import Door
 from enemy import Enemy
+from eventsManager import EventManager
+from hud import HUD
+import interface
+from player import Player
 from room import Room
 
-from panda3d.core import AntialiasAttrib, Fog, Texture, TextureStage
 
+# loadPrcFileData("", "prefer-parasite-buffer #f")
 #TODO: Review these files
-import scene_obj
-import scene_actor
-import interface
-import collisionSystem
-from panda3d.ai import *
-from MainMenu import MainMenu
-
-# menu = interface.Interface()
-
-floorHandler = collisionSystem.floorHandler
-wallHandler = collisionSystem.wallHandler
-
-#** Collision masks
-FLOOR_MASK=collisionSystem.FLOOR_MASK
-WALL_MASK=collisionSystem.WALL_MASK
+CAM_NEAR=0.1
+CAM_FAR =1000
 
 CAM_NEAR = 0.1
 CAM_FAR  = 1000
 
 class MetalSlender(ShowBase):
+	
+	VERSION=0.1
 		
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -48,23 +40,22 @@ class MetalSlender(ShowBase):
 
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
-		#TODO: Correct model scaling
-		self.room   = Room(self, "room", "temp/lcg", self.render)
-		self.blocoh = Room(self, "blocoh", "temp/blocoh", self.render)
+		self.rooms = []
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg13" , self.render))
+# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
+		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
 		
-		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
-		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)
+		#TODO: Support multiple rooms
+		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='', scene=self.render)
+		self.actions = ActionManager(self, self.rooms[0].model, self.player)
 		
-		self.player   = Player(name = "player", pos = Vec3(90,90,12), model='', scene=self.render)
-		self.actions  = ActionManager(self, self.room.getNodePath(), self.player)
+		self.taskMgr.add(self.player.updateAll, "player/update")
+		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
 		
 		EventManager(self, self.player, self.actions).start()
 
 		#TODO: Only test code
 		self.placeTargets()
-
-		#self.target1.hide()
-		#self.target2.hide()
 
 		self.enemy = Enemy(Vec3(-76.1808, -52.1483, -14.4758), [self.target1, self.target2])
 
@@ -148,6 +139,7 @@ class MetalSlender(ShowBase):
 		self.banana.setScale(20)
 		self.banana.setPos(23.3466, -85.0269, -14.4758)
 		self.banana.reparentTo(self.render)
+
 
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()

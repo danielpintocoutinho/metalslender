@@ -1,24 +1,19 @@
-from pandac.PandaModules import Vec3
-from panda3d.core import BitMask32
-
 from collections import defaultdict
-from math import sin,pi
-from random import random
 
-from lighting import Flashlight
-from scene_obj import SceneObj
-from hud import HUD
-import collisionSystem
-
-from direct.showbase.DirectObject import DirectObject
-from direct.interval.LerpInterval import LerpPosInterval
-from direct.interval.LerpInterval import LerpHprInterval
 from direct.interval.IntervalGlobal import Sequence
+from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
+from panda3d.core import BitMask32, CollisionSphere, Vec3
+
+from random import random
+from collision import CollisionMask as Mask
+from hud import HUD
+from lighting import Flashlight
+from scene_obj import SceneObject
 
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 0.2
 
-class Player(SceneObj):
+class Player(SceneObject):
 	
 	RESTFUL=0
 	TIRED=1
@@ -49,8 +44,8 @@ class Player(SceneObj):
 	breathrates[(EXHAUSTED, WALKING)] = 1.0 / 160
 	breathrates[(EXHAUSTED, RUNNING)] =-1.0 /   5
 
-	def __init__(self, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObj.__init__(self, name, model, scene, pos, scale, False)
+	def __init__(self, base, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
+		SceneObject.__init__(self, base, name, model, scene, pos, scale)
 
 		self.breath  = 1.0
 		self.fear    = 0.0
@@ -61,7 +56,7 @@ class Player(SceneObj):
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
 		
-		self.setupCamera()
+		self.setupCamera(base)
 		self.setupFlashlight()
 		self.setupKeys()
 		self.setupCollistion()
@@ -69,6 +64,8 @@ class Player(SceneObj):
 		self.updateState(Player.RESTFUL)
 
 		self.last = 0
+		
+	#TODO: add method boo!
 		
 	#TODO: Move this to flashlight class?
 	def setupFlashlight(self):
@@ -92,15 +89,19 @@ class Player(SceneObj):
 		self.keys = [Player.STOPPED] * 4
 
 	#TODO: Create my own camera and put it into base.cam
-	def setupCamera(self):
+	def setupCamera(self, base):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
 		self.cam.setPos(Vec3(0,0,Player.HEIGHT))
 		
 	def setupCollistion(self):
-		self.setObjCollision()
-		self.setFloorCollision(collisionSystem.FLOOR_MASK, BitMask32.allOff())
-		self.setWallCollision(collisionSystem.WALL_MASK, BitMask32.allOff())
+		#TODO: Use a Polygon, instead
+		self.addCollisionSolid(CollisionSphere(0, 0, 0, Player.HEIGHT / 7))
+# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
+# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
+		self.addCollisionRay()
+		self.setFloorCollision(fromMask=Mask.FLOOR)
+		self.setWallCollision(fromMask=Mask.WALL)
 		
 	def setupSound(self):
 		#sounds of the player
@@ -203,7 +204,7 @@ class Player(SceneObj):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.getFloorHandler().isOnGround() and \
+			if (self.floorHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -252,13 +253,13 @@ class Player(SceneObj):
 			return task.done
 	
 	def jump(self):
-		if self.getFloorHandler().isOnGround(): 
+		if self.floorHandler.isOnGround(): 
 			self.getFloorHandler().addVelocity(Player.JUMP_POWER)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.getFloorHandler().isOnGround():
+		if self.floorHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()

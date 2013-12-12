@@ -20,8 +20,8 @@ class ActionManager(DirectObject):
 		self.player = player
 		
 		self.center = Vec3(0,0,0)		
-		self.hand   = Vec3(0,0,0)
-		self.point0 = scene_obj.SceneObj("act_point0","assets/models/sphere", base.render, self.hand, 1)
+		self.hand  = Vec3(0,0,0)
+		self.point0 = scene_obj.SceneObject(base, "act_point0","assets/models/sphere", base.render, self.hand, 1)
 		
 		self.doors = [Door(base, room,Vec3(101, 32, 0), Vec3(-90, 0, 0), 90), \
 					  Door(base, room,Vec3(40, 35, 0), Vec3(0, 0, 0), 90), \
@@ -38,7 +38,7 @@ class ActionManager(DirectObject):
 		self.accept("u", self.hide)
 		self.accept("i", self.show)
 		
-		self.point0.model.hide()
+		self.point0.getNodePath().hide()
 	
 	def update(self):
 		self.center = self.player.getNodePath().getPos()
@@ -53,7 +53,7 @@ class ActionManager(DirectObject):
 		self.hand = rot2 + self.center
 		self.hand.setZ(self.hand.getZ() + self.base.cam.getPos().getZ() - 5)
 	
-		self.point0.model.setPos(self.hand)			
+		self.point0.getNodePath().setPos(self.hand)
 		
 	def act(self):
 		
