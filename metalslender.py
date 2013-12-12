@@ -113,7 +113,7 @@ class MetalSlender(ShowBase):
 	
 		self.setBackgroundColor(0,0,0.2,1)
 	
-		self.camLens.setNearFar(0.001,1000)
+		self.camLens.setNearFar(1,1000)
 		self.camLens.setFov(75)
 
 		self.disableMouse()

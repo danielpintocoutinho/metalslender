@@ -10,7 +10,7 @@ POWER_RATE = -1/120.0
 
 #TODO: Think about it: should all task management be setup in MetalSlender class?
 class Flashlight:
-	def __init__(self, name, owner, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.01, far = 100):
+	def __init__(self, name, owner, color = Vec4(1.0, 1.0, 0.9, 1), fov =	60,	near = 0.0001, far = 30):
 		self.color = color
 		self.power = 1.0
 		self.last  = 0.0
