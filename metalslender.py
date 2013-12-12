@@ -37,7 +37,8 @@ class MetalSlender(ShowBase):
 		# Load the scene.
 		self.rooms = []
 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg13" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
+# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
+		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
 		
 		#TODO: Support multiple rooms
 		self.actions = ActionManager(self, self.rooms[0].model)
@@ -137,7 +138,7 @@ class MetalSlender(ShowBase):
 # 		self.inst_h = menu.addInstructions(0.75 , 'I: increase fear' )
 		return True
 	
-	def setAmbientlight(self, color = Vec4(0.31, 0.31, 0.31, 1)):
+	def setAmbientlight(self, color = Vec4(0.01, 0.01, 0.01, 1.0)):
 		alight = AmbientLight("Ambient")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)

@@ -11,7 +11,6 @@ from lighting import Flashlight
 from panda3d.core import BitMask32
 from scene_obj import SceneObject
 
-
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 0.2
 
@@ -20,8 +19,8 @@ TIRED=1
 EXHAUSTED=2
 
 STOPPED=0.0
-WALKING=1.0
-RUNNING=8.0
+WALKING=8.0
+RUNNING=2.0
 
 NORMAL   = 1.0
 CRAWLING = 0.5
