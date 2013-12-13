@@ -17,7 +17,7 @@ class SceneObject:
 		self.wallHandler  = CollisionHandlerPusher()
 		self.floorHandler = CollisionHandlerGravity()
 		#TODO: Adjust gravity and max velocity
-		self.floorHandler.setGravity(9.81+80)
+		self.floorHandler.setGravity(9.81+60)
 # 		self.floorHandler.setMaxVelocity(1000)
 		#BUG: The player cannot walk through a wall, but he may run through it!
 		
@@ -43,3 +43,6 @@ class SceneObject:
 	
 	def getNodePath(self):
 		return self.root
+
+	def removeCollisionSolid(self):
+		self.collSol.node().clearSolids()

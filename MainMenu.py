@@ -44,6 +44,7 @@ class MainMenu:
       
   def show(self):
     self.mainFrame.show()
+    self.image.show()
 
   
   #TODO: check this

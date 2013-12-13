@@ -103,8 +103,8 @@ class EventManager(DirectObject):
 		#print "##"
 		#print("eve:",self.point.getX(),self.point.getY(),self.point.getZ())
 		#print("eve:",self.center.getX(),self.center.getY(),self.center.getZ())
-		print self.diff_dist(self.base.render.find("point3"))
-		print self.diff_dir(self.base.render.find("point3"))
+		#print self.diff_dist(self.base.render.find("point3"))
+		#print self.diff_dir(self.base.render.find("point3"))
 			
 		return Task.cont
 		
@@ -126,3 +126,16 @@ class EventManager(DirectObject):
 	
 	def start(self):
 		self.base.taskMgr.add(self.update, "update-task")
+
+	def destroy(self):
+		self.point0.root.removeNode()
+		self.point1.root.removeNode()
+		self.point2.root.removeNode()
+		self.point3.root.removeNode()
+		self.firstEnemy.removeNode()
+
+		base.loader.unloadSfx(self.scare)
+		base.loader.unloadSfx(self.tension)
+
+
+

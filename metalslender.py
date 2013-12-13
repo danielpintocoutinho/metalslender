@@ -1,5 +1,6 @@
 #!/usr/bin/ppython
 from direct.showbase.ShowBase import ShowBase
+from direct.gui.DirectGui import *
 from panda3d.ai import *
 from panda3d.core import AmbientLight, Vec3, Vec4, CollisionTraverser, \
 	WindowProperties, AntialiasAttrib, Fog, Texture, TextureStage
@@ -15,6 +16,8 @@ from hud import HUD
 import interface
 from player import Player
 from room import Room
+import time
+import math
 
 # loadPrcFileData("", "prefer-parasite-buffer #f")
 #TODO: Review these files
@@ -24,9 +27,11 @@ CAM_FAR =1000
 CAM_NEAR = 0.1
 CAM_FAR  = 1000
 
+
 class MetalSlender(ShowBase):
 	
 	VERSION=0.1
+
 		
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -38,39 +43,20 @@ class MetalSlender(ShowBase):
 		self.setupEnvironment()
 		
 		self.AIworld = AIWorld(self.render)
-		self.enemies = []
 
-		#TODO: Many things are only done once the game is started
-		# Load the scene.
-		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "temp/lcg13" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
-		
-		for enemy in self.enemies:
-			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
-		
-		#TODO: Support multiple rooms
-		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
-		self.actions = ActionManager(self, self.rooms[0].model, self.player)
-# 		print self.player.root.ls()
-		
-		self.taskMgr.add(self.player.updateAll, "player/update")
-		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-		
-		EventManager(self, self.player, self.actions).start()
 
-		#TODO: Only test code
-		self.placeTargets()
+		self.initTimer = True
+		self.time = 0
+		self.gameOver = True
 
-# 		self.enemy = Enemy(Vec3(-76.1808, -52.1483, -14.4758), [self.target1, self.target2])
+		self.setFrameRateMeter(True)
+		self.taskMgr.add(self.menuDisplay, "menuDisplay")
+
 # 		self.AIworld.addAiChar(self.enemy.getHooded())
 
 		self.mainMenu = MainMenu(self)
 		#self.mainMenu.hide()
 
-		self.taskMgr.add(self.player.updateAll, "player/update")
-		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 
 		# User controls
 		self.addCommands()
@@ -106,7 +92,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.05, 0.05, 0.05, 1)):
+	def setupLighting(self, color = Vec4(0.3, 0.3, 0.3, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -117,31 +103,6 @@ class MetalSlender(ShowBase):
 		alight.setColor((1.0,1.0,1.0,1.0))
 		self.shadeless = self.render.attachNewNode(alight)
 		
-	def placeTargets(self):
-		self.target1 = self.loader.loadModel("assets/chicken/arrow")
-		self.target1.setColor(1,0,0)
-		self.target1.setPos(-76.1808, -52.1483, -14.0991)
-		self.target1.setScale(5)
-		self.target1.reparentTo(self.render)
-
-		self.target1 = self.loader.loadModel("assets/chicken/arrow")
-		self.target1.setColor(1,0,0)
-		self.target1.setPos(23.3466,  30.4134, -14.0991)
-		self.target1.setScale(5)
-		self.target1.reparentTo(self.render)
-
-		# Target2
-		self.target2 = self.loader.loadModel("assets/chicken/arrow")
-		self.target2.setColor(0,1,0)
-		self.target2.setPos(23.3466, -85.0269, -14.0991)
-		self.target2.setScale(5)
-		self.target2.reparentTo(self.render)
-
-		self.banana = self.loader.loadModel("assets/chicken/banana")
-		self.banana.setScale(20)
-
-		self.banana.setPos(23.3466, -85.0269, -14.4758)
-		self.banana.reparentTo(self.render)
 
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()
@@ -149,10 +110,10 @@ class MetalSlender(ShowBase):
 		self.render.setShaderAuto()
 	
 		#TODO: Must be moved to player's camera
-		self.camLens.setNearFar(CAM_NEAR,CAM_FAR)
+		#self.camLens.setNearFar(CAM_NEAR,CAM_FAR)
 		self.camLens.setFov(75)
 
-		self.disableMouse()
+		#self.disableMouse()
 		self.win.movePointer(0, 100, 100)
 
 		self.props = WindowProperties()
@@ -168,6 +129,7 @@ class MetalSlender(ShowBase):
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
+		self.accept('g', self.endGame)
 		self.accept('i', self.actionKeys, ['i'])
 
 	def actionKeys(self, key):
@@ -184,20 +146,170 @@ class MetalSlender(ShowBase):
 		return True
 
 	def AIUpdate(self,task):
+		hasAttacked = []
 		for enemy in self.enemies:
-			enemy.update()
-		self.AIworld.update()       
+			attack = enemy.update()
+			hasAttacked.append(attack)
+		#print "novo ciclo"
+		for i in hasAttacked:
+			if (i == True):
+				#print "vai chamar o hurt"
+				self.player.hurt()
+				#attack
+		self.AIworld.update()
+		if (not self.taskMgr.hasTaskNamed("player/update")):
+			for enemy in self.enemies:
+				enemy.stop()
+			self.endGame()
+			return task.done
 		return task.cont
 
 	def newGame(self):
+		
+		self.enemies = []
+		self.doors = []
+		self.keys = []
+
+		#TODO: Many things are only done once the game is started
+		# Load the scene.
+		self.rooms = []
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+		
+		for enemy in self.enemies:
+			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
+		
+		#TODO: Support multiple rooms
+		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
+		self.actions = ActionManager(self, self.rooms[0].model, self.player)
+		self.actions.addDoors(self, self.rooms[1].model, self.doors)
+		self.actions.addKeys(self, self.rooms[1].model, self.keys)
+		
+		self.em = EventManager(self, self.player, self.actions)
+		self.em.start()
+
+		self.player.start()
+		for enemy in self.enemies:
+			enemy.start()
+
+
 		self.hud      = HUD(self, self.player)
 		self.controls = PlayerControls(self.player, self.actions)
 		self.camctrl  = CameraControls(self, self.player)
 
+
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
 		self.mainMenu.hide()
-		
+
+
+		self.taskMgr.add(self.player.updateAll, "player/update")
+		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
+		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
+		self.taskMgr.add(self.playerUpdate, "playerUpdate")
+		
+
+	def endGame(self):
+		self.hud.hide()
+		if (self.gameOver):
+			self.image = OnscreenImage(image="assets/images/GameOver.png", pos = (0, 0, 0), parent=base.render2d, scale=(1,1,1))
+		else:
+			self.image = OnscreenImage(image="assets/images/to-be-continued.jpg", pos = (0, 0, 0), parent=base.render2d, scale=(1,1,1))
+		self.startTimer(3)
+
+		for room in self.rooms:
+			room.model.removeNode()
+		self.player.clean()
+		self.player.getNodePath().removeNode()
+		for enemy in self.enemies:
+			enemy.seeker.cleanup()
+			enemy.hooded.slnp.removeNode()
+			enemy.hooded.clean()
+			enemy.seeker.removeNode()
+			enemy.model.removeNode()
+		self.em.destroy()
+		for door in self.actions.doors:
+			door.clean()
+			door.model.removeNode()
+			door.knob.removeNode()
+		self.actions.point0.root.removeNode()
+		for key in self.actions.keys:
+			key.clean()
+			key.model.removeNode()
+
+
+		self.taskMgr.remove("player/update")
+		self.taskMgr.remove("player/flashlight/update")
+		self.taskMgr.remove("AIUpdate")
+		self.taskMgr.remove("update-task")
+		self.taskMgr.remove("checkGoal")
+		self.taskMgr.remove('hud')
+		self.taskMgr.remove("camera/control")
+
+
+
+
+	def menuDisplay(self, task):
+		if (self.initTimer == False):
+			hasFinished = self.timer()
+			if (hasFinished):
+				self.resetTimer()
+				self.image.hide()
+				self.props.setCursorHidden(False)
+				self.props.setMouseMode(self.props.M_absolute)
+				self.win.requestProperties(self.props)
+				self.mainMenu.show()
+
+		return task.cont
+
+
+
+	def timer(self):
+		currentTime = time.time()
+		diff = currentTime - self.time
+		if (diff > self.interval):
+			self.resetTimer()
+			return True
+		else:
+			return False
+
+	def resetTimer(self):
+		self.initTimer = True
+
+	def startTimer(self, interval):
+		if (self.initTimer == True):
+			self.interval = interval
+			self.initTimer = False
+			self.time = time.time()
+
+	def distance(self, p1, p2):
+		#print "p1: ", p1
+		#print "p2: ", p2    
+		d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
+		return math.sqrt(d)
+
+	def playerUpdate(self, task):
+		reached = self.checkGoal()
+		if (reached):
+			self.endGame()
+			return task.done
+		someKey = False
+		for key in self.actions.keys:
+			if (key.wasPicked()):
+				someKey = True
+		self.hud.setKey(someKey)
+
+		return task.cont
+
+	def checkGoal(self):
+		dist = self.distance(self.player.getNodePath().getPos(), self.goal.getPos())
+		radius = 40
+		if (dist < radius):
+			self.gameOver = False
+			return True
+		return False
+
+
 
 MetalSlender().run()

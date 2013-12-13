@@ -28,10 +28,11 @@ class ActionManager(DirectObject):
 					  Door(base, room,Vec3(102, 4.5, 0), Vec3(0, 0, 0), -85), \
 					  Door(base, room,Vec3(222.5, 35, 5.1), Vec3(0, 0, 0), 90), \
 					  Door(base, room,Vec3(250, 37, 5.1), Vec3(90, 0, 0), -87), \
-		              Door(base, room,Vec3(249.5, 58.5, 5.1), Vec3(125, 0, 0), -117)]
+		              Door(base, room,Vec3(249.5, 58.5, 5.1), Vec3(125, 0, 0), -117)
+		              ]
 		              
-		#self.locked_doors = [LockedDoor(base, room,Vec3(35, -45, 0), Vec3(180, 0, 0), -90)]
-		self.locked_doors = []
+		self.locked_doors = [LockedDoor(base, room,Vec3(35, -45, 0), Vec3(180, 0, 0), -90)]
+		#self.locked_doors = []
 
 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 7.32), Vec3(0, 0, 0))]
 		
@@ -89,3 +90,16 @@ class ActionManager(DirectObject):
 		
 	def diff_dist(self, point):	
 		return (point.getPos() - self.point).length()
+
+
+	def addDoors(self, base, room, doors):
+		print "numero de portas: ", len(doors)
+		for door in doors:
+			newDoor = Door(base, room, door.getPos(render), Vec3(-90, 0, 0), 90)
+			self.doors.append(newDoor)
+
+	def addKeys(self, base, room, keys):
+		print "numero de chaves: ", len(keys)
+		for key in keys:
+			newKey = Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",key.getPos(render), Vec3(0, 0, 0))
+			self.keys.append(newKey)

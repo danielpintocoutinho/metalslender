@@ -1,4 +1,4 @@
-from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, PerspectiveLens, PointLight, Spotlight, Vec3, Vec4
+from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, PerspectiveLens, PointLight, Spotlight, Vec3, Vec4, CullFaceAttrib
 
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
@@ -11,6 +11,9 @@ class Room(SceneObject):
 		
 		self.model = base.loader.loadModel(model)
 		self.model.reparentTo(self.root)
+
+		self.model.setDepthOffset(1)
+		self.model.setAttrib(CullFaceAttrib.make(CullFaceAttrib.MCullClockwise))
 		
 		self.root.setPos(pos)
 		self.root.setScale(scale)
@@ -18,6 +21,9 @@ class Room(SceneObject):
 		self.setupLightSources(scene)
 		self.setupCollision()
 		self.setupEnemies(base)
+		self.setupGoal(base)
+		self.setupDoors(base)
+		self.setupKeys(base)
 		
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
@@ -27,6 +33,18 @@ class Room(SceneObject):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
 	 		base.enemies.append(Enemy(np.getPos(), patrol))
 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
+
+	def setupGoal(self, base):
+		np = self.model.find('**/Goal')
+		base.goal = np
+
+	def setupDoors(self, base):
+		for np in self.model.findAllMatches('**/Door*'):
+	 		base.doors.append(np)
+
+	def setupKeys(self, base):
+		for np in self.model.findAllMatches('**/Key*'):
+	 		base.keys.append(np)
 			
 	def setupCollision(self):
 		#TODO: Adjust ramp collision

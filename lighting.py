@@ -37,10 +37,12 @@ class Flashlight:
 		lens1.setNearFar(near, far)
 # 		lens2.setNearFar(near, far)
 
+		lens1.setFilmSize(5096)
+
 		self.light1 = Spotlight(name + '/wide')
 # 		self.light2 = Spotlight(name + '/narrow')
 		
-		self.light1.setShadowCaster(True)
+		self.light1.setShadowCaster(True, 2048, 2048, 1)
 # 		self.light2.setShadowCaster(False)
 		
 		self.light1.setColor(color)
@@ -86,3 +88,6 @@ class Flashlight:
 	
 	def setHpr(self, vec):
 		self.node1.setHpr(vec)
+
+	def isOn(self):
+		return self.on

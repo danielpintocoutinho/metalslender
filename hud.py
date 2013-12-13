@@ -20,8 +20,12 @@ class HUD(DirectObject):
 		self.last = 0
 		self.heartbasis = 'assets/images/heartbeat2-%d.png'
 		self.heartframe = 0
-		self.heartimage = OnscreenImage(self.heartbasis % (1,), scale=(0.1,1,0.1), pos=(0,1,-0.8))
-		self.text = OnscreenText('', pos=(0, -0.975), scale=0.05, fg=(0,1,0,1),	bg=(0,0,0,1))
+		self.heartimage = OnscreenImage(self.heartbasis % (1,), scale=(0.1,0.1,0.1), pos=(-1,0, 0.8))
+		self.keyimage = OnscreenImage('assets/images/key.png', scale=(0.08,0.08,0.08), pos=(-1,0,0.60))
+		self.keyimage.setTransparency(TransparencyAttrib.MAlpha)
+		self.text = OnscreenText('', pos=(-0.8, 0.8), scale=0.05, fg=(0,1,0,1),	bg=(0,0,0,0))
+
+		self.hasKey = False
 
 		self.base.taskMgr.add(self.update, 'hud')
 
@@ -57,7 +61,18 @@ class HUD(DirectObject):
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
 			#return task.done
 
+		if (self.hasKey):
+			self.keyimage.show()
+		else:
+			self.keyimage.hide()
 		self.heartimage.show()
 		self.text.show()
 
 		return task.cont
+
+	def hide(self):
+		self.heartimage.hide()
+		self.text.hide()
+
+	def setKey(self, key):
+		self.hasKey = key

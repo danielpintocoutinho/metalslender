@@ -13,6 +13,7 @@ class Hooded(AICharacter):
 
     def initialize(self):
         self.initTimer = True
+        self.attackTimer = True
         self.currentStatus = 0
 
         # we create a spotlight that will be the sentinel's eye and will be used to fire the inView method
@@ -36,8 +37,8 @@ class Hooded(AICharacter):
         self.goingBack = False
         self.heard = False
         self.isProtected = False
-        self.lastPos = self.get_node_path().getPos(render)
-
+        self.Attacked = False
+        self.started = False
 
         self.sentinelHandler = CollisionHandlerQueue()
 
@@ -46,7 +47,7 @@ class Hooded(AICharacter):
         sentinelRay = self.get_node_path().attachNewNode(CollisionNode('sentinelray'))
         sentinelRay.node().addSolid(sentraygeom)
         # we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
-        sentinelRay.node().setFromCollideMask(CollisionMask.SENTINEL|CollisionMask.WALL)
+        sentinelRay.node().setFromCollideMask(CollisionMask.SENTINEL|CollisionMask.WALL|CollisionMask.DOOR)
         sentinelRay.node().setIntoCollideMask(CollisionMask.NONE)
         # we add the ray to the sentinel collider and now it is ready to go
         base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
@@ -58,16 +59,22 @@ class Hooded(AICharacter):
         self.currentTarget = 0
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
+        print "num targets: ", self.numTargets
+        for i in self.PatrolPos:
+            print i.getPos(render)
         self.increment = 1
         self.getAiBehaviors().seek(self.PatrolPos[0])
 
     def distance(self, p1, p2):
+        #print "p1: ", p1
+        #print "p2: ", p2    
         d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
         return math.sqrt(d)
         
     #to update the AIWorld    
     def update(self):
-        #self.currentStatus = 5
+        if (self.started == False):
+            return False
         captured = self.sent_detect()
         if (captured):
             if (self.isProtected):
@@ -107,6 +114,12 @@ class Hooded(AICharacter):
             self.kill()
         elif self.currentStatus == 4:
             self.pause()
+        #print "vai atacar? ", self.Attacked
+        if (self.Attacked):
+            self.Attacked = False
+            return True
+        return False
+
  
     def patrol(self):
         distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
@@ -119,6 +132,7 @@ class Hooded(AICharacter):
             #self.getAiBehaviors().resumeAi("wander")
             hasFinished = self.timer()
             if (hasFinished == True):
+                print self.PatrolPos[self.currentTarget].getPos(render)
                 self.currentTarget += self.increment
                 if (self.currentTarget == self.numTargets - 1):
                     self.increment = -1
@@ -173,7 +187,9 @@ class Hooded(AICharacter):
         if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
             print "entrei?"
             #print self.get_node_path().getPos()
-            if (distance > 3):
+            print distance
+            if (distance > 5):
+                print "Muito longe?"
                 self.getAiBehaviors().pauseAi("all")
                 return
 
@@ -249,7 +265,23 @@ class Hooded(AICharacter):
 
 
     def kill(self):
-        print "Vou te kill"
+        #print "Vou te kill ", self.attackTimer
+        if (self.attackTimer):
+            self.Attacked = True
+            self.attackTimer = False
+            self.startTimer(3)
+            self.currentStatus = 4
+            #self.pause()
+        else:
+            hasFinished = self.timer()
+            print "has finished? ", hasFinished
+            if (hasFinished):
+                self.attackTimer = True
+                self.resetTimer()
+            else:
+                self.Attacked = False
+
+
         
 
     def sent_traverse(self, o):
@@ -261,13 +293,12 @@ class Hooded(AICharacter):
             entry = self.sentinelHandler.getEntry(0)
             colliderNode = entry.getIntoNode()
             # if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
-            for i in self.sentinelHandler.getEntries():
-                print i.getIntoNode().getName()
+            #for i in self.sentinelHandler.getEntries():
+                #print i.getIntoNode().getName()
             if colliderNode.getName() == 'playerCollision.Solid':
                 self.isProtected = False
                 if self.detected == False:
                     self.detected = True
-                    self.screechsound = loader.loadSfx("assets/sounds/enemies/anazgul_scream.mp3")
                     self.screechsound.play()
                 return True
             elif colliderNode.getName() == 'lightarea':
@@ -288,7 +319,7 @@ class Hooded(AICharacter):
         # query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
             #print o.getPos(render)
             if self.slnp.node().isInView(o.getPos(self.slnp)):
-                print "Ta no meu campo de visao"
+                #print "Ta no meu campo de visao"
                 self.get_node_path().lookAt(o)
                 if self.sent_traverse(o):
                     self.pursueTarget = o
@@ -300,6 +331,8 @@ class Hooded(AICharacter):
     def timer(self):
         currentTime = time.time()
         diff = currentTime - self.time
+        #print "diff ", diff
+        #print "interval ", self.interval
         if (diff > self.interval):
             self.initTimer = True
             return True
@@ -310,17 +343,14 @@ class Hooded(AICharacter):
         self.initTimer = True
 
     def startTimer(self, interval):
+        #print "ja foi iniciado"
         if (self.initTimer == True):
             self.interval = interval
             self.initTimer = False
             self.time = time.time()
 
     def addDynamicObject(self, dynamicObject):
-        print "Adding dynamic objects"
-        print dynamicObject.getName()
-        #self.getAiBehaviors().addDynamicObstacle(dynamicObject)
         self.dynamicObstacles.append(dynamicObject)
-        print "deu pau?" 
 
 
     def hear(self, noisePos):
@@ -331,3 +361,13 @@ class Hooded(AICharacter):
 
     def pause(self):
         self.getAiBehaviors().pauseAi("all")
+
+    def start(self):
+        self.started = True
+
+    def stop(self):
+        self.started = False
+
+    def clean(self):
+        loader.unloadSfx(self.screechsound)
+

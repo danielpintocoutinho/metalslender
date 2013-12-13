@@ -50,6 +50,7 @@ class LockedDoor(DirectObject):
 		if (self.locked):
 			
 			if (key.wasPicked()):
+				key.used()
 				key.pickedSound.play()
 				self.unlockSound.play()
 				self.locked = 0

@@ -10,6 +10,8 @@ from hud import HUD
 from lighting import Flashlight
 from scene_obj import SceneObject
 
+import time
+
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 0.2
 
@@ -20,8 +22,8 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=7.5
-	RUNNING=3.5
+	WALKING=2.0
+	RUNNING=4.0
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
@@ -46,13 +48,19 @@ class Player(SceneObject):
 
 	def __init__(self, base, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
 		SceneObject.__init__(self, base, name, model, scene, pos, scale)
+		self.getNodePath().setPos(pos)
 
+		self.startPos = pos
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
 		self.stopped = 1.0
+		self.life = 2.0
 		self.pace = Player.NORMAL
-		
+
+		self.initTimer = True
+		self.attacked = False
+
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
 		
@@ -130,7 +138,8 @@ class Player(SceneObject):
 		return self.state == Player.EXHAUSTED
 
 	def isAlive(self):
-		return self.breath > -1
+		#return self.breath > -1
+		return self.life > 0.0
 
 	#TODO: Other methods like isDead()
 	
@@ -216,6 +225,8 @@ class Player(SceneObject):
 		
 		#Breathing sound
 		self.breathing.setVolume(max(self.breath_vol-1,self.breath_vol - self.breath))
+		if (self.breath == 0):
+			self.breath = 0.01
 		self.breathing.setPlayRate(min(1.0, 0.6 * (1/self.breath)))
 		
 	def updateBreath(self, elapsed):
@@ -239,6 +250,14 @@ class Player(SceneObject):
 		self.updateFlashBang()
 		self.updateSound()
 
+		if (self.attacked):
+			#print "Atacado"
+			timeFinished = self.timer()
+			if (timeFinished):
+				self.life += 1.0
+				self.attacked = False
+		#print "life: ", self.life
+
 		#TODO: Review player logic
 		if self.isAlive():
 			if self.breath > self.fear:
@@ -250,7 +269,6 @@ class Player(SceneObject):
 			#TODO: Send an event saying that it can't run anymore?
 			else:
 				pass
-
 			return task.cont
 		else:
 			#TODO: send a 'death' event and, possibly, play back a nice heart stopping animation
@@ -272,3 +290,49 @@ class Player(SceneObject):
 	
 	def scream(self):
 		self.screams.play()
+
+	def hurt(self):
+		#print "vou ser hurt"
+		self.attacked = True
+		self.life -= 1.0
+		self.startTimer(5)
+
+
+	def timer(self):
+		currentTime = time.time()
+		diff = currentTime - self.time
+		print diff
+		if (diff > self.interval):
+			self.resetTimer()
+			return True
+		else:
+			return False
+
+	def resetTimer(self):
+		self.initTimer = True
+
+	def startTimer(self, interval):
+		if (self.initTimer == True):
+			self.interval = interval
+			self.initTimer = False
+			self.time = time.time()
+
+	def start(self):
+		self.getNodePath().setPos(self.startPos)
+
+	def clean(self):
+		for step in self.footsteps:
+			loader.unloadSfx(step)      
+	
+		loader.unloadSfx(self.screams)
+		loader.unloadSfx(self.breathing)
+
+	def turnFlashlight(self):
+		self.flashlight.toggle()
+		print "on? ", self.flashlight.isOn()
+		if (self.flashlight.isOn()):
+			self.removeCollisionSolid()
+			self.addCollisionSolid(CollisionSphere(0, 0, 0, 20))
+		else:
+			self.removeCollisionSolid()
+			self.addCollisionSolid(CollisionSphere(0, 0, 0, 4))

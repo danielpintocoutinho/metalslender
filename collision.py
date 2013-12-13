@@ -8,3 +8,4 @@ class CollisionMask:
 	WALL  = BitMask32.bit(2)
 	SENTINEL = BitMask32.bit(3)
 	PLAYER = BitMask32(4)
+	DOOR = BitMask32.bit(5)

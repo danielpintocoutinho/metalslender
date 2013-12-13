@@ -10,7 +10,8 @@ class Enemy:
 		self.pos.z += 10
 		self.seeker.setPos(self.pos)
 		self.seeker.reparentTo(render)
-		self.seeker.setScale(60)
+		#self.seeker.setScale(6)
+		self.startPos = self.pos
 
 		self.hooded = Hooded("seeker",self.seeker, 20, 5, 5)
 		self.hooded.initialize()
@@ -20,7 +21,7 @@ class Enemy:
 		return self.hooded
 
 	def update(self):
-		self.hooded.update()
+		return self.hooded.update()
 
 	def defineDynamicObjects(self, model, objectsPath):
 		self.model = loader.loadModel(model)
@@ -30,3 +31,11 @@ class Enemy:
 
 	def hear(self, noisePos):
 		self.hooded.hear(noisePos)
+
+	def start(self):
+		self.seeker.setPos(self.startPos)
+		self.hooded.start()
+
+	def stop(self):
+		self.hooded.stop()
+
