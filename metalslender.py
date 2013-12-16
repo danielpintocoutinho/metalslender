@@ -38,7 +38,7 @@ class MetalSlender(DirectObject):
 		self.initConfig()
 
 		# Load the scene.
-		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg13")	
+		self.room = scene_obj.SceneObj("room", "assets/chicken/lcg")	
 		self.room.setTerrainCollision("**/LCG_walls_int","**/LCG_floor_01", WALL_MASK,FLOOR_MASK)
 		self.blocoh = scene_obj.SceneObj("blocoh", "assets/chicken/blocoh")
 		#self.blocoh.setTerrainCollision("**/H_corredor.003","**/H_floor_01", WALL_MASK,FLOOR_MASK)

@@ -85,7 +85,7 @@ class EventManager(DirectObject):
 				if (self.vol <= 0):
 					self.tension.stop()			
 		
-		#TODO: melhorar sistema para detecção da direção do olhar do jogador.  
+		#TODO: melhorar sistema para deteccao da direcao do olhar do jogador.git  
 		#1- Susto : corredor para a cozinha
 		if (not self.scared1 and (self.diff_dist(self.point2) < 5) and (self.diff_dir(self.point2)) < 10):
 			self.enemyInterval.start()
@@ -102,8 +102,8 @@ class EventManager(DirectObject):
 		#print "##"
 		#print("eve:",self.point.getX(),self.point.getY(),self.point.getZ())
 		#print("eve:",self.center.getX(),self.center.getY(),self.center.getZ())
-		print self.diff_dist(render.find("point3"))
-		print self.diff_dir(render.find("point3"))
+		#print self.diff_dist(render.find("point3"))
+		#print self.diff_dir(render.find("point3"))
 			
 		return Task.cont
 		
