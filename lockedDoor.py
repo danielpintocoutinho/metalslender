@@ -9,14 +9,14 @@ from direct.interval.IntervalGlobal import Sequence
 
 import scene_obj
 
-audio3d = Audio3DManager.Audio3DManager(base.sfxManagerList[0], camera)
-
 class LockedDoor(DirectObject):
 	
-	def __init__(self,fatherNode, pos, hpr, angle):
+	def __init__(self, base, fatherNode, pos, hpr, angle):
 		
-		self.model = loader.loadModel("assets/chicken/porta")
-		self.knob  = loader.loadModel("assets/chicken/knob")
+		audio3d = Audio3DManager.Audio3DManager(base.sfxManagerList[0], base.cam)
+		
+		self.model = base.loader.loadModel("assets/chicken/porta")
+		self.knob  = base.loader.loadModel("assets/chicken/knob")
 		self.knob.setPos(Vec3(17.6,0,8))
 		self.knob.reparentTo(self.model)
 		self.room = fatherNode
@@ -34,12 +34,10 @@ class LockedDoor(DirectObject):
 		knobInterval2  = self.knob.hprInterval(0.1,Vec3(0,0,0))
 		self.knobSequence = Sequence(knobInterval1,knobInterval2)
 		
-		self.forceSound  = audio3d.loadSfx('assets/sounds/items/door_force.mp3')
-		self.unlockSound = audio3d.loadSfx('assets/sounds/items/door_unlock.mp3')
-		self.openSound   = audio3d.loadSfx('assets/sounds/items/door_open.mp3')
-		self.closeSound  = audio3d.loadSfx('assets/sounds/items/door_close.mp3')
-		
-		audio3d.attachSoundToObject(self.openSound, self.model)
+		self.forceSound  = loader.loadSfx('assets/sounds/items/door_force.mp3')
+		self.unlockSound = loader.loadSfx('assets/sounds/items/door_unlock.mp3')
+		self.openSound   = loader.loadSfx('assets/sounds/items/door_open.mp3')
+		self.closeSound  = loader.loadSfx('assets/sounds/items/door_close.mp3')
 		
 		self.closed = 1
 		self.locked = 1
@@ -50,6 +48,7 @@ class LockedDoor(DirectObject):
 		if (self.locked):
 			
 			if (key.wasPicked()):
+				key.used()
 				key.pickedSound.play()
 				self.unlockSound.play()
 				self.locked = 0

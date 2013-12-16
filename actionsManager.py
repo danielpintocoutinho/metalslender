@@ -14,37 +14,38 @@ from collectible import Collectible
 
 class ActionManager(DirectObject):
 	
-	
-	def __init__(self, room):
+	def __init__(self, base, room, player):
 		
-		self.player = None
+		self.base   = base
+		self.player = player
 		
 		self.center = Vec3(0,0,0)		
-		self.hand  = Vec3(0,0,0)
-		self.point0 = scene_obj.SceneObj("act_point0","assets/models/sphere", self.hand, 1)
+		self.hand   = Vec3(0,0,0)
+		self.point0 = scene_obj.SceneObject(base, "act_point0","assets/models/sphere", base.render, self.hand, 1)
 		
-		self.doors = [Door(room,Vec3(101, 32, 0), Vec3(-90, 0, 0), 90), \
-					  Door(room,Vec3(40, 35, 0), Vec3(0, 0, 0), 90), \
-					  Door(room,Vec3(102, 4.5, 0), Vec3(0, 0, 0), -85), \
-					  Door(room,Vec3(222.5, 35, 5.1), Vec3(0, 0, 0), 90), \
-					  Door(room,Vec3(250, 37, 5.1), Vec3(90, 0, 0), -87), \
-		              Door(room,Vec3(249.5, 58.5, 5.1), Vec3(125, 0, 0), -117)]
+		self.doors = [Door(base, room,Vec3(99, 32, 0), Vec3(-90, 0, 0), 90), \
+					  Door(base, room,Vec3(38, 35, 0), Vec3(0, 0, 0), 90), \
+					  Door(base, room,Vec3(100, 4.5, 0), Vec3(0, 0, 0), -85), \
+					  Door(base, room,Vec3(220.5, 35, 5.1), Vec3(0, 0, 0), 90), \
+					  Door(base, room,Vec3(248, 37, 5.1), Vec3(90, 0, 0), -87), \
+		              Door(base, room,Vec3(247.5, 58.5, 5.1), Vec3(125, 0, 0), -117)
+		              ]
 		              
-		self.locked_doors = [LockedDoor(room,Vec3(35, -45, 0), Vec3(180, 0, 0), -90)]
-		
-		self.keys = [Collectible(room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 7.32), Vec3(0, 0, 0))]
+		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90)]
+		#self.locked_doors = []
+
+		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 13), Vec3(0, 0, 0))]
 		
 		#visualize direction
 		self.accept("u", self.hide)
 		self.accept("i", self.show)
 		
-		self.point0.model.hide()
-		
+		self.point0.getNodePath().hide()
 	
 	def update(self):
 		self.center = self.player.getNodePath().getPos()
 		
-		ang1 = base.cam.getHpr().getY()*(3.141592/180)
+		ang1 = self.base.cam.getHpr().getY()*(3.141592/180)
 		ang2 = self.player.getNodePath().getHpr().getX()*(3.141592/180)
 		vec_cen = Vec3(self.center.getX(),self.center.getY()+15,self.center.getZ()) - self.center
 		
@@ -52,10 +53,9 @@ class ActionManager(DirectObject):
 		rot2 = Vec3(rot1.getX()*cos(ang2) - rot1.getY()*sin(ang2), rot1.getX() * -sin(ang2) + rot1.getY()*cos(ang2), rot1.getZ())
 		
 		self.hand = rot2 + self.center
-		self.hand.setZ(self.hand.getZ() + base.cam.getPos().getZ() - 5)
+		self.hand.setZ(self.hand.getZ() + self.base.cam.getPos().getZ() - 5)
 	
-		self.point0.model.setPos(self.hand)
-					
+		self.point0.getNodePath().setPos(self.hand)
 		
 	def act(self):
 		
@@ -90,7 +90,16 @@ class ActionManager(DirectObject):
 		
 	def diff_dist(self, point):	
 		return (point.getPos() - self.point).length()
-		
-	def setPlayer(self, player):
-		self.player = player		
 
+
+	def addDoors(self, base, room, doors):
+		print "numero de portas: ", len(doors)
+		for door in doors:
+			newDoor = Door(base, room, door.getPos(render), Vec3(-90, 0, 0), 90)
+			self.doors.append(newDoor)
+
+	def addKeys(self, base, room, keys):
+		print "numero de chaves: ", len(keys)
+		for key in keys:
+			newKey = Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",key.getPos(render), Vec3(0, 0, 0))
+			self.keys.append(newKey)
