@@ -44,7 +44,6 @@ class MetalSlender(ShowBase):
 		
 		self.AIworld = AIWorld(self.render)
 
-
 		self.initTimer = True
 		self.time = 0
 		self.gameOver = True
@@ -56,7 +55,6 @@ class MetalSlender(ShowBase):
 
 		self.mainMenu = MainMenu(self)
 		#self.mainMenu.hide()
-
 
 		# User controls
 		self.addCommands()
@@ -117,7 +115,7 @@ class MetalSlender(ShowBase):
 		self.win.movePointer(0, 100, 100)
 
 		self.props = WindowProperties()
-		self.props.setFullscreen(1)
+		self.props.setFullscreen(True)
 		self.props.setSize(1920, 1080)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
@@ -173,8 +171,8 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg"   , self.render))
+		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
 		
 		for enemy in self.enemies:
 			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
