@@ -55,7 +55,7 @@ class Player(SceneObject):
 		self.fear    = 0.0
 		self.speed   = 0.0
 		self.stopped = 1.0
-		self.life = 2.0
+		self.life = 1.0
 		self.pace = Player.NORMAL
 
 		self.initTimer = True
@@ -256,7 +256,7 @@ class Player(SceneObject):
 			if (timeFinished):
 				self.life += 1.0
 				self.attacked = False
-		#print "life: ", self.life
+		print "life: ", self.life
 
 		#TODO: Review player logic
 		if self.isAlive():

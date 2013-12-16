@@ -218,33 +218,6 @@ class MetalSlender(ShowBase):
 			self.image = OnscreenImage(image="assets/images/to-be-continued.jpg", pos = (0, 0, 0), parent=base.render2d, scale=(1,1,1))
 		self.startTimer(3)
 
-		for room in self.rooms:
-			room.model.removeNode()
-		self.player.clean()
-		self.player.getNodePath().removeNode()
-		for enemy in self.enemies:
-			enemy.seeker.cleanup()
-			enemy.hooded.slnp.removeNode()
-			enemy.hooded.clean()
-			enemy.seeker.removeNode()
-			enemy.model.removeNode()
-		self.em.destroy()
-		for door in self.actions.doors:
-			door.clean()
-			door.model.removeNode()
-			door.knob.removeNode()
-		self.actions.point0.root.removeNode()
-		for key in self.actions.keys:
-			key.clean()
-			key.model.removeNode()
-
-
-		self.taskMgr.remove("player/update")
-		self.taskMgr.remove("player/flashlight/update")
-		self.taskMgr.remove("AIUpdate")
-		self.taskMgr.remove("update-task")
-		self.taskMgr.remove("checkGoal")
-		self.taskMgr.remove('hud')
 		self.taskMgr.remove("camera/control")
 
 
