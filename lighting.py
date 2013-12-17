@@ -1,6 +1,4 @@
 from panda3d.core import PerspectiveLens, Spotlight, Vec4
-
-
 from panda3d.core import *
 
 #TODO: Think about it: should all task management be setup in MetalSlender class?
@@ -10,11 +8,11 @@ class Flashlight:
 	POWER_DRAIN_RATE = -1/240.0
 	POWER_GAIN_RATE  =  1/480.0
 	
-	ATT_CONST = 0.5
-	ATT_LIN   = 0.0001
-	ATT_QUAD  = 0.00001
+	ATT_CONST = 2
+	ATT_LIN   = 0.04
+	ATT_QUAD  = 0.004
 	
-	def __init__(self, name, owner, scene, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100):
+	def __init__(self, name, owner, scene, pos, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100, resol=(1920,1080)):
 		self.owner = owner
 		self.scene = scene
 		self.color = color
@@ -25,7 +23,7 @@ class Flashlight:
 		self.powerrate = Flashlight.POWER_DRAIN_RATE 
 		
 		self.nodepath = owner.cam.attachNewNode(name)
-		self.nodepath.setPos((5, 2, -5))
+		self.nodepath.setPos(pos)
 		self.nodepath.setHpr((5,5,0))
 
 		lens1 = PerspectiveLens()
@@ -37,12 +35,13 @@ class Flashlight:
 		lens1.setNearFar(near, far)
 # 		lens2.setNearFar(near, far)
 
-		lens1.setFilmSize(5096)
+# 		lens1.setFilmSize(resol[0], resol[1])
 
 		self.light1 = Spotlight(name + '/wide')
 # 		self.light2 = Spotlight(name + '/narrow')
 		
-		self.light1.setShadowCaster(True, 2048, 2048, 1)
+# 		self.light1.setShadowCaster(True, resol[0], resol[1], 1)
+# 		self.light1.setShadowCaster(True)
 # 		self.light2.setShadowCaster(False)
 		
 		self.light1.setColor(color)
