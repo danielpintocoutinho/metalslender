@@ -13,7 +13,7 @@ class Enemy:
 		#self.seeker.setScale(6)
 		self.startPos = self.pos
 
-		self.hooded = Hooded("seeker",self.seeker, 20, 5, 5)
+		self.hooded = Hooded("seeker", self.seeker, 1200, 800, 800)
 		self.hooded.initialize()
 		self.hooded.setPatrolPos(patrolPos)
 

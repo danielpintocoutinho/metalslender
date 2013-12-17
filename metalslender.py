@@ -31,8 +31,7 @@ CAM_FAR  = 1000
 class MetalSlender(ShowBase):
 	
 	VERSION=0.1
-
-		
+	
 	def __init__(self):
 		ShowBase.__init__(self)
 		
@@ -67,7 +66,6 @@ class MetalSlender(ShowBase):
 		self.setupFog()
 		self.setupSkydome('assets/chicken/skydome')
 		
-		#TODO: Is it possible to use per-room fog?
 	def setupFog(self):
 		self.fog = Fog("fog")
 
@@ -90,7 +88,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.3, 0.3, 0.3, 1)):
+	def setupLighting(self, color = Vec4(0.315, 0.315, 0.315, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -100,7 +98,6 @@ class MetalSlender(ShowBase):
 		alight = AmbientLight("ShadelessLight")
 		alight.setColor((1.0,1.0,1.0,1.0))
 		self.shadeless = self.render.attachNewNode(alight)
-		
 
 	def initConfig(self):
 		self.cTrav = CollisionTraverser()
@@ -163,7 +160,6 @@ class MetalSlender(ShowBase):
 		return task.cont
 
 	def newGame(self):
-		
 		self.enemies = []
 		self.doors = []
 		self.keys = []
@@ -171,17 +167,20 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg"   , self.render))
-		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
+# 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg"   , self.render))
+# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+# 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/blocoh_e_lcg"   , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/tudo-pedro", self.render))
 		
-		for enemy in self.enemies:
-			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
+		#TODO: adjust code
+# 		for enemy in self.enemies:
+# 			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
 		
 		#TODO: Support multiple rooms
-		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
+		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player)
-		self.actions.addDoors(self, self.rooms[1].model, self.doors)
-		self.actions.addKeys(self, self.rooms[1].model, self.keys)
+		self.actions.addDoors(self, self.rooms[0].model, self.doors)
+		self.actions.addKeys(self, self.rooms[0].model, self.keys)
 		
 		self.em = EventManager(self, self.player, self.actions)
 		self.em.start()
@@ -190,23 +189,19 @@ class MetalSlender(ShowBase):
 		for enemy in self.enemies:
 			enemy.start()
 
-
 		self.hud      = HUD(self, self.player)
 		self.controls = PlayerControls(self.player, self.actions)
 		self.camctrl  = CameraControls(self, self.player)
 
-
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
 		self.mainMenu.hide()
-
 
 		self.taskMgr.add(self.player.updateAll, "player/update")
 		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
 		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
 		self.taskMgr.add(self.playerUpdate, "playerUpdate")
-		
 
 	def endGame(self):
 		self.hud.hide()
@@ -236,7 +231,6 @@ class MetalSlender(ShowBase):
 			key.clean()
 			key.model.removeNode()
 
-
 		self.taskMgr.remove("player/update")
 		self.taskMgr.remove("player/flashlight/update")
 		self.taskMgr.remove("AIUpdate")
@@ -244,9 +238,6 @@ class MetalSlender(ShowBase):
 		self.taskMgr.remove("checkGoal")
 		self.taskMgr.remove('hud')
 		self.taskMgr.remove("camera/control")
-
-
-
 
 	def menuDisplay(self, task):
 		if (self.initTimer == False):
@@ -260,8 +251,6 @@ class MetalSlender(ShowBase):
 				self.mainMenu.show()
 
 		return task.cont
-
-
 
 	def timer(self):
 		currentTime = time.time()
@@ -301,13 +290,11 @@ class MetalSlender(ShowBase):
 		return task.cont
 
 	def checkGoal(self):
-		dist = self.distance(self.player.getNodePath().getPos(), self.goal.getPos())
-		radius = 40
-		if (dist < radius):
-			self.gameOver = False
-			return True
+# 		dist = self.distance(self.player.getNodePath().getPos(), self.goal.getPos())
+# 		radius = 40
+# 		if (dist < radius):
+# 			self.gameOver = False
+# 			return True
 		return False
-
-
 
 MetalSlender().run()

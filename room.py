@@ -1,5 +1,7 @@
 from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, PerspectiveLens, PointLight, Spotlight, Vec3, Vec4, CullFaceAttrib
 
+from panda3d.core import TransparencyAttrib
+
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
 from enemy import Enemy
@@ -24,6 +26,7 @@ class Room(SceneObject):
 		self.setupGoal(base)
 		self.setupDoors(base)
 		self.setupKeys(base)
+		self.setupTrees()
 		
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
@@ -45,6 +48,16 @@ class Room(SceneObject):
 	def setupKeys(self, base):
 		for np in self.model.findAllMatches('**/Key*'):
 	 		base.keys.append(np)
+	 		
+	def setupTrees(self):
+		for tree in self.model.findAllMatches('**/=Tree'):
+			tree.setTwoSided(True)
+			tree.setBillboardAxis()
+			tree.setTransparency(TransparencyAttrib.MAlpha)
+			tree.ls()
+# 			tree.getMaterial().setSpecular((0,0,0,1))
+# 			help(tree)
+# 			tree.setDiffuse((0.1, 0.1, 0.1, 1.0))
 			
 	def setupCollision(self):
 		#TODO: Adjust ramp collision

@@ -22,8 +22,8 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=2.0
-	RUNNING=4.0
+	WALKING=1.0
+	RUNNING=2.0
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
