@@ -88,7 +88,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.315, 0.315, 0.315, 1)):
+	def setupLighting(self, color = Vec4(0.015, 0.015, 0.015, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -167,20 +167,19 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.rooms = []
-# 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg"   , self.render))
-# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg-pedro"   , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
 # 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/blocoh_e_lcg"   , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/tudo-pedro", self.render))
 		
 		#TODO: adjust code
-# 		for enemy in self.enemies:
-# 			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
+		for enemy in self.enemies:
+			enemy.defineDynamicObjects("assets/chicken/lcg-pedro", "**/LCG_porta*")
 		
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player)
-		self.actions.addDoors(self, self.rooms[0].model, self.doors)
-		self.actions.addKeys(self, self.rooms[0].model, self.keys)
+		self.actions.addDoors(self, self.rooms[1].model, self.doors)
+		self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
 		self.em = EventManager(self, self.player, self.actions)
 		self.em.start()

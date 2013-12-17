@@ -59,9 +59,9 @@ class Hooded(AICharacter):
         self.currentTarget = 0
         self.PatrolPos = PatrolPos
         self.numTargets = len(PatrolPos)
-        print "num targets: ", self.numTargets
-        for i in self.PatrolPos:
-            print i.getPos(render)
+#         print "num targets: ", self.numTargets
+#         for i in self.PatrolPos:
+#             print i.getPos(render)
         self.increment = 1
         self.getAiBehaviors().seek(self.PatrolPos[0])
 
@@ -132,7 +132,7 @@ class Hooded(AICharacter):
             #self.getAiBehaviors().resumeAi("wander")
             hasFinished = self.timer()
             if (hasFinished == True):
-                print self.PatrolPos[self.currentTarget].getPos(render)
+#                 print self.PatrolPos[self.currentTarget].getPos(render)
                 self.currentTarget += self.increment
                 if (self.currentTarget == self.numTargets - 1):
                     self.increment = -1
@@ -189,19 +189,19 @@ class Hooded(AICharacter):
             #print self.get_node_path().getPos()
             print distance
             if (distance > 5):
-                print "Muito longe?"
+#                 print "Muito longe?"
                 self.getAiBehaviors().pauseAi("all")
                 return
 
-            if (isinstance(self.pursueTarget, NodePath)):
-                print "aqui?"
-                print self.pursueTarget.getPos(render)
-            else:
-                print "ou aqui?"
-                print self.pursueTarget
+#             if (isinstance(self.pursueTarget, NodePath)):
+#                 print "aqui?"
+#                 print self.pursueTarget.getPos(render)
+#             else:
+#                 print "ou aqui?"
+#                 print self.pursueTarget
             if (self.lostTarget == False):
                 if (self.goingBack == True):
-                    print "uhul"
+#                     print "uhul"
                     self.getAiBehaviors().pauseAi("all")
                     self.getAiBehaviors().seek(self.PatrolPos[self.currentTarget])
                     self.currentStatus = 0
@@ -222,7 +222,7 @@ class Hooded(AICharacter):
                 else:
                     self.getAiBehaviors().pauseAi("all")
                     self.currentStatus = 3
-                    print "aqui tambem?"
+#                     print "aqui tambem?"
             else:
                 print "perdi? ", self.lostTarget
                 self.startTimer(5)
@@ -238,7 +238,7 @@ class Hooded(AICharacter):
     def wander(self):
         #print "wander - ", self.lostTarget
         if (self.getAiBehaviors().behaviorStatus("wander") != "active"):
-            print "entrei aqui uma unica vez"
+#             print "entrei aqui uma unica vez"
             self.getAiBehaviors().pauseAi("all")
             self.getAiBehaviors().wander(self.radius, 0,self.aoe, 1.0)
             #self.getAiBehaviors().resumeAi("wander")
@@ -260,7 +260,7 @@ class Hooded(AICharacter):
                 self.getAiBehaviors().pauseAi("all")
 
                 #self.getAiBehaviors().seek(self.PatrolPos[self.currentTarget])
-                print "vai voltar pro pathfinding ", self.currentStatus
+#                 print "vai voltar pro pathfinding ", self.currentStatus
         
 
 
@@ -274,7 +274,7 @@ class Hooded(AICharacter):
             #self.pause()
         else:
             hasFinished = self.timer()
-            print "has finished? ", hasFinished
+#             print "has finished? ", hasFinished
             if (hasFinished):
                 self.attackTimer = True
                 self.resetTimer()
@@ -370,4 +370,3 @@ class Hooded(AICharacter):
 
     def clean(self):
         loader.unloadSfx(self.screechsound)
-

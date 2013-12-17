@@ -22,7 +22,7 @@ class Room(SceneObject):
 		
 		self.setupLightSources(scene)
 		self.setupCollision()
-		self.setupEnemies(base)
+# 		self.setupEnemies(base)
 		self.setupGoal(base)
 		self.setupDoors(base)
 		self.setupKeys(base)
@@ -31,6 +31,7 @@ class Room(SceneObject):
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
 			
+	#TODO: Find out what is missing in the scenario
 	def setupEnemies(self, base):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
@@ -66,6 +67,7 @@ class Room(SceneObject):
 		self.setCollision("**/=Floor", Mask.FLOOR)
 		self.setCollision("**/*walls*", Mask.WALL)
 		self.setCollision("**/*floor*", Mask.FLOOR)
+		self.setCollision("**/*escada*", Mask.FLOOR)
 		
 	def setupLightSources(self, scene):
 		self.lights = []

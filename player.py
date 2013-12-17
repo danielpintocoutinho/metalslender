@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
-from panda3d.core import BitMask32, CollisionSphere, Vec3
+from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3
 
 from random import random
 from collision import CollisionMask as Mask
@@ -22,17 +22,20 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=1.0
-	RUNNING=2.0
+	WALKING=0.05
+	RUNNING=0.10
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
 	
-	HEIGHT = 35.0
-	CROUCHED_HEIGHT = 10.0
+	HEIGHT = 1.8
+	CROUCHED_HEIGHT = 0.5
 	FEAR_RATE = -1.0 / 30
 	
-	JUMP_POWER = 40.0
+	JUMP_POWER = 3.0
+	
+	SIGHT_NEAR = HEIGHT/18
+	SIGHT_FAR  = 100
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -77,7 +80,7 @@ class Player(SceneObject):
 		
 	#TODO: Move this to flashlight class?
 	def setupFlashlight(self):
-		self.flashlight = Flashlight('spot', self, self.scene)
+		self.flashlight = Flashlight('spot', self, self.scene, (Player.HEIGHT / 7, -Player.HEIGHT / 17.5, -Player.HEIGHT / 7), near=Player.SIGHT_NEAR, far=Player.SIGHT_FAR)
 		
 		self.flashfearbang = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
 
@@ -101,14 +104,12 @@ class Player(SceneObject):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
 		self.cam.setPos(Vec3(0,0,Player.HEIGHT))
+		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
-		#TODO: Use a Polygon, instead
-# 		self.addCollisionSolid(CollisionSphere(0, 0, 0, Player.HEIGHT / 7))
-		self.addCollisionSolid(CollisionSphere(0, 0, 0, 4))
-# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
-# 		self.addCollisionSolid(CollisionTube(0, 0, 0, 0, 0, Player.HEIGHT, Player.HEIGHT / 7))
-		self.addCollisionRay()
+		#TODO: Try a Polygon, instead
+		self.addCollisionSolid(CollisionSphere(0, 0, Player.HEIGHT / 2, Player.HEIGHT / 9))
+		self.addCollisionRay(CollisionRay(0, 0, Player.HEIGHT / 2, 0, 0, -1))
 		self.setFloorCollision(fromMask=Mask.FLOOR)
 		self.setWallCollision(fromMask=Mask.WALL, intoMask=Mask.SENTINEL)
 		
@@ -301,7 +302,7 @@ class Player(SceneObject):
 	def timer(self):
 		currentTime = time.time()
 		diff = currentTime - self.time
-		print diff
+# 		print diff
 		if (diff > self.interval):
 			self.resetTimer()
 			return True
@@ -329,10 +330,10 @@ class Player(SceneObject):
 
 	def turnFlashlight(self):
 		self.flashlight.toggle()
-		print "on? ", self.flashlight.isOn()
+# 		print "on? ", self.flashlight.isOn()
 		if (self.flashlight.isOn()):
 			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 20))
+			self.addCollisionSolid(CollisionSphere(0, 0, 0, 1))
 		else:
 			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 4))
+			self.addCollisionSolid(CollisionSphere(0, 0, 0, 0.2))
