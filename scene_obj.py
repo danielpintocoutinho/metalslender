@@ -47,4 +47,5 @@ class SceneObject:
 	def __del__(self):
 		self.collSol.removeNode()
 		self.collRay.removeNode()
+		self.root.removeNode()
 		

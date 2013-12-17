@@ -32,3 +32,5 @@ class Enemy:
 	def __del__(self):
 		self.seeker.removeNode()
 		self.hooded = None
+		self.model.removeNode()
+		self.doors = None

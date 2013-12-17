@@ -70,8 +70,12 @@ class Door(DirectObject):
 		return (hand - self.knob.getPos(self.room)).length()
 	
 	def __del__(self):
-		self.room = None
+		self.room.removeNode()
 		self.model.removeNode()
 		self.knob.removeNode()
+		self.room = None
+		self.model = None
+		self.knob = None
 		self.openSound = None
 		self.closeSound = None
+		self.knobSequence = None

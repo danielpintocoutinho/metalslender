@@ -3,6 +3,7 @@ from direct.gui.DirectGui import *
 class MainMenu:
   def __init__(self, parent):
     playimg = ("assets/images/PlayButton.png")
+    resumeimg = ("assets/images/PlayButton.png")
     exitimg = ("assets/images/ExitButton.png")
 
     self.mainFrame = DirectFrame(
@@ -28,8 +29,8 @@ class MainMenu:
                             image_scale = (2.5,1,1),
                             relief = None,
                             #text = ("Singleplayer"), 
-                            pos = (0,2,-0.6),
-                            scale=.06,
+                            pos = (0,2,0.0),
+                            scale=.08,
                             command = parent.pauseGame
                             )
     
@@ -42,6 +43,7 @@ class MainMenu:
                              command=parent.userExit)
 
     self.image = self.load2Dimage("assets/images/Loading.png")
+    self.pause.hide()
         
   def load2Dimage(self, imagepath):
     img=OnscreenImage(image=imagepath, pos = (0, 0, 0),
@@ -49,13 +51,25 @@ class MainMenu:
     )
     return img
 
-
-  def hide(self):
+  def hideNewGame(self):
     self.mainFrame.hide()
+    self.new.hide()
     self.image.hide()
       
-  def show(self):
+  def showNewGame(self):
     self.mainFrame.show()
+    self.new.show()
+    self.pause.hide()
+    self.image.show()
+  
+  def hidePauseGame(self):
+    self.mainFrame.hide()
+    self.pause.hide()
+    self.image.hide()
+      
+  def showPauseGame(self):
+    self.mainFrame.show()
+    self.pause.show()
     #self.image.show()
 
   

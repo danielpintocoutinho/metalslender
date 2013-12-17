@@ -93,3 +93,4 @@ class Room(SceneObject):
 	def __del__(self):
 		self.model.removeNode()
 		self.root.removeNode()
+		del self.lights [:]

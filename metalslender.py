@@ -1,4 +1,5 @@
 #!/usr/bin/ppython
+import gc
 from direct.showbase.ShowBase import ShowBase
 from panda3d.ai import *
 from panda3d.core import AmbientLight, Vec3, Vec4, Mat4, CollisionTraverser, \
@@ -31,11 +32,15 @@ class MetalSlender(ShowBase):
 		
 	def __init__(self):
 		ShowBase.__init__(self)
-		
+		self.cTrav = CollisionTraverser()
+		self.initConfig()
+		self.initGame()
+
+	def initGame(self):
 		# Preliminary capabilities check.
 		#if not self.initMessages(): 
 		#	return
-		self.initConfig()
+		
 		self.setupEnvironment()
 		
 		self.AIworld = AIWorld(self.render)
@@ -53,12 +58,8 @@ class MetalSlender(ShowBase):
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player)
-# 		print self.player.root.ls()
-		
-		self.taskMgr.add(self.player.updateAll, "player/update")
-		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-		
-		EventManager(self, self.player, self.actions).start()
+		self.events = EventManager(self, self.player, self.actions)
+		self.events.start()
 
 		#TODO: Only test code
 		self.placeTargets()
@@ -110,8 +111,8 @@ class MetalSlender(ShowBase):
 	def setupLighting(self, color = Vec4(0.05, 0.05, 0.05, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
-		alight = self.render.attachNewNode(alight)
-		self.render.setLight(alight)
+		self.amblight = self.render.attachNewNode(alight)
+		self.render.setLight(self.amblight)
 		
 		#This light may be used by shadeless materials
 		alight = AmbientLight("ShadelessLight")
@@ -122,12 +123,6 @@ class MetalSlender(ShowBase):
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
 		self.target1.setColor(1,0,0)
 		self.target1.setPos(-76.1808, -52.1483, -14.0991)
-		self.target1.setScale(5)
-		self.target1.reparentTo(self.render)
-
-		self.target1 = self.loader.loadModel("assets/chicken/arrow")
-		self.target1.setColor(1,0,0)
-		self.target1.setPos(23.3466,  30.4134, -14.0991)
 		self.target1.setScale(5)
 		self.target1.reparentTo(self.render)
 
@@ -145,8 +140,6 @@ class MetalSlender(ShowBase):
 		self.banana.reparentTo(self.render)
 
 	def initConfig(self):
-		self.cTrav = CollisionTraverser()
-		
 		self.render.setShaderAuto()
 	
 		#TODO: Must be moved to player's camera
@@ -164,7 +157,6 @@ class MetalSlender(ShowBase):
 		self.paused = False
 		
 		self.openMainWindow()
-		self.win.requestProperties(self.props)
 		self.graphicsEngine.openWindows()
 		self.win.requestProperties(self.props)
 		
@@ -200,7 +192,7 @@ class MetalSlender(ShowBase):
 
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
-		self.mainMenu.hide()
+		self.mainMenu.hideNewGame()
 		
 		self.taskMgr.add(self.camctrl.update, "camera/control")
 	
@@ -208,9 +200,9 @@ class MetalSlender(ShowBase):
 		if (self.paused == True):
 			self.props.setCursorHidden(True)
 			self.win.requestProperties(self.props)
-			self.mainMenu.hide()
+			self.mainMenu.hidePauseGame()
 			self.paused = False
-			EventManager(self, self.player, self.actions).start()
+			self.events.start()
 			self.taskMgr.add(self.player.updateAll, "player/update")
 			self.taskMgr.add(self.hud.update, 'hud')
 			self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
@@ -218,7 +210,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.add(self.camctrl.update, "camera/control")
 			self.accept('p', self.pauseGame)
 		else:
-			EventManager(self, self.player, self.actions).stop()
+			self.events.stop()
 			self.ignore('p')
 			self.player.pause()
 			self.taskMgr.remove("camera/control")
@@ -229,10 +221,48 @@ class MetalSlender(ShowBase):
 			self.taskMgr.remove("AIUpdate")
 			self.props.setCursorHidden(False)
 			self.win.requestProperties(self.props)
-			self.mainMenu.show()
+			self.mainMenu.showPauseGame()
 			self.paused = True
 		
 	def restartGame(self):
-		#gc.collect()
+		self.events.stop()
+		self.taskMgr.remove("camera/control")
+		self.taskMgr.remove("player/update")
+		self.taskMgr.remove('hud')
+		self.taskMgr.remove('player/flashlight/update')
+		self.taskMgr.remove("AIUpdate")
+		self.cleanResources()
+		self.props.setCursorHidden(False)
+		self.win.requestProperties(self.props)
+		self.initGame()
+	
+	def cleanResources(self):
+		self.AIworld = None
+		del self.enemies [:]
+		del self.rooms [:]
+		self.enemies = None
+		self.rooms = None
+		self.player = None
+		self.actions = None
+		self.events = None
+		self.mainMenu = None
+		self.fog = None
+		self.skydome.removeNode()
+		self.amblight.removeNode()
+		self.shadeless.removeNode()
+		self.target1.removeNode()
+		self.target2.removeNode()
+		self.banana.removeNode()
+		self.skydome = None
+		self.amblight = None
+		self.shadeless = None
+		self.target1 = None
+		self.target2 = None
+		self.banana = None
+		self.hud = None
+		self.camctrl = None
+		self.controls = None
+		self.cTrav.clearColliders()
+		gc.collect()
 
 MetalSlender().run()
