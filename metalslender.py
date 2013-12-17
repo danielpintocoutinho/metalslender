@@ -56,6 +56,9 @@ class MetalSlender(ShowBase):
 # 		self.AIworld.addAiChar(self.enemy.getHooded())
 
 		self.mainMenu = MainMenu(self)
+		self.introSound = loader.loadSfx('assets/sounds/intro.mp3')
+		self.introSound.setLoop(True)
+		self.introSound.play()
 		#self.mainMenu.hide()
 
 
@@ -93,7 +96,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.3, 0.3, 0.3, 1)):
+	def setupLighting(self, color = Vec4(0.8, 0.8, 0.8, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -167,6 +170,10 @@ class MetalSlender(ShowBase):
 
 	def newGame(self):
 		
+		self.introSound.stop()
+		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
+		initialSound.play()
+		
 		self.enemies = []
 		self.doors = []
 		self.keys = []
@@ -177,12 +184,14 @@ class MetalSlender(ShowBase):
 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
 		
+		self.rooms[1].root.detachNode();
+		
 		for enemy in self.enemies:
 			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
 		
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
-		self.actions = ActionManager(self, self.rooms[0].model, self.player)
+		self.actions = ActionManager(self, self.rooms[0].model, self.player,self.rooms)
 		#self.actions.addDoors(self, self.rooms[1].model, self.doors)
 		#self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
@@ -293,6 +302,7 @@ class MetalSlender(ShowBase):
 	def playerUpdate(self, task):
 		reached = self.checkGoal()
 		if (reached):
+			self.player.die()
 			self.endGame()
 			return task.done
 		someKey = False

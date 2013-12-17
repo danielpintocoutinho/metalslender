@@ -14,8 +14,6 @@ class Door(DirectObject):
 	
 	def __init__(self, base, fatherNode, pos, hpr, angle):
 		
-		self.audio3d = Audio3DManager.Audio3DManager(base.sfxManagerList[0], base.cam)
-		
 		self.model = base.loader.loadModel("assets/chicken/porta")
 		self.knob  = base.loader.loadModel("assets/chicken/knob")
 		self.knob.setPos(Vec3(17.6,0,8))
@@ -41,11 +39,9 @@ class Door(DirectObject):
 		knobInterval2  = self.knob.hprInterval(0.1,Vec3(0,0,0))
 		self.knobSequence = Sequence(knobInterval1,knobInterval2)
 		
-		self.openSound  = self.audio3d.loadSfx('assets/sounds/items/door_open.mp3')
-		self.closeSound = self.audio3d.loadSfx('assets/sounds/items/door_close.mp3')
+		self.openSound  = loader.loadSfx('assets/sounds/items/door_open.mp3')
+		self.closeSound = loader.loadSfx('assets/sounds/items/door_close.mp3')
 		#self.point0 = scene_obj.SceneObj("knob0","assets/models/sphere", self.knob, 1)
-		
-		self.audio3d.attachSoundToObject(self.openSound, self.model)
 		
 		self.closed = 1
 		
@@ -70,4 +66,5 @@ class Door(DirectObject):
 	def clean(self):
 		#self.audio3d.unloadSfx(self.openSound)
 		#self.audio3d.unloadSfx(self.closeSound)
-		self.audio3d.disable()
+		#self.audio3d.disable()
+		pass

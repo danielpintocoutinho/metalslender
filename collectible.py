@@ -25,9 +25,10 @@ class Collectible(DirectObject):
 		self.picked = False
 		
 	def act(self):
-		self.pickedSound.play()
-		self.model.detachNode()
-		self.picked = True
+		if (not self.picked):
+			self.pickedSound.play()
+			self.model.detachNode()
+			self.picked = True
 				
 	def act_dist(self, hand):
 		return (hand - self.model.getPos(self.room)).length()

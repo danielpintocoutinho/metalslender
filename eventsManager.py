@@ -1,6 +1,7 @@
 from panda3d.core import *
 from math import *
 import sys,os
+import random
 
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase import Audio3DManager
@@ -9,6 +10,7 @@ from direct.task import Task
 import scene_obj
 
 from actionsManager import ActionManager
+
 
 class EventManager(DirectObject):
 	
@@ -23,7 +25,8 @@ class EventManager(DirectObject):
 		
 		self.draw = 1
 		
-		self.vision  = Vec3(0,20,-10)
+		self.vision = Vec3(0,20,-10)
+		self.back   = Vec3(0,-20,-10)
 		
 		#Pontos chave para os sustos
 		self.point0 = scene_obj.SceneObject(base, "point0", "assets/models/sphere", base.render, self.vision, 1)
@@ -40,12 +43,14 @@ class EventManager(DirectObject):
 		
 		self.scare   = base.loader.loadSfx("assets/sounds/scare/scare2.mp3")
 		self.tension = base.loader.loadSfx("assets/sounds/scare/tension/tension.mp3")
+		self.incFear = 0;
 		
-		self.firstEnemy = base.loader.loadModel("assets/chicken/hooded")
+		self.firstEnemy = base.loader.loadModel("assets/chicken/vulto")
 		self.firstEnemy.setPos(Vec3(220,-20,-10))
-		self.firstEnemy.setScale(8)
+		self.firstEnemy.setHpr(180,0,0)
+		self.firstEnemy.setScale(2.1)
 		self.firstEnemy.reparentTo(base.render)
-		self.enemyInterval = self.firstEnemy.posInterval(0.8,Vec3(220,80,-10),startPos = Vec3(220,-20,-10))
+		self.enemyInterval = self.firstEnemy.posInterval(0.8,Vec3(220,120,-10),startPos = Vec3(220,-20,-10))
 		
 		#visualize direction
 		self.accept("h", self.hide)
@@ -67,6 +72,14 @@ class EventManager(DirectObject):
 		self.vision = rot2 + self.center
 		self.vision.setZ(self.vision.getZ() + self.base.cam.getPos().getZ())
 		
+		vec_cen = Vec3(self.center.getX(),self.center.getY()-70,self.center.getZ()) - self.center
+		
+		rot1 = Vec3(vec_cen.getX(), vec_cen.getY()*cos(ang1) + vec_cen.getZ()*sin(ang1), vec_cen.getY() * sin(ang1) + vec_cen.getZ()*cos(ang1))
+		rot2 = Vec3(rot1.getX()*cos(ang2) - rot1.getY()*sin(ang2), rot1.getX() * -sin(ang2) + rot1.getY()*cos(ang2), rot1.getZ())
+		
+		self.back = rot2 + self.center
+		self.back.setZ(self.player.root.getZ())
+		
 		if not self.point0.getNodePath().isEmpty():
 			self.point0.getNodePath().setPos(self.vision)
 		
@@ -79,28 +92,36 @@ class EventManager(DirectObject):
 				if (self.tension.getVolume() < 1):
 					self.vol += 0.01
 					self.tension.setVolume(self.vol)
-		else:
-			if (self.tension.status() == self.tension.PLAYING):
-				self.tension.setVolume(self.vol)
-				self.vol -= 0.005
-				if (self.vol <= 0):
-					self.tension.stop()			
 		
+		#increase fear
+		if (self.incFear):
+			self.player.fear = min(self.player.fear + 0.05, 1.0)
+			if (self.player.fear > 0.99):
+				#filters.delBlurSharpen()
+				self.incFear = 0;
 
 		#TODO: improve player's aiming detection system  
 
 		#1- Susto : corredor para a cozinha
-		if (not self.scared1 and (self.diff_dist(self.point2.getNodePath()) < 5) and (self.diff_dir(self.point2.getNodePath())) < 10):
+		#if (not self.scared1 and (self.diff_dist(self.point2.getNodePath()) < 5) and (self.diff_dir(self.point2.getNodePath())) < 10):
+		if (not self.scared1 and self.player.root.getPos().getX() > 150):
+			self.firstEnemy.setHpr(180,0,0)
 			self.enemyInterval.start()
 			self.scared1 = 1
 			self.scare.play()
-			self.player.scream()
+			#self.player.scream()
+			self.incFear = 1;
 			
 		#2- Susto : banheiro
-		if (not self.scared2 and not self.items.doors[5].closed  and (self.diff_dist(self.point3.getNodePath()) < 30) and (self.diff_dir(self.point3.getNodePath())) < 14):
+		if (not self.scared2 and self.player.root.getPos().getX() > 247.5 and self.player.root.getPos().getY() > 58.5):
 			self.scared2 = 1
+			self.firstEnemy.setPos(Vec3(self.vision.getX(),self.vision.getY(),self.player.root.getZ()))
+			self.firstEnemy.setHpr(self.player.root.getHpr())
+			enemyInterval2 = self.firstEnemy.posInterval(0.8,self.back,startPos = self.firstEnemy.getPos())
+			enemyInterval2.start()
 			self.scare.play()
-			self.player.scream()
+			self.player.die()
+			self.player.fear = -2
 		
 		#print "##"
 		#print("eve:",self.point.getX(),self.point.getY(),self.point.getZ())
@@ -114,7 +135,9 @@ class EventManager(DirectObject):
 		
 		
 	def hide(self):
-		self.point0.model.hide()
+		self.player.fear = 0;
+		self.firstEnemy.setPos(Vec3(self.vision.getX(),self.vision.getY(),self.player.root.getZ()))
+		self.firstEnemy.setHpr(self.player.root.getHpr())
 		
 	def show(self):
 			self.point0.model.show()	

@@ -3,6 +3,7 @@ from collections import defaultdict
 from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
 from panda3d.core import BitMask32, CollisionSphere, Vec3
+from direct.filter.CommonFilters import CommonFilters
 
 from random import random
 from collision import CollisionMask as Mask
@@ -13,7 +14,7 @@ from scene_obj import SceneObject
 import time
 
 FLASH_FEAR_TIME = 0.03
-FLASH_FEAR_AMP  = 0.2
+FLASH_FEAR_AMP  = 1.2
 
 class Player(SceneObject):
 	
@@ -70,6 +71,8 @@ class Player(SceneObject):
 		self.setupCollistion()
 		self.setupSound()
 		self.updateState(Player.RESTFUL)
+		
+		self.filters = CommonFilters(base.win, base.cam)
 
 		self.last = 0
 		
@@ -125,6 +128,8 @@ class Player(SceneObject):
 		self.screams = loader.loadSfx("assets/sounds/player/scream_low1.mp3")
 		self.breathing = loader.loadSfx("assets/sounds/player/breathing.mp3")
 		self.breath_vol = 1.07
+		
+		self.dyingSound = loader.loadSfx("assets/sounds/player/dying.mp3")
 		
 		self.breathing.setVolume(self.breath_vol - self.breath)
 		self.breathing.setPlayRate(0.6)
@@ -237,6 +242,8 @@ class Player(SceneObject):
 
 		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
 		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
+		
+		#self.filters.setBlurSharpen( 1.0 - self.fear)
 				
 	def updateAll(self, task):
 		elapsed = task.time - self.last
@@ -296,6 +303,10 @@ class Player(SceneObject):
 		self.attacked = True
 		self.life -= 1.0
 		self.startTimer(5)
+		
+	def die(self):
+		self.breathing.stop()
+		self.dyingSound.play()
 
 
 	def timer(self):

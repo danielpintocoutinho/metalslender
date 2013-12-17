@@ -10,11 +10,13 @@ import scene_obj
 
 from door import Door
 from lockedDoor import LockedDoor
+from gate import Gate
+from lock import Lock
 from collectible import Collectible
 
 class ActionManager(DirectObject):
 	
-	def __init__(self, base, room, player):
+	def __init__(self, base, room, player,rooms):
 		
 		self.base   = base
 		self.player = player
@@ -28,13 +30,18 @@ class ActionManager(DirectObject):
 					  Door(base, room,Vec3(100, 4.5, 0), Vec3(0, 0, 0), -85), \
 					  Door(base, room,Vec3(220.5, 35, 5.1), Vec3(0, 0, 0), 90), \
 					  Door(base, room,Vec3(248, 37, 5.1), Vec3(90, 0, 0), -87), \
-		              Door(base, room,Vec3(247.5, 58.5, 5.1), Vec3(125, 0, 0), -117)
+		              Door(base, room,Vec3(247.5, 58.5, 5.1), Vec3(125, 0, 0), -117), \
+		              Gate(base, rooms[1],Vec3(87.8, -2893.36, 0), Vec3(180, 0, 0), 90), \
+					  Gate(base, rooms[1],Vec3(-23.46, -2893.36, 0), Vec3(0, 0, 0), -90)
 		              ]
-		              
-		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90)]
+		
+		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(30, -2891.36, 5), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
+
+		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90, rooms[1], 0)]
 		#self.locked_doors = []
 
-		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 13), Vec3(0, 0, 0))]
+		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 13), Vec3(0, 0, 0)), \
+		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(0, 0, 0), Vec3(0, 0, 0))]
 		
 		#visualize direction
 		self.accept("u", self.hide)
@@ -73,14 +80,18 @@ class ActionManager(DirectObject):
 				
 		for i in range(len(self.locked_doors)):
 			if(self.locked_doors[i].act_dist(self.hand) < 8):
-				self.locked_doors[i].act(self.keys[i])
+				self.locked_doors[i].act(self.keys[self.locked_doors[i].keyId])
 				return
+				
+		if(self.lock.act_dist(self.hand) < 12):
+			self.lock.act(self.keys[1])
 		
 	def hide(self):
-		self.point0.model.hide()
+		self.point0.getNodePath().hide()
 		
 	def show(self):
-		self.point0.model.show()
+		#self.point0.getNodePath().show()
+		pass
 	
 	def diff_dir(self, point):
 		v = self.center - self.point

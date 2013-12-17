@@ -11,7 +11,7 @@ import scene_obj
 
 class LockedDoor(DirectObject):
 	
-	def __init__(self, base, fatherNode, pos, hpr, angle):
+	def __init__(self, base, fatherNode, pos, hpr, angle, lockedRoom, keyId):
 		
 		audio3d = Audio3DManager.Audio3DManager(base.sfxManagerList[0], base.cam)
 		
@@ -23,6 +23,8 @@ class LockedDoor(DirectObject):
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+		self.lockedRoom = lockedRoom
+		self.keyId = keyId
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle
@@ -52,6 +54,9 @@ class LockedDoor(DirectObject):
 				key.pickedSound.play()
 				self.unlockSound.play()
 				self.locked = 0
+				#self.lockedRoom.root = render.attachNewNode("bloco")
+				#self.lockedRoom.model.reparentTo(self.lockedRoom.root)
+				self.lockedRoom.root.reparentTo(render)
 			else:
 				self.forceSound.play()
 			
