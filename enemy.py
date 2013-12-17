@@ -3,7 +3,7 @@ from hooded import *
 class Enemy:
 
 	def __init__(self, pos, patrolPos):
-		self.seeker = Actor("assets/chicken/vulto")
+		self.seeker = Actor("assets/chicken/vulto-pedro")
 		#self.seeker = Actor("models/ralph",{"run":"models/ralph-run", "walk":"models/ralph-walk"})
 		self.seeker.setCollideMask(BitMask32.allOff())
 		self.pos = pos
@@ -13,7 +13,7 @@ class Enemy:
 		#self.seeker.setScale(6)
 		self.startPos = self.pos
 
-		self.hooded = Hooded("seeker",self.seeker, 20, 5, 5)
+		self.hooded = Hooded("seeker", self.seeker, 1200, 800, 800)
 		self.hooded.initialize()
 		self.hooded.setPatrolPos(patrolPos)
 

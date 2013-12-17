@@ -25,11 +25,13 @@ class EventManager(DirectObject):
 		
 		self.draw = 1
 		
-		self.vision = Vec3(0,20,-10)
-		self.back   = Vec3(0,-20,-10)
+		self.vision = Vec3(0,4,0)
+		self.back   = Vec3(0,-4,0)
 		
 		#Pontos chave para os sustos
-		self.point0 = scene_obj.SceneObject(base, "point0", "assets/models/sphere", base.render, self.vision, 1)
+		self.point0 = loader.loadModel("assets/models/sphere")
+		self.point0.setPos(Vec3(0,5,0))
+		self.point0.reparentTo(render)
 		self.point1 = scene_obj.SceneObject(base, "point1", "assets/models/sphere", base.render, Vec3(100,25,10), 1)
 		self.point2 = scene_obj.SceneObject(base, "point2", "assets/models/sphere", base.render, Vec3(160,20,15), 1)
 		self.point3 = scene_obj.SceneObject(base, "point3", "assets/models/sphere", base.render, Vec3(280,70,15), 1)
@@ -56,15 +58,13 @@ class EventManager(DirectObject):
 		self.accept("h", self.hide)
 		self.accept("j", self.show)
 		
-		self.point0.getNodePath().removeNode()
-		
 	
 	def update(self, task):
 		self.center = self.player.root.getPos()
 		
 		ang1 = self.base.cam.getHpr().getY()*(3.141592/180)
 		ang2 = self.player.root.getHpr().getX()*(3.141592/180)
-		vec_cen = Vec3(self.center.getX(),self.center.getY()+30,self.center.getZ()) - self.center
+		vec_cen = Vec3(self.center.getX(),self.center.getY()+5,self.center.getZ()) - self.center
 		
 		rot1 = Vec3(vec_cen.getX(), vec_cen.getY()*cos(ang1) + vec_cen.getZ()*sin(ang1), vec_cen.getY() * sin(ang1) + vec_cen.getZ()*cos(ang1))
 		rot2 = Vec3(rot1.getX()*cos(ang2) - rot1.getY()*sin(ang2), rot1.getX() * -sin(ang2) + rot1.getY()*cos(ang2), rot1.getZ())
@@ -72,7 +72,7 @@ class EventManager(DirectObject):
 		self.vision = rot2 + self.center
 		self.vision.setZ(self.vision.getZ() + self.base.cam.getPos().getZ())
 		
-		vec_cen = Vec3(self.center.getX(),self.center.getY()-70,self.center.getZ()) - self.center
+		vec_cen = Vec3(self.center.getX(),self.center.getY()-20,self.center.getZ()) - self.center
 		
 		rot1 = Vec3(vec_cen.getX(), vec_cen.getY()*cos(ang1) + vec_cen.getZ()*sin(ang1), vec_cen.getY() * sin(ang1) + vec_cen.getZ()*cos(ang1))
 		rot2 = Vec3(rot1.getX()*cos(ang2) - rot1.getY()*sin(ang2), rot1.getX() * -sin(ang2) + rot1.getY()*cos(ang2), rot1.getZ())
@@ -80,8 +80,11 @@ class EventManager(DirectObject):
 		self.back = rot2 + self.center
 		self.back.setZ(self.player.root.getZ())
 		
-		if not self.point0.getNodePath().isEmpty():
-			self.point0.getNodePath().setPos(self.vision)
+		#self.point0.root.setPos(self.vision)
+		#print("p: ",self.vision,self.point0.getPos())
+		
+		#if not self.point0.getNodePath().isEmpty():
+		#	self.point0.getNodePath().setPos(self.vision)
 		
 		if (self.center.getX() > 100):
 			if (self.tension.status() != self.tension.PLAYING):
@@ -140,7 +143,7 @@ class EventManager(DirectObject):
 		self.firstEnemy.setHpr(self.player.root.getHpr())
 		
 	def show(self):
-			self.point0.model.show()	
+		self.point0.reparentTo(render)
 	
 	def diff_dir(self, point):
 		v = self.center - self.vision

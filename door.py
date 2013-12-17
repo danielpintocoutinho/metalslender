@@ -22,6 +22,7 @@ class Door(DirectObject):
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+		self.model.setScale(0.05)
 
 
 		"""self.modelBody = self.model.attachNewNode(CollisionNode("door"))

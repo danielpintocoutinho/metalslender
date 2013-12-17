@@ -25,7 +25,7 @@ class ActionManager(DirectObject):
 		self.hand   = Vec3(0,0,0)
 		self.point0 = scene_obj.SceneObject(base, "act_point0","assets/models/sphere", base.render, self.hand, 1)
 		
-		self.doors = [Door(base, room,Vec3(99, 32, 0), Vec3(-90, 0, 0), 90), \
+		self.doors = [Door(base, room,Vec3(5.006, -0.08, -0.58), Vec3(-90, 0, 0), 90), \
 					  Door(base, room,Vec3(38, 35, 0), Vec3(0, 0, 0), 90), \
 					  Door(base, room,Vec3(100, 4.5, 0), Vec3(0, 0, 0), -85), \
 					  Door(base, room,Vec3(220.5, 35, 5.1), Vec3(0, 0, 0), 90), \
@@ -40,7 +40,7 @@ class ActionManager(DirectObject):
 		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90, rooms[1], 0)]
 		#self.locked_doors = []
 
-		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(266.57, -19.85, 13), Vec3(0, 0, 0)), \
+		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \
 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(0, 0, 0), Vec3(0, 0, 0))]
 		
 		#visualize direction
@@ -54,7 +54,7 @@ class ActionManager(DirectObject):
 		
 		ang1 = self.base.cam.getHpr().getY()*(3.141592/180)
 		ang2 = self.player.getNodePath().getHpr().getX()*(3.141592/180)
-		vec_cen = Vec3(self.center.getX(),self.center.getY()+15,self.center.getZ()) - self.center
+		vec_cen = Vec3(self.center.getX(),self.center.getY()+3,self.center.getZ()) - self.center
 		
 		rot1 = Vec3(vec_cen.getX(), vec_cen.getY()*cos(ang1) + vec_cen.getZ()*sin(ang1), vec_cen.getY() * sin(ang1) + vec_cen.getZ()*cos(ang1))
 		rot2 = Vec3(rot1.getX()*cos(ang2) - rot1.getY()*sin(ang2), rot1.getX() * -sin(ang2) + rot1.getY()*cos(ang2), rot1.getZ())
@@ -63,6 +63,8 @@ class ActionManager(DirectObject):
 		self.hand.setZ(self.hand.getZ() + self.base.cam.getPos().getZ() - 5)
 	
 		self.point0.getNodePath().setPos(self.hand)
+		
+		print("h: ",self.hand,self.point0.getNodePath().getPos())
 		
 	def act(self):
 		

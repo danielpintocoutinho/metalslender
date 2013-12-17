@@ -1,9 +1,14 @@
 from direct.gui.DirectGui import *
+from panda3d.core import TransparencyAttrib
 
 class MainMenu:
   def __init__(self, parent):
+    logoimg = ("assets/images/metalslender.png")
     playimg = ("assets/images/PlayButton.png")
+    playimghover = ("assets/images/PlayButtonHover.png")
     exitimg = ("assets/images/ExitButton.png")
+    exitimghover = ("assets/images/ExitButtonHover.png")
+
 
     self.mainFrame = DirectFrame(
                                  frameColor=(1,0,0,0.0),
@@ -11,25 +16,40 @@ class MainMenu:
                                  frameSize=(-2,-0.6,0.9,-0.2 )
 
                                  )
-    self.new = DirectButton(
+    self.logo = DirectButton(
                             parent = self.mainFrame,
-                            image = playimg,
-                            image_scale = (2.5,1,1),
+                            image = logoimg,
+                            image_scale = (3.66,1,1),
                             relief = None,
                             #text = ("Singleplayer"), 
-                            pos = (0,0,0.0),
+                            pos = (0.15,0,0.15),
+                            scale=0.15,
+                            command = parent.newGame
+                            )
+    self.new = DirectButton(
+                            parent = self.mainFrame,
+                            image = (playimg, playimghover, playimghover),
+                            #image_scale = (2.5,1,1),
+                            relief = None,
+                            #text = ("Singleplayer"), 
+                            pos = (0.08,0,-0.1),
                             scale=.05,
                             command = parent.newGame
                             )
     self.exit = DirectButton(
                              parent = self.mainFrame,
-                             image = exitimg, 
+                             image = (exitimg, exitimghover, exitimghover),
+                             relief = None,
                              #text = ("Exit"), 
-                             pos = (0.0,1,-0.3),
+                             pos = (0.08,0,-0.2),
                              scale=.05,
                              command=parent.userExit)
 
     self.image = self.load2Dimage("assets/images/Loading.png")
+    self.logo.setTransparency(TransparencyAttrib.MAlpha)
+    self.new.setTransparency(TransparencyAttrib.MAlpha)
+    self.exit.setTransparency(TransparencyAttrib.MAlpha)
+
         
   def load2Dimage(self, imagepath):
     img=OnscreenImage(image=imagepath, pos = (0, 0, 0),
@@ -44,7 +64,6 @@ class MainMenu:
       
   def show(self):
     self.mainFrame.show()
-    self.image.show()
 
   
   #TODO: check this

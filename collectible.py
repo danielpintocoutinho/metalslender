@@ -19,6 +19,7 @@ class Collectible(DirectObject):
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+		self.model.setScale(0.05)
 		
 		self.pickedSound = loader.loadSfx(pathSound)
 		
@@ -31,6 +32,7 @@ class Collectible(DirectObject):
 			self.picked = True
 				
 	def act_dist(self, hand):
+		print ("hand: ",hand," -> ", (hand - self.model.getPos(self.room)).length())
 		return (hand - self.model.getPos(self.room)).length()
 		
 	def wasPicked(self):
