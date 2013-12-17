@@ -21,6 +21,18 @@ class MainMenu:
                             scale=.05,
                             command = parent.newGame
                             )
+    
+    self.pause = DirectButton(
+                            parent = self.mainFrame,
+                            image = playimg,
+                            image_scale = (2.5,1,1),
+                            relief = None,
+                            #text = ("Singleplayer"), 
+                            pos = (0,2,-0.6),
+                            scale=.06,
+                            command = parent.pauseGame
+                            )
+    
     self.exit = DirectButton(
                              parent = self.mainFrame,
                              image = exitimg, 
@@ -44,6 +56,7 @@ class MainMenu:
       
   def show(self):
     self.mainFrame.show()
+    #self.image.show()
 
   
   #TODO: check this

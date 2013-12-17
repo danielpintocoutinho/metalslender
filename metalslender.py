@@ -1,7 +1,7 @@
 #!/usr/bin/ppython
 from direct.showbase.ShowBase import ShowBase
 from panda3d.ai import *
-from panda3d.core import AmbientLight, Vec3, Vec4, CollisionTraverser, \
+from panda3d.core import AmbientLight, Vec3, Vec4, Mat4, CollisionTraverser, \
 	WindowProperties, AntialiasAttrib, Fog, Texture, TextureStage
 
 from MainMenu import MainMenu
@@ -24,6 +24,7 @@ CAM_FAR =1000
 CAM_NEAR = 0.1
 CAM_FAR  = 1000
 
+
 class MetalSlender(ShowBase):
 	
 	VERSION=0.1
@@ -43,8 +44,8 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "temp/lcg13" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "temp/blocoh", self.render))
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
 		
 		for enemy in self.enemies:
 			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
@@ -156,10 +157,11 @@ class MetalSlender(ShowBase):
 		self.win.movePointer(0, 100, 100)
 
 		self.props = WindowProperties()
-		self.props.setFullscreen(1)
-		self.props.setSize(1920, 1080)
+		self.props.setFullscreen(0)
+		self.props.setSize(800, 600)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
+		self.paused = False
 		
 		self.openMainWindow()
 		self.win.requestProperties(self.props)
@@ -169,6 +171,8 @@ class MetalSlender(ShowBase):
 	def addCommands(self):
 		self.accept('escape', self.userExit)
 		self.accept('i', self.actionKeys, ['i'])
+		self.accept('p', self.pauseGame)
+		self.accept('z', self.restartGame)
 
 	def actionKeys(self, key):
 		if key == 'i':
@@ -199,5 +203,36 @@ class MetalSlender(ShowBase):
 		self.mainMenu.hide()
 		
 		self.taskMgr.add(self.camctrl.update, "camera/control")
+	
+	def pauseGame(self):
+		if (self.paused == True):
+			self.props.setCursorHidden(True)
+			self.win.requestProperties(self.props)
+			self.mainMenu.hide()
+			self.paused = False
+			EventManager(self, self.player, self.actions).start()
+			self.taskMgr.add(self.player.updateAll, "player/update")
+			self.taskMgr.add(self.hud.update, 'hud')
+			self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
+			self.taskMgr.add(self.AIUpdate,"AIUpdate")
+			self.taskMgr.add(self.camctrl.update, "camera/control")
+			self.accept('p', self.pauseGame)
+		else:
+			EventManager(self, self.player, self.actions).stop()
+			self.ignore('p')
+			self.player.pause()
+			self.taskMgr.remove("camera/control")
+			self.taskMgr.remove("player/update")
+			self.taskMgr.remove('hud')
+			self.player.resetLast()
+			self.taskMgr.remove('player/flashlight/update')
+			self.taskMgr.remove("AIUpdate")
+			self.props.setCursorHidden(False)
+			self.win.requestProperties(self.props)
+			self.mainMenu.show()
+			self.paused = True
+		
+	def restartGame(self):
+		#gc.collect()
 
 MetalSlender().run()

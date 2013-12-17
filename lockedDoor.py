@@ -72,4 +72,13 @@ class LockedDoor(DirectObject):
 				self.closed = 1
 				
 	def act_dist(self, hand):
-		return (hand - self.knob.getPos(self.room)).length()		
+		return (hand - self.knob.getPos(self.room)).length()
+	
+	def __del__(self):
+		self.room = None
+		self.model.removeNode()
+		self.knob.removeNode()
+		self.openSound = None
+		self.closeSound = None
+		self.forceSound = None
+		self.unlockSound = None

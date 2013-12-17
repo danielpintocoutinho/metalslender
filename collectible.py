@@ -35,3 +35,9 @@ class Collectible(DirectObject):
 		
 	def wasPicked(self):
 		return self.picked
+	
+	def __del__(self):
+		self.room = None
+		self.model.removeNode()
+		self.pickedSound = None
+		

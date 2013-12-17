@@ -20,8 +20,8 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=7.5
-	RUNNING=3.5
+	WALKING=1.0
+	RUNNING=1.0
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
@@ -30,7 +30,7 @@ class Player(SceneObject):
 	CROUCHED_HEIGHT = 10.0
 	FEAR_RATE = -1.0 / 30
 	
-	JUMP_POWER = 40.0
+	JUMP_POWER = 80.0
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -52,6 +52,7 @@ class Player(SceneObject):
 		self.speed   = 0.0
 		self.stopped = 1.0
 		self.pace = Player.NORMAL
+		self.paused = False
 		
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
@@ -224,7 +225,7 @@ class Player(SceneObject):
 		deltabreath = self.breathrate * elapsed
 		deltafear   = Player.FEAR_RATE       * elapsed
 
-		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
+		self.breath = 1.0 #min(1.0, max(-self.fear, self.breath + deltabreath))
 		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
 				
 	def updateAll(self, task):
@@ -272,3 +273,19 @@ class Player(SceneObject):
 	
 	def scream(self):
 		self.screams.play()
+		
+	def resetLast(self):
+		self.last = 0
+		
+	def pause(self):
+		if (self.paused == True):
+			self.paused = False
+		else:
+			self.paused = True
+			
+	def isPaused(self):
+		return self.paused
+		
+	def __del__(self):
+		self.scene = None
+		self.flashlight = None

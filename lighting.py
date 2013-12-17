@@ -85,3 +85,9 @@ class Flashlight:
 	
 	def setHpr(self, vec):
 		self.node1.setHpr(vec)
+		
+	def __del__(self):
+		self.owner = None
+		self.scene = None
+		self.node1.removeNode()
+		self.nodepath.removeNode()

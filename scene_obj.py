@@ -43,3 +43,8 @@ class SceneObject:
 	
 	def getNodePath(self):
 		return self.root
+	
+	def __del__(self):
+		self.collSol.removeNode()
+		self.collRay.removeNode()
+		

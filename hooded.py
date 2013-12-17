@@ -331,3 +331,7 @@ class Hooded(AICharacter):
 
     def pause(self):
         self.getAiBehaviors().pauseAi("all")
+        
+    def __del__(self):
+        self.slnp.removeNode()
+        

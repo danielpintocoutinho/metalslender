@@ -61,3 +61,9 @@ class HUD(DirectObject):
 		self.text.show()
 
 		return task.cont
+	
+	def __del__(self):
+		self.base   = None
+		self.player = None
+		self.heartimage.destroy()
+		self.text.destroy()

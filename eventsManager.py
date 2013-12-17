@@ -126,3 +126,18 @@ class EventManager(DirectObject):
 	
 	def start(self):
 		self.base.taskMgr.add(self.update, "update-task")
+	
+	def stop(self):
+		self.base.taskMgr.remove("update-task")
+		
+	def __del__(self):
+		self.player = None
+		self.items  = None
+		self.base = None
+		self.firstEnemy.removeNode()
+		self.point0 = None
+		self.point1 = None
+		self.point2 = None
+		self.point3 = None
+		self.scare = None
+		self.tension = None

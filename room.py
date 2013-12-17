@@ -11,6 +11,7 @@ class Room(SceneObject):
 		
 		self.model = base.loader.loadModel(model)
 		self.model.reparentTo(self.root)
+		self.model.setCollideMask(BitMask32.allOff())
 		
 		self.root.setPos(pos)
 		self.root.setScale(scale)
@@ -88,3 +89,7 @@ class Room(SceneObject):
 	def setCollision(self, pattern, intoMask):
 		for np in self.model.findAllMatches(pattern): 
 			np.node().setIntoCollideMask(intoMask)
+			
+	def __del__(self):
+		self.model.removeNode()
+		self.root.removeNode()

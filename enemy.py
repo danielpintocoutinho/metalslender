@@ -28,3 +28,7 @@ class Enemy:
 
 	def hear(self, noisePos):
 		self.hooded.hear(noisePos)
+		
+	def __del__(self):
+		self.seeker.removeNode()
+		self.hooded = None

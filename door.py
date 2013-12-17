@@ -18,6 +18,7 @@ class Door(DirectObject):
 		
 		self.model = base.loader.loadModel("assets/chicken/porta")
 		self.knob  = base.loader.loadModel("assets/chicken/knob")
+		self.model.setCollideMask(BitMask32.allOff())
 		self.knob.setPos(Vec3(17.6,0,8))
 		self.knob.reparentTo(self.model)
 		self.room = fatherNode
@@ -26,11 +27,11 @@ class Door(DirectObject):
 		self.model.setHpr(hpr)
 
 
-		self.modelBody = self.model.attachNewNode(CollisionNode("door"))
+		#self.modelBody = self.model.attachNewNode(CollisionNode("door"))
 		print "door pos: ", pos
-		self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
-		self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
-		self.modelBody.node().setIntoCollideMask(CollisionMask.WALL)
+		#self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
+		#self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
+		#self.modelBody.node().setIntoCollideMask(CollisionMask.WALL)
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle
@@ -66,4 +67,11 @@ class Door(DirectObject):
 				self.closed = 1
 				
 	def act_dist(self, hand):
-		return (hand - self.knob.getPos(self.room)).length()		
+		return (hand - self.knob.getPos(self.room)).length()
+	
+	def __del__(self):
+		self.room = None
+		self.model.removeNode()
+		self.knob.removeNode()
+		self.openSound = None
+		self.closeSound = None

@@ -89,3 +89,11 @@ class ActionManager(DirectObject):
 		
 	def diff_dist(self, point):	
 		return (point.getPos() - self.point).length()
+	
+	def __del__(self):
+		self.base   = None
+		self.player = None
+		self.point0 = None
+		del self.doors [:]
+		del self.locked_doors [:]
+		del self.keys [:]

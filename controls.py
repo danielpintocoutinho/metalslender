@@ -55,3 +55,7 @@ class PlayerControls(DirectObject):
 			base.cTrav.hideCollisions()
 			l=base.render.findAllMatches("**/+CollisionNode")
 			for cn in l: cn.hide()
+	
+	def __del__(self):
+		self.player = None
+		self.actMng = None
