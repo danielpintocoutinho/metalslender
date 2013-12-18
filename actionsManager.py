@@ -41,7 +41,7 @@ class ActionManager(DirectObject):
 		#self.locked_doors = []
 
 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \
-		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(0, 0, 0), Vec3(0, 0, 0))]
+		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(0, 0, -0.5), Vec3(0, 0, 0))]
 		
 		#visualize direction
 		self.accept("u", self.hide)
