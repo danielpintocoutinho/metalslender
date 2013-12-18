@@ -42,6 +42,8 @@ class Room(SceneObject):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
 	 		base.enemies.append(Enemy(np.getPos(), patrol))
 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
+			#TODO: Make this work
+# 			base.enemies[-1].defineDynamicObjects("assets/chicken/lcg-pedro", "**/LCG_porta*")
 
 	def setupGoal(self, base):
 		np = self.model.find('**/Goal')

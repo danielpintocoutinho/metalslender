@@ -8,8 +8,7 @@ from panda3d.core import AmbientLight, Vec3, Vec4, Mat4, CollisionTraverser, \
 
 from MainMenu import MainMenu
 from actionsManager import ActionManager
-from camera import CameraControls
-from controls import PlayerControls
+from controls import CameraControls, PlayerControls
 from door import Door
 from enemy import Enemy
 from eventsManager import EventManager
@@ -39,49 +38,19 @@ class MetalSlender(ShowBase):
 		self.initGame()
 
 	def initGame(self):
-		# Preliminary capabilities check.
-		#if not self.initMessages(): 
-		#	return
 		self.initConfig()
 
-		self.setupEnvironment()
-		
-		self.AIworld = AIWorld(self.render)
-
-# <<<<<<< HEAD
 		self.initTimer = True
 		self.time = 0
 		self.gameOver = True
-# =======
-		#TODO: Many things are only done once the game is started
-		# Load the scene.
-		self.rooms = []
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
-		
-		for enemy in self.enemies:
-			enemy.defineDynamicObjects("assets/chicken/lcg", "**/LCG_porta*")
-		
-		#TODO: Support multiple rooms
-		self.player  = Player(self, name = "player", pos = Vec3(90,90,12), model='assets/chicken/coelho', scene=self.render)
-		self.actions = ActionManager(self, self.rooms[0].model, self.player)
-		self.events = EventManager(self, self.player, self.actions)
-		self.events.start()
-# >>>>>>> refs/remotes/origin/master
 
 		self.setFrameRateMeter(True)
 		self.taskMgr.add(self.menuDisplay, "menuDisplay")
-
-# 		self.AIworld.addAiChar(self.enemy.getHooded())
 
 		self.mainMenu = MainMenu(self)
 		self.introSound = loader.loadSfx('assets/sounds/intro.mp3')
 		self.introSound.setLoop(True)
 		self.introSound.play()
-		#self.mainMenu.hide()
-
-		# User controls
-		self.addCommands()
 		
 	def setupEnvironment(self):
 		#TODO: Not working
@@ -94,13 +63,8 @@ class MetalSlender(ShowBase):
 	def setupFog(self):
 		self.fog = Fog("fog")
 
-# 		self.fog.setColor(0.5, 0.1, 0.1)
 		self.fog.setColor(0, 0, 0)
 		self.fog.setExpDensity(0.004)
-
-# 		self.fog.setLinearRange(0,320)
-# 		self.fog.setLinearFallback(45,160,320)
-# 		self.cam.attachNewNode(self.fog)
 
 		self.render.setFog(self.fog)
 		
@@ -113,7 +77,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.8, 0.8, 0.8, 1)):
+	def setupLighting(self, color = Vec4(0.02, 0.02, 0.02, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		self.amblight = self.render.attachNewNode(alight)
@@ -123,6 +87,13 @@ class MetalSlender(ShowBase):
 		alight = AmbientLight("ShadelessLight")
 		alight.setColor((1.0,1.0,1.0,1.0))
 		self.shadeless = self.render.attachNewNode(alight)
+		
+	def loadScenario(self):
+		self.rooms = []
+		
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
 		
 	def placeTargets(self):
 		self.target1 = self.loader.loadModel("assets/chicken/arrow")
@@ -174,19 +145,18 @@ class MetalSlender(ShowBase):
 		self.accept('i', self.actionKeys, ['i'])
 		self.accept('p', self.pauseGame)
 		self.accept('z', self.restartGame)
+		
+	def addTasks(self):
+		self.taskMgr.add(self.camctrl.update, "camera/control")
+		self.taskMgr.add(self.player.updateAll, "player/update")
+		self.taskMgr.add(self.hud.update, 'hud')
+		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
+		self.taskMgr.add(self.AIUpdate,"AIUpdate")
+		self.taskMgr.add(self.camctrl.update, "camera/control")
 
 	def actionKeys(self, key):
 		if key == 'i':
 			self.player.fear = min(self.player.fear + 0.1, 1.0)
-		
-	#TODO: Verify if video features are supported
-	def initMessages(self):
-# 		self.inst_m = menu.addInstructions(0.95 , '[WASD]: walk')
-# 		self.inst_h = menu.addInstructions(0.90 , 'SPACE: jump')
-# 		self.inst_h = menu.addInstructions(0.85 , 'SHIFT+[WASD]: run' )
-# 		self.inst_h = menu.addInstructions(0.80 , 'F: Flashlight On/Off')
-# 		self.inst_h = menu.addInstructions(0.75 , 'I: increase fear' )
-		return True
 
 	def AIUpdate(self,task):
 		hasAttacked = []
@@ -209,6 +179,10 @@ class MetalSlender(ShowBase):
 
 	def newGame(self):
 		
+		self.setupEnvironment()
+		
+		self.AIworld = AIWorld(self.render)
+		
 		self.introSound.stop()
 		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
 		initialSound.play()
@@ -219,20 +193,15 @@ class MetalSlender(ShowBase):
 
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
-		self.rooms = []
-
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
-		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
+		self.loadScenario()
 		
 		#self.rooms[1].root.detachNode();
 		
-		#TODO: adjust code
+		#TODO: This code must go in room construction
 		for enemy in self.enemies:
 			enemy.defineDynamicObjects("assets/chicken/lcg-pedro", "**/LCG_porta*")
 		
 		#TODO: Support multiple rooms
-
 		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player,self.rooms)
 		self.actions.addDoors(self, self.rooms[1].model, self.doors)
@@ -251,12 +220,11 @@ class MetalSlender(ShowBase):
 
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
-# <<<<<<< HEAD
-# 		self.mainMenu.hide()
-# =======
+
 		self.mainMenu.hideNewGame()
 		
-		self.taskMgr.add(self.camctrl.update, "camera/control")
+		self.addTasks()
+		self.addCommands()
 	
 	def pauseGame(self):
 		if (self.paused == True):

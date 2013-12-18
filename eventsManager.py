@@ -28,7 +28,8 @@ class EventManager(DirectObject):
 		
 		#Pontos chave para os sustos
 		self.point0 = loader.loadModel("assets/models/sphere")
-		self.point0.setPos(Vec3(0,5,0))
+		self.point0.setScale(0.05)
+		self.point0.setPos(Vec3(0,0,0))
 		self.point0.reparentTo(render)
 		self.point1 = scene_obj.SceneObject(base, "point1", "assets/models/sphere", base.render, Vec3(100,25,10), 1)
 		self.point2 = scene_obj.SceneObject(base, "point2", "assets/models/sphere", base.render, Vec3(160,20,15), 1)
