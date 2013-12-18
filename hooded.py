@@ -8,10 +8,11 @@ import math
 import time
 from collision import CollisionMask
 
-
 class Hooded(AICharacter):
 
-    def initialize(self):
+    def __init__(self, name, root, mass, movforce, maxforce):
+    	AICharacter.__init__(self, name, root, mass, movforce, maxforce)
+    	
         self.initTimer = True
         self.attackTimer = True
         self.currentStatus = 0
@@ -25,6 +26,7 @@ class Hooded(AICharacter):
         lens.setFov(60)
         self.slight.setLens(lens)
         self.slnp = self.get_node_path().attachNewNode(self.slight)
+        #TODO: Debugging option
         self.slight.showFrustum()
         self.slnp.setH(self.slnp.getH()-180)
         self.hearing = 5.0
@@ -53,7 +55,9 @@ class Hooded(AICharacter):
         base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
         
         self.screechsound = loader.loadSfx("assets/sounds/enemies/nazgul_scream.mp3")
-
+        
+	def __del__(self):
+		self.slnp.removeNode()
 
     def setPatrolPos(self, PatrolPos):
         self.currentTarget = 0
@@ -233,7 +237,6 @@ class Hooded(AICharacter):
                 self.aoe = 10
 
         #print distance
-        
 
     def wander(self):
         #print "wander - ", self.lostTarget
@@ -262,8 +265,6 @@ class Hooded(AICharacter):
                 #self.getAiBehaviors().seek(self.PatrolPos[self.currentTarget])
 #                 print "vai voltar pro pathfinding ", self.currentStatus
         
-
-
     def kill(self):
         #print "Vou te kill ", self.attackTimer
         if (self.attackTimer):
@@ -280,9 +281,6 @@ class Hooded(AICharacter):
                 self.resetTimer()
             else:
                 self.Attacked = False
-
-
-        
 
     def sent_traverse(self, o):
         # start the ray traverse
@@ -351,7 +349,6 @@ class Hooded(AICharacter):
 
     def addDynamicObject(self, dynamicObject):
         self.dynamicObstacles.append(dynamicObject)
-
 
     def hear(self, noisePos):
         dist = distance(self.get_node_path().getPos(), noisePos)

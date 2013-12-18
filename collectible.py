@@ -25,6 +25,11 @@ class Collectible(DirectObject):
 		
 		self.picked = False
 		
+	def __del__(self):
+		self.room = None
+		self.model.removeNode()
+		self.pickedSound = None
+		
 	def act(self):
 		if (not self.picked):
 			self.pickedSound.play()

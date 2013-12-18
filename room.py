@@ -22,7 +22,7 @@ class Room(SceneObject):
 		
 		self.setupLightSources(scene)
 		self.setupCollision()
-# 		self.setupEnemies(base)
+		self.setupEnemies(base)
 		self.setupGoal(base)
 		self.setupDoors(base)
 		self.setupKeys(base)
@@ -30,6 +30,11 @@ class Room(SceneObject):
 		
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
+			
+	def __del__(self):
+		self.model.removeNode()
+		self.root.removeNode()
+		del self.lights [:]
 			
 	#TODO: Find out what is missing in the scenario
 	def setupEnemies(self, base):
@@ -61,7 +66,6 @@ class Room(SceneObject):
 # 			tree.setDiffuse((0.1, 0.1, 0.1, 1.0))
 			
 	def setupCollision(self):
-		#TODO: Adjust ramp collision
 		#TODO: Load room objects and triggers
 		self.setCollision("**/=Wall", Mask.WALL)
 		self.setCollision("**/=Floor", Mask.FLOOR)

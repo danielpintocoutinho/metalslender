@@ -26,6 +26,11 @@ class SceneObject:
 		
 		self.wallHandler.addCollider(self.collSol, self.root)
 		base.cTrav.addCollider(self.collSol, self.wallHandler)
+	
+	def __del__(self):
+		self.collSol.removeNode()
+		self.collRay.removeNode()
+		self.root.removeNode()
 			
 	def addCollisionRay(self, ray = CollisionRay(0, 0, 1, 0, 0, -1)):
 		self.collRay.node().addSolid(ray)

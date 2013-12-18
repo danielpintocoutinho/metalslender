@@ -51,3 +51,6 @@ class SceneActor(scene_obj.SceneObject):
 	
 	def getActor(self):
 		return self.model
+	
+	def __del__(self):
+		self.model.removeNode()

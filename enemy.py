@@ -14,8 +14,13 @@ class Enemy:
 		self.startPos = self.pos
 
 		self.hooded = Hooded("seeker", self.seeker, 1200, 800, 800)
-		self.hooded.initialize()
 		self.hooded.setPatrolPos(patrolPos)
+		
+	def __del__(self):
+		self.seeker.removeNode()
+		self.hooded = None
+		self.model.removeNode()
+		self.doors = None
 
 	def getHooded(self):
 		return self.hooded
@@ -38,4 +43,3 @@ class Enemy:
 
 	def stop(self):
 		self.hooded.stop()
-

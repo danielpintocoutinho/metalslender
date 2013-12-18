@@ -13,6 +13,11 @@ class CameraControls:
 		self.move = False
 
 	def update(self, task):
+		if (self.player.isPaused() == True):
+			self.player.pause()
+			self.base.win.movePointer(0, 100, 100)
+			return task.cont
+		
 		md = self.base.win.getPointer(0)
 		x = md.getX()
 		y = md.getY()
@@ -28,3 +33,7 @@ class CameraControls:
 # 		self.base.skydome.setHpr(-self.player.getNodePath().getHpr())
 
 		return task.cont
+	
+	def __del__(self):
+		self.base = None
+		self.player = None

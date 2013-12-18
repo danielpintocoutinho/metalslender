@@ -11,9 +11,7 @@ import scene_obj
 
 from actionsManager import ActionManager
 
-
 class EventManager(DirectObject):
-	
 	
 	def __init__(self, base, player, itemList):
 		
@@ -57,7 +55,19 @@ class EventManager(DirectObject):
 		#visualize direction
 		self.accept("h", self.hide)
 		self.accept("j", self.show)
-		
+				
+	def __del__(self):
+		self.player = None
+		self.items  = None
+		self.base = None
+		self.firstEnemy.removeNode()
+		self.firstEnemy = None
+		self.point0 = None
+		self.point1 = None
+		self.point2 = None
+		self.point3 = None
+		self.scare = None
+		self.tension = None
 	
 	def update(self, task):
 		self.center = self.player.root.getPos()
@@ -129,10 +139,8 @@ class EventManager(DirectObject):
 		#print "##"
 		#print("eve:",self.point.getX(),self.point.getY(),self.point.getZ())
 		#print("eve:",self.center.getX(),self.center.getY(),self.center.getZ())
-
 		#print self.diff_dist(self.base.render.find("point3"))
 		#print self.diff_dir(self.base.render.find("point3"))
-
 			
 		return Task.cont
 		
@@ -166,6 +174,6 @@ class EventManager(DirectObject):
 
 		base.loader.unloadSfx(self.scare)
 		base.loader.unloadSfx(self.tension)
-
-
-
+	
+	def stop(self):
+		self.base.taskMgr.remove("update-task")

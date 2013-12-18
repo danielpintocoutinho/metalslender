@@ -16,6 +16,7 @@ class Door(DirectObject):
 		
 		self.model = base.loader.loadModel("assets/chicken/porta")
 		self.knob  = base.loader.loadModel("assets/chicken/knob")
+		self.model.setCollideMask(BitMask32.allOff())
 		self.knob.setPos(Vec3(17.6,0,8))
 		self.knob.reparentTo(self.model)
 		self.room = fatherNode
@@ -24,11 +25,11 @@ class Door(DirectObject):
 		self.model.setHpr(hpr)
 		self.model.setScale(0.05)
 
-
-		"""self.modelBody = self.model.attachNewNode(CollisionNode("door"))
-		self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
-		self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
-		self.modelBody.node().setIntoCollideMask(CollisionMask.DOOR)"""
+		#self.modelBody = self.model.attachNewNode(CollisionNode("door"))
+		print "door pos: ", pos
+		#self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
+		#self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
+		#self.modelBody.node().setIntoCollideMask(CollisionMask.WALL)
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle
@@ -45,6 +46,17 @@ class Door(DirectObject):
 		#self.point0 = scene_obj.SceneObj("knob0","assets/models/sphere", self.knob, 1)
 		
 		self.closed = 1
+		
+	def __del__(self):
+		self.room.removeNode()
+		self.model.removeNode()
+		self.knob.removeNode()
+		self.room = None
+		self.model = None
+		self.knob = None
+		self.openSound = None
+		self.closeSound = None
+		self.knobSequence = None
 		
 	def act(self):
 		

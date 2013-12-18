@@ -48,6 +48,14 @@ class ActionManager(DirectObject):
 		self.accept("i", self.show)
 		
 		self.point0.getNodePath().hide()
+		
+	def __del__(self):
+		self.base   = None
+		self.player = None
+		self.point0 = None
+		del self.doors [:]
+		del self.locked_doors [:]
+		del self.keys [:]
 	
 	def update(self):
 		self.center = self.player.getNodePath().getPos()
@@ -103,7 +111,6 @@ class ActionManager(DirectObject):
 		
 	def diff_dist(self, point):	
 		return (point.getPos() - self.point).length()
-
 
 	def addDoors(self, base, room, doors):
 		print "numero de portas: ", len(doors)

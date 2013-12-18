@@ -67,6 +67,8 @@ class Player(SceneObject):
 		self.initTimer = True
 		self.attacked = False
 
+		self.paused = False
+		
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
 		
@@ -80,6 +82,10 @@ class Player(SceneObject):
 		self.filters = CommonFilters(base.win, base.cam)
 
 		self.last = 0
+			
+	def __del__(self):
+		self.scene = None
+		self.flashlight = None
 		
 	#TODO: add method boo!
 		
@@ -243,7 +249,7 @@ class Player(SceneObject):
 		deltabreath = self.breathrate * elapsed
 		deltafear   = Player.FEAR_RATE       * elapsed
 
-		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
+		self.breath = 1.0 #min(1.0, max(-self.fear, self.breath + deltabreath))
 		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
 		
 		#self.filters.setBlurSharpen( 1.0 - self.fear)
@@ -350,3 +356,15 @@ class Player(SceneObject):
 		else:
 			self.removeCollisionSolid()
 			self.addCollisionSolid(CollisionSphere(0, 0, 0, 0.2))
+		
+	def resetLast(self):
+		self.last = 0
+		
+	def pause(self):
+		if (self.paused == True):
+			self.paused = False
+		else:
+			self.paused = True
+			
+	def isPaused(self):
+		return self.paused
