@@ -9,7 +9,7 @@ class SceneObject:
 	BODY_SOLID_SUFIX = 'BodySolid'
 	FEET_SOLID_SUFIX = 'FeetSolid'
 
-	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
+	def __init__(self, base, name, scene, pos=Vec3(0,0,0), scale=1.0):
 
 		self.root = scene.attachNewNode(name)
 	

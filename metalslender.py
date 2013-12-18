@@ -90,52 +90,22 @@ class MetalSlender(ShowBase):
 	def loadScenario(self):
 		self.rooms = []
 		
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
+# 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
-		
-	def placeTargets(self):
-		self.target1 = self.loader.loadModel("assets/chicken/arrow")
-		self.target1.setColor(1,0,0)
-		self.target1.setPos(-76.1808, -52.1483, -14.0991)
-		self.target1.setScale(5)
-		self.target1.reparentTo(self.render)
-
-		# Target2
-		self.target2 = self.loader.loadModel("assets/chicken/arrow")
-		self.target2.setColor(0,1,0)
-		self.target2.setPos(23.3466, -85.0269, -14.0991)
-		self.target2.setScale(5)
-		self.target2.reparentTo(self.render)
-
-		self.banana = self.loader.loadModel("assets/chicken/banana")
-		self.banana.setScale(20)
-
-		self.banana.setPos(23.3466, -85.0269, -14.4758)
-		self.banana.reparentTo(self.render)
 
 	def initConfig(self):
 		self.render.setShaderAuto()
-	
-		#TODO: Must be moved to player's camera
-		#self.camLens.setNearFar(CAM_NEAR,CAM_FAR)
-		self.camLens.setFov(75)
-
-		#self.disableMouse()
-		self.win.movePointer(0, 100, 100)
 
 		self.props = WindowProperties()
-
-# 		self.props.setFullscreen(True)
-		self.props.setSize(1280, 720)
-
-		self.props.setCursorHidden(False)
+		self.props.setFullscreen(True)
+		self.props.setSize(1920, 1080)
 		self.props.setMouseMode(self.props.M_absolute)
-		self.paused = False
 		
-		self.openMainWindow()
-		self.graphicsEngine.openWindows()
 		self.win.requestProperties(self.props)
+		self.win.movePointer(0, 100, 100)
+		
+		self.paused = False
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)

@@ -63,7 +63,9 @@ class Player(SceneObject):
 	breathrates[(EXHAUSTED, RUNNING)] =-1.0 /   5
 
 	def __init__(self, base, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObject.__init__(self, base, name, model, scene, pos, scale)
+		SceneObject.__init__(self, base, name, scene, pos, scale)
+		
+		#TODO: load the model
 		self.getNodePath().setPos(pos)
 
 		self.startPos = pos

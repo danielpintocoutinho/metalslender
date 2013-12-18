@@ -65,12 +65,12 @@ class Hooded(AICharacter):
 	def __del__(self):
 		self.slnp.removeNode()
 
-	def setPatrolPos(self, PatrolPos):
+	def setPatrolPos(self, route):
 		self.currentTarget = 0
-		self.PatrolPos = PatrolPos
-		self.numTargets = len(PatrolPos)
+		self.PatrolPos = route
+		self.numTargets = len(route)
 #		  print "num targets: ", self.numTargets
-#		  for i in self.PatrolPos:
+#		  for i in self.route:
 #			  print i.getPos(render)
 		self.increment = 1
 		self.getAiBehaviors().seek(self.PatrolPos[0])

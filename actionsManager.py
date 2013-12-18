@@ -23,7 +23,7 @@ class ActionManager(DirectObject):
 		
 		self.center = Vec3(0,0,0)		
 		self.hand   = Vec3(0,0,0)
-		self.point0 = scene_obj.SceneObject(base, "act_point0","assets/models/sphere", base.render, self.hand, 1)
+		self.point0 = scene_obj.SceneObject(base, "act_point0", base.render, self.hand, 1)
 		
 		self.doors = [Door(base, room,Vec3(5.006, -0.08, -0.58), Vec3(-90, 0, 0), 90), \
 					  Door(base, room,Vec3(38, 35, 0), Vec3(0, 0, 0), 90), \

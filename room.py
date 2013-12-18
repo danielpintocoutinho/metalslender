@@ -38,8 +38,8 @@ class Room(SceneObject):
 	def setupEnemies(self, base):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
-	 		base.enemies.append(Enemy(np.getPos(), patrol))
-			base.AIworld.addAiChar(base.enemies[-1].getHooded())
+	 		base.enemies.append(Enemy(base, 'Hooded.' + str(len(base.enemies)), self.root, patrol, np.getPos()))
+# 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
 			base.enemies[-1].addDynamicObjects(self.doors)
 
 	def setupGoal(self, base):
@@ -59,15 +59,6 @@ class Room(SceneObject):
 			tree.setTwoSided(True)
 			tree.setBillboardAxis()
 			tree.setTransparency(TransparencyAttrib.MAlpha)
-			mat = Material()
-			mat.setSpecular((1,0,0,1))
-			mat.setDiffuse((0.1, 0.1, 0.1, 1))
-			mat.setShininess(0)
-			tree.setMaterial(mat)
-# 			tree.ls()
-# 			tree.getMaterial().setSpecular((0,0,0,1))
-# 			help(tree)
-# 			tree.setDiffuse((0.1, 0.1, 0.1, 1.0))
 			
 	def setupCollision(self):
 		#TODO: Load room objects and triggers
