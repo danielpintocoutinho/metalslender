@@ -25,19 +25,19 @@ class ActionManager(DirectObject):
 		self.hand   = Vec3(0,0,0)
 		self.point0 = scene_obj.SceneObject(base, "act_point0", base.render, self.hand, 1)
 		
-		self.doors = [Door(base, room,Vec3(5.006, -0.08, -0.58), Vec3(-90, 0, 0), 90), \
-					  Door(base, room,Vec3(38, 35, 0), Vec3(0, 0, 0), 90), \
-					  Door(base, room,Vec3(100, 4.5, 0), Vec3(0, 0, 0), -85), \
-					  Door(base, room,Vec3(220.5, 35, 5.1), Vec3(0, 0, 0), 90), \
-					  Door(base, room,Vec3(248, 37, 5.1), Vec3(90, 0, 0), -87), \
-		              Door(base, room,Vec3(247.5, 58.5, 5.1), Vec3(125, 0, 0), -117), \
-		              Gate(base, rooms[1],Vec3(87.8, -2893.36, 0), Vec3(180, 0, 0), 90), \
-					  Gate(base, rooms[1],Vec3(-23.46, -2893.36, 0), Vec3(0, 0, 0), -90)
-		              ]
+# 		self.doors = [Door(base, room,Vec3(5.006, -0.08, -0.58), Vec3(-90, 0, 0), 90), \
+# 					  Door(base, room,Vec3(38, 35, 0), Vec3(0, 0, 0), 90), \
+# 					  Door(base, room,Vec3(100, 4.5, 0), Vec3(0, 0, 0), -85), \
+# 					  Door(base, room,Vec3(220.5, 35, 5.1), Vec3(0, 0, 0), 90), \
+# 					  Door(base, room,Vec3(248, 37, 5.1), Vec3(90, 0, 0), -87), \
+# 		              Door(base, room,Vec3(247.5, 58.5, 5.1), Vec3(125, 0, 0), -117), \
+# 		              Gate(base, rooms[1],Vec3(87.8, -2893.36, 0), Vec3(180, 0, 0), 90), \
+# 					  Gate(base, rooms[1],Vec3(-23.46, -2893.36, 0), Vec3(0, 0, 0), -90)
+# 		              ]
 		
-		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(30, -2891.36, 5), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
+# 		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(30, -2891.36, 5), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
 
-		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90, rooms[1], 0)]
+# 		self.locked_doors = [LockedDoor(base, room,Vec3(35, -85, 10), Vec3(180, 0, 0), -90, rooms[1], 0)]
 		#self.locked_doors = []
 
 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \

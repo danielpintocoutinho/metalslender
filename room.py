@@ -30,7 +30,6 @@ class Room(SceneObject):
 			np.hide()
 			
 	def __del__(self):
-		self.model.removeNode()
 		self.root.removeNode()
 		del self.lights [:]
 			
@@ -111,11 +110,6 @@ class Room(SceneObject):
 			lightNP.setHpr(np.getHpr())
 # 			lightNP.setCompass()
 			self.model.setLight(lightNP)
-			
-			if np.getTag('Hide'):
-				np.hide()
-			else:
-				np.setLight(scene.find('ShadelessLight'))
 		
 	def setCollision(self, pattern, intoMask):
 		for np in self.model.findAllMatches(pattern): 

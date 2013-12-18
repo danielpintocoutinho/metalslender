@@ -12,6 +12,8 @@ class SceneObject:
 	def __init__(self, base, name, scene, pos=Vec3(0,0,0), scale=1.0):
 
 		self.root = scene.attachNewNode(name)
+		self.root.setPos(pos)
+		self.root.setScale(scale)
 	
 		self.auraSolid = self.root.attachNewNode(CollisionNode(name + SceneObject.AURA_SOLID_SUFIX))
 		self.bodySolid = self.root.attachNewNode(CollisionNode(name + SceneObject.BODY_SOLID_SUFIX))
@@ -50,7 +52,7 @@ class SceneObject:
 		self.bodySolid.node().clearSolids()
 		self.bodySolid.node().addSolid(solid)
 		
-	def setSightSolid(self, ray = CollisionRay(0, 0, 1, 0, 0, -1)):
+	def setFeetSolid(self, ray = CollisionRay(0, 0, 1, 0, 0, -1)):
 		self.feetSolid.node().clearSolids()
 		self.feetSolid.node().addSolid(ray)
 		

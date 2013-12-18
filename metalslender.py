@@ -90,9 +90,10 @@ class MetalSlender(ShowBase):
 	def loadScenario(self):
 		self.rooms = []
 		
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/teste-pedro" , self.render))
 # 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
-		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
+# 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+# 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
 
 	def initConfig(self):
 		self.render.setShaderAuto()
@@ -119,7 +120,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.player.updateAll, "player/update")
 		self.taskMgr.add(self.hud.update, 'hud')
 		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-		self.taskMgr.add(self.AIUpdate,"AIUpdate")
+# 		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
 
 	def actionKeys(self, key):
@@ -168,8 +169,8 @@ class MetalSlender(ShowBase):
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player,self.rooms)
-		self.actions.addDoors(self, self.rooms[1].model, self.doors)
-		self.actions.addKeys(self, self.rooms[1].model, self.keys)
+# 		self.actions.addDoors(self, self.rooms[1].model, self.doors)
+# 		self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
 		self.em = EventManager(self, self.player, self.actions)
 		self.em.start()
@@ -200,7 +201,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.add(self.player.updateAll, "player/update")
 			self.taskMgr.add(self.hud.update, 'hud')
 			self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-			self.taskMgr.add(self.AIUpdate,"AIUpdate")
+# 			self.taskMgr.add(self.AIUpdate,"AIUpdate")
 			self.taskMgr.add(self.camctrl.update, "camera/control")
 			self.accept('p', self.pauseGame)
 		else:
@@ -212,7 +213,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.remove('hud')
 			self.player.resetLast()
 			self.taskMgr.remove('player/flashlight/update')
-			self.taskMgr.remove("AIUpdate")
+# 			self.taskMgr.remove("AIUpdate")
 			self.props.setCursorHidden(False)
 			self.win.requestProperties(self.props)
 			self.mainMenu.showPauseGame()

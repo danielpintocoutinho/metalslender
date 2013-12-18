@@ -39,7 +39,7 @@ class Player(SceneObject):
 	FEAR_SCREAM_MIN = 0.0
 	FEAR_FOV_AMP    = 75.0
 	
-	JUMP_POWER = 3.0
+	JUMP_POWER = 10.0
 	
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
@@ -132,7 +132,7 @@ class Player(SceneObject):
 	def setupCollistion(self):
 		self.setAuraSolid (Player.LIGHT_AURA)
 		self.setBodySolid (Player.BODY_SOLID)
-		self.setSightSolid(Player.FEET_SOLID)
+		self.setFeetSolid(Player.FEET_SOLID)
 		
 		self.setAuraCollision (intoMask=Mask.PLAYER)
 		self.setBodyCollision (fromMask=Mask.WALL  )
