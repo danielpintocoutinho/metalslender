@@ -91,7 +91,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.8, 0.8, 0.8, 1)):
+	def setupLighting(self, color = Vec4(0.1, 0.1, 0.1, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -181,7 +181,8 @@ class MetalSlender(ShowBase):
 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
 		
-		#self.rooms[1].root.detachNode();
+		self.rooms[1].root.detachNode();
+		self.rooms[2].root.hide()
 
 		
 		#TODO: adjust code
@@ -195,7 +196,7 @@ class MetalSlender(ShowBase):
 		self.actions.addDoors(self, self.rooms[1].model, self.doors)
 		self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
-		self.em = EventManager(self, self.player, self.actions)
+		self.em = EventManager(self, self.player, self.actions, self.rooms)
 		self.em.start()
 
 		self.player.start()

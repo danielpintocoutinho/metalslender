@@ -4,7 +4,7 @@ from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
 from direct.filter.CommonFilters import CommonFilters
 
-from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3
+from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3, Vec4
 
 
 from random import random
@@ -26,7 +26,7 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.05
-	RUNNING=0.10
+	RUNNING=0.80
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
@@ -80,6 +80,9 @@ class Player(SceneObject):
 		self.filters = CommonFilters(base.win, base.cam)
 
 		self.last = 0
+		self.dying = 0
+		self.dyingInterval1 = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
+		self.dyingInterval2 = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
 		
 	#TODO: add method boo!
 		
@@ -252,6 +255,31 @@ class Player(SceneObject):
 		elapsed = task.time - self.last
 		self.last = task.time
 		
+		if (self.dying):
+			self.life -= 0.005
+			self.filters.setBlurSharpen(self.life-0.2)
+			
+			if (not self.dyingInterval1.isPlaying() and not self.dyingInterval2.isPlaying()):
+				self.dyingInterval1.finish()
+				self.dyingInterval2.finish()
+				xrot = 10*random() - 5
+				yrot = 10*random() - 5
+				hpr1 = (self.getNodePath().getHpr().getX()+xrot, 0, 0)
+				hpr2 = (0, base.cam.getHpr().getY()+yrot, 0)
+			
+				self.dyingInterval1 = self.getNodePath().hprInterval(0.01/self.life,hpr1)
+				self.dyingInterval2 = base.cam.hprInterval(0.01/self.life,hpr2)
+				self.dyingInterval1.start()
+				self.dyingInterval2.start()
+				
+			if (self.isAlive()):
+				return task.cont
+			else:
+				self.filters.delBlurSharpen()
+				fadeIn = render.colorScaleInterval(0.1, Vec4(1,1,1,1))
+				fadeIn.start()
+				return task.done
+		
 		#TODO: Refactor
 		self.cam.node().getLens().setFov(75 + self.fear * 95)
 		
@@ -310,6 +338,9 @@ class Player(SceneObject):
 	def die(self):
 		self.breathing.stop()
 		self.dyingSound.play()
+		fadeOut = render.colorScaleInterval(3, Vec4(1,0,0,1))
+		fadeOut.start()
+		self.dying = 1
 
 
 	def timer(self):

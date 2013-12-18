@@ -23,6 +23,7 @@ class LockedDoor(DirectObject):
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+		self.model.setScale(0.05)
 		self.lockedRoom = lockedRoom
 		self.keyId = keyId
 		
@@ -50,13 +51,11 @@ class LockedDoor(DirectObject):
 		if (self.locked):
 			
 			if (key.wasPicked()):
+				self.lockedRoom.root.reparentTo(render)
 				key.used()
 				key.pickedSound.play()
 				self.unlockSound.play()
 				self.locked = 0
-				#self.lockedRoom.root = render.attachNewNode("bloco")
-				#self.lockedRoom.model.reparentTo(self.lockedRoom.root)
-				self.lockedRoom.root.reparentTo(render)
 			else:
 				self.forceSound.play()
 			

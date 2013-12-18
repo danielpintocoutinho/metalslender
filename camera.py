@@ -13,6 +13,10 @@ class CameraControls:
 		self.move = False
 
 	def update(self, task):
+		
+		if (self.player.dying):
+			return task.cont
+		
 		md = self.base.win.getPointer(0)
 		x = md.getX()
 		y = md.getY()

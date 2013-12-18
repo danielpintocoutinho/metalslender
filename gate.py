@@ -15,11 +15,13 @@ class Gate(DirectObject):
 		
 		self.model = base.loader.loadModel("assets/chicken/portao")
 		self.knob = self.model.attachNewNode("knob")
-		self.knob.setPos(Vec3(52,0,5))
+		self.knob.setPos(Vec3(50,0,12))
+		self.knob.reparentTo(self.model)
 		self.room = fatherNode.model
 		self.model.reparentTo(self.room)
 		self.model.setPos(pos)
 		self.model.setHpr(hpr)
+		self.model.setScale(0.05)
 		
 		self.closeAngle = hpr.getX()
 		self.openAngle  = hpr.getX() + angle
