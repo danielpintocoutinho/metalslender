@@ -26,7 +26,7 @@ class Door(DirectObject):
 		self.model.setScale(0.05)
 
 		#self.modelBody = self.model.attachNewNode(CollisionNode("door"))
-		print "door pos: ", pos
+# 		print "door pos: ", pos
 		#self.modelBody.node().addSolid(CollisionTube(10, 0, -10, 10, 0, 0, 4))
 		#self.modelBody.node().setFromCollideMask(CollisionMask.NONE)
 		#self.modelBody.node().setIntoCollideMask(CollisionMask.WALL)

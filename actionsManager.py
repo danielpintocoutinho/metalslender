@@ -72,7 +72,7 @@ class ActionManager(DirectObject):
 	
 		self.point0.getNodePath().setPos(self.hand)
 		
-		print("h: ",self.hand,self.point0.getNodePath().getPos())
+# 		print("h: ",self.hand,self.point0.getNodePath().getPos())
 		
 	def act(self):
 		
@@ -113,13 +113,13 @@ class ActionManager(DirectObject):
 		return (point.getPos() - self.point).length()
 
 	def addDoors(self, base, room, doors):
-		print "numero de portas: ", len(doors)
+# 		print "numero de portas: ", len(doors)
 		for door in doors:
 			newDoor = Door(base, room, door.getPos(render), Vec3(-90, 0, 0), 90)
 			self.doors.append(newDoor)
 
 	def addKeys(self, base, room, keys):
-		print "numero de chaves: ", len(keys)
+# 		print "numero de chaves: ", len(keys)
 		for key in keys:
 			newKey = Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",key.getPos(render), Vec3(0, 0, 0))
 			self.keys.append(newKey)

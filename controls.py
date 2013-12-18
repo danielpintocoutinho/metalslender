@@ -39,8 +39,8 @@ class PlayerControls(DirectObject):
 		self.accept("shift-e" , self.actMng.act)
 		self.accept("e"       , self.actMng.act)
 		
-		self.accept('f'      , self.player.turnFlashlight)
-		self.accept('shift-f', self.player.turnFlashlight)
+		self.accept('f'      , self.player.toggleFlashlight)
+		self.accept('shift-f', self.player.toggleFlashlight)
 
 		self.accept('t', self.toggle_collisions)
 

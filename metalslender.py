@@ -76,8 +76,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setCompass()
 		self.skydome.setLight(self.shadeless)
 		
-# 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.02, 0.02, 0.02, 1)):
+	def setupLighting(self, color = Vec4(0.22, 0.22, 0.22, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		self.amblight = self.render.attachNewNode(alight)
@@ -92,7 +91,7 @@ class MetalSlender(ShowBase):
 		self.rooms = []
 		
 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
 		
 	def placeTargets(self):
@@ -114,7 +113,6 @@ class MetalSlender(ShowBase):
 
 		self.banana.setPos(23.3466, -85.0269, -14.4758)
 		self.banana.reparentTo(self.render)
-# >>>>>>> refs/remotes/origin/master
 
 	def initConfig(self):
 		self.render.setShaderAuto()
@@ -128,8 +126,8 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
-		self.props.setFullscreen(True)
-		self.props.setSize(1920, 1080)
+# 		self.props.setFullscreen(True)
+		self.props.setSize(1280, 720)
 
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
@@ -196,10 +194,6 @@ class MetalSlender(ShowBase):
 		self.loadScenario()
 		
 		#self.rooms[1].root.detachNode();
-		
-		#TODO: This code must go in room construction
-		for enemy in self.enemies:
-			enemy.defineDynamicObjects("assets/chicken/lcg-pedro", "**/LCG_porta*")
 		
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)

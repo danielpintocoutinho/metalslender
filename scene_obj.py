@@ -1,53 +1,70 @@
-from pandac.PandaModules import CollisionHandlerGravity, CollisionHandlerPusher, \
+from pandac.PandaModules import CollisionHandlerEvent, CollisionHandlerGravity, PhysicsCollisionHandler, CollisionHandlerPusher, \
 	CollisionNode, CollisionSphere, CollisionRay, Vec3
 
 from collision import CollisionMask as Mask
 
 class SceneObject:
+	
+	AURA_SOLID_SUFIX = 'AuraSolid'
+	BODY_SOLID_SUFIX = 'BodySolid'
+	FEET_SOLID_SUFIX = 'FeetSolid'
 
 	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
 
 		self.root = scene.attachNewNode(name)
-
-# 				self.modelBody = self.model.attachNewNode(CollisionNode(name + 'col'))
 	
-		self.collSol = self.root.attachNewNode(CollisionNode(name + 'Collision.Solid'))
-		self.collRay = self.root.attachNewNode(CollisionNode(name + 'Collision.Ray'))
+		self.auraSolid = self.root.attachNewNode(CollisionNode(name + SceneObject.AURA_SOLID_SUFIX))
+		self.bodySolid = self.root.attachNewNode(CollisionNode(name + SceneObject.BODY_SOLID_SUFIX))
+		self.feetSolid = self.root.attachNewNode(CollisionNode(name + SceneObject.FEET_SOLID_SUFIX))
 		
-		self.wallHandler  = CollisionHandlerPusher()
-		self.floorHandler = CollisionHandlerGravity()
-		#TODO: Adjust gravity and max velocity
-		self.floorHandler.setGravity(9.81)
-# 		self.floorHandler.setMaxVelocity(1000)
-		#BUG: The player cannot walk through a wall, but he may run through it!
+		self.auraHandler = CollisionHandlerEvent()
+		#TODO: If this guy is an actor
+		#self.bodyHandler  = PhysicsCollisionHandler()
+		self.bodyHandler  = CollisionHandlerPusher()
+		self.feetHandler = CollisionHandlerGravity()
 		
-		self.floorHandler.addCollider(self.collRay, self.root)
-		base.cTrav.addCollider(self.collRay, self.floorHandler)
+		self.auraHandler.addInPattern('into-%in')
+# 		self.auraHandler.addAgainPattern('%fn-again-%in')
+		self.auraHandler.addOutPattern('out-%in')
+
+		self.feetHandler.setGravity(9.81)
+# 		self.feetHandler.setMaxVelocity(1000)
 		
-		self.wallHandler.addCollider(self.collSol, self.root)
-		base.cTrav.addCollider(self.collSol, self.wallHandler)
+		base.cTrav.addCollider(self.auraSolid, self.auraHandler)
+		base.cTrav.addCollider(self.feetSolid, self.feetHandler)
+		base.cTrav.addCollider(self.bodySolid, self.bodyHandler)
+		
+		self.feetHandler.addCollider(self.feetSolid, self.root)
+		self.bodyHandler.addCollider(self.bodySolid, self.root)
 	
 	def __del__(self):
-		self.collSol.removeNode()
-		self.collRay.removeNode()
+		self.bodySolid.removeNode()
+		self.feetSolid.removeNode()
 		self.root.removeNode()
-			
-	def addCollisionRay(self, ray = CollisionRay(0, 0, 1, 0, 0, -1)):
-		self.collRay.node().addSolid(ray)
 		
-	def addCollisionSolid(self, solid = CollisionSphere(0, 0, 0, 1)):
-		self.collSol.node().addSolid(solid)
+	def setAuraSolid(self, solid = CollisionSphere(0, 0, 0, 1)):
+		self.auraSolid.node().clearSolids()
+		self.auraSolid.node().addSolid(solid)
+					
+	def setBodySolid(self, solid = CollisionSphere(0, 0, 0, 1)):
+		self.bodySolid.node().clearSolids()
+		self.bodySolid.node().addSolid(solid)
+		
+	def setSightSolid(self, ray = CollisionRay(0, 0, 1, 0, 0, -1)):
+		self.feetSolid.node().clearSolids()
+		self.feetSolid.node().addSolid(ray)
+		
+	def setAuraCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
+		self.auraSolid.node().setFromCollideMask(fromMask)
+		self.auraSolid.node().setIntoCollideMask(intoMask)
 	
-	def setFloorCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
-		self.collRay.node().setFromCollideMask(fromMask)
-		self.collRay.node().setIntoCollideMask(intoMask)
+	def setFeetCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
+		self.feetSolid.node().setFromCollideMask(fromMask)
+		self.feetSolid.node().setIntoCollideMask(intoMask)
 		
-	def setWallCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
-		self.collSol.node().setFromCollideMask(fromMask)
-		self.collSol.node().setIntoCollideMask(intoMask)
+	def setBodyCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
+		self.bodySolid.node().setFromCollideMask(fromMask)
+		self.bodySolid.node().setIntoCollideMask(intoMask)
 	
 	def getNodePath(self):
 		return self.root
-
-	def removeCollisionSolid(self):
-		self.collSol.node().clearSolids()

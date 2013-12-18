@@ -26,19 +26,29 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.07
-	RUNNING=0.15
+	RUNNING=0.35
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
 	
 	HEIGHT = 1.8
 	CROUCHED_HEIGHT = 0.5
-	FEAR_RATE = -1.0 / 30
+	
+	FEAR_RATE       = -1.0 / 240
+	FEAR_INC        = 0.1
+	FEAR_SCREAM_MIN = 0.0
+	FEAR_FOV_AMP    = 75.0
 	
 	JUMP_POWER = 3.0
 	
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
+	
+	BODY_SOLID = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
+# 	CROUCHED_BODY_SOLID
+	DARK_AURA  = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
+	LIGHT_AURA = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT * 5)
+	FEET_SOLID = CollisionRay   (0, 0, HEIGHT / 2, 0, 0, -1)
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -118,11 +128,13 @@ class Player(SceneObject):
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
-		#TODO: Try a Polygon, instead
-		self.addCollisionSolid(CollisionSphere(0, 0, Player.HEIGHT / 2, Player.HEIGHT / 9))
-		self.addCollisionRay(CollisionRay(0, 0, Player.HEIGHT / 2, 0, 0, -1))
-		self.setFloorCollision(fromMask=Mask.FLOOR)
-		self.setWallCollision(fromMask=Mask.WALL, intoMask=Mask.SENTINEL)
+		self.setAuraSolid (Player.LIGHT_AURA)
+		self.setBodySolid (Player.BODY_SOLID)
+		self.setSightSolid(Player.FEET_SOLID)
+		
+		self.setAuraCollision (intoMask=Mask.PLAYER)
+		self.setBodyCollision (fromMask=Mask.WALL  )
+		self.setFeetCollision(fromMask=Mask.FLOOR )
 		
 	def setupSound(self):
 		#sounds of the player
@@ -228,7 +240,7 @@ class Player(SceneObject):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.floorHandler.isOnGround() and \
+			if (self.feetHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -241,7 +253,7 @@ class Player(SceneObject):
 		self.breathing.setVolume(max(self.breath_vol-1,self.breath_vol - self.breath))
 		if (self.breath == 0):
 			self.breath = 0.01
-		self.breathing.setPlayRate(min(1.0, 0.6 * (1/self.breath)))
+		self.breathing.setPlayRate(min(1.0, 0.6 * (1/(0.1 + self.breath))))
 		
 	def updateBreath(self, elapsed):
 		oldbreath   = self.breath
@@ -249,7 +261,7 @@ class Player(SceneObject):
 		deltabreath = self.breathrate * elapsed
 		deltafear   = Player.FEAR_RATE       * elapsed
 
-		self.breath = 1.0 #min(1.0, max(-self.fear, self.breath + deltabreath))
+		self.breath = min(1.0, max(-self.fear, self.breath + deltabreath))
 		self.fear   = min(1.0, max(       0.0, self.fear   + deltafear  ))
 		
 		#self.filters.setBlurSharpen( 1.0 - self.fear)
@@ -259,7 +271,7 @@ class Player(SceneObject):
 		self.last = task.time
 		
 		#TODO: Refactor
-		self.cam.node().getLens().setFov(75 + self.fear * 95)
+		self.cam.node().getLens().setFov(75 + self.fear * Player.FEAR_FOV_AMP)
 		
 		self.updateBreath(elapsed)
 		self.updatePosition(elapsed)
@@ -291,18 +303,23 @@ class Player(SceneObject):
 			return task.done
 	
 	def jump(self):
-		if self.floorHandler.isOnGround(): 
-			self.floorHandler.addVelocity(Player.JUMP_POWER)
+		if self.feetHandler.isOnGround(): 
+			self.feetHandler.addVelocity(Player.JUMP_POWER)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.floorHandler.isOnGround():
+		if self.feetHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()
 			else:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.CROUCHED_HEIGHT)).start()
+	
+	def boo(self):
+		self.fear = min(1.0, self.fear + Player.FEAR_INC)
+		if self.fear > Player.FEAR_SCREAM_MIN:
+			self.scream()
 	
 	def scream(self):
 		self.screams.play()
@@ -316,7 +333,6 @@ class Player(SceneObject):
 	def die(self):
 		self.breathing.stop()
 		self.dyingSound.play()
-
 
 	def timer(self):
 		currentTime = time.time()
@@ -347,15 +363,13 @@ class Player(SceneObject):
 		loader.unloadSfx(self.screams)
 		loader.unloadSfx(self.breathing)
 
-	def turnFlashlight(self):
+	def toggleFlashlight(self):
 		self.flashlight.toggle()
-# 		print "on? ", self.flashlight.isOn()
+		
 		if (self.flashlight.isOn()):
-			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 1))
+			self.setAuraSolid(Player.LIGHT_AURA)
 		else:
-			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 0.2))
+			self.setAuraSolid(Player.DARK_AURA)
 		
 	def resetLast(self):
 		self.last = 0

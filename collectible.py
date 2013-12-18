@@ -37,7 +37,7 @@ class Collectible(DirectObject):
 			self.picked = True
 				
 	def act_dist(self, hand):
-		print ("hand: ",hand," -> ", (hand - self.model.getPos(self.room)).length())
+# 		print ("hand: ",hand," -> ", (hand - self.model.getPos(self.room)).length())
 		return (hand - self.model.getPos(self.room)).length()
 		
 	def wasPicked(self):

@@ -13,14 +13,13 @@ class Enemy:
 		#self.seeker.setScale(6)
 		self.startPos = self.pos
 
-		self.hooded = Hooded("seeker", self.seeker, 1200, 800, 800)
+		self.hooded = Hooded("seeker", self.seeker, 60, 2, 2)
 		self.hooded.setPatrolPos(patrolPos)
 		
 	def __del__(self):
 		self.seeker.removeNode()
 		self.hooded = None
-		self.model.removeNode()
-		self.doors = None
+		self.model.removeNode()		
 
 	def getHooded(self):
 		return self.hooded
@@ -28,10 +27,8 @@ class Enemy:
 	def update(self):
 		return self.hooded.update()
 
-	def defineDynamicObjects(self, model, objectsPath):
-		self.model = loader.loadModel(model)
-		self.doors  = self.model.findAllMatches(objectsPath)
-		for o in self.doors:
+	def addDynamicObjects(self, objects):
+		for o in objects:
 			self.hooded.addDynamicObject(o)
 
 	def hear(self, noisePos):

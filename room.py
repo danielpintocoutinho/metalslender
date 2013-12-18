@@ -1,6 +1,4 @@
-from pandac.PandaModules import BitMask32, DirectionalLight, NodePath, PerspectiveLens, PointLight, Spotlight, Vec3, Vec4, CullFaceAttrib
-
-from panda3d.core import TransparencyAttrib
+from panda3d.core import BitMask32, CullFaceAttrib, DirectionalLight, Material, NodePath, PerspectiveLens, PointLight, Spotlight, TransparencyAttrib, Vec3, Vec4
 
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
@@ -20,12 +18,12 @@ class Room(SceneObject):
 		self.root.setPos(pos)
 		self.root.setScale(scale)
 		
+		self.setupDoors(base)
+		self.setupKeys(base)
 		self.setupLightSources(scene)
 		self.setupCollision()
 		self.setupEnemies(base)
 		self.setupGoal(base)
-		self.setupDoors(base)
-		self.setupKeys(base)
 		self.setupTrees()
 		
 		for np in self.model.findAllMatches('**/=Hide'):
@@ -42,16 +40,15 @@ class Room(SceneObject):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
 	 		base.enemies.append(Enemy(np.getPos(), patrol))
 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
-			#TODO: Make this work
-# 			base.enemies[-1].defineDynamicObjects("assets/chicken/lcg-pedro", "**/LCG_porta*")
+			base.enemies[-1].addDynamicObjects(self.doors)
 
 	def setupGoal(self, base):
 		np = self.model.find('**/Goal')
 		base.goal = np
 
 	def setupDoors(self, base):
-		for np in self.model.findAllMatches('**/Door*'):
-	 		base.doors.append(np)
+		self.doors  = self.model.findAllMatches('**/Door*')
+ 		base.doors += self.doors
 
 	def setupKeys(self, base):
 		for np in self.model.findAllMatches('**/Key*'):
@@ -62,7 +59,12 @@ class Room(SceneObject):
 			tree.setTwoSided(True)
 			tree.setBillboardAxis()
 			tree.setTransparency(TransparencyAttrib.MAlpha)
-			tree.ls()
+			mat = Material()
+			mat.setSpecular((1,0,0,1))
+			mat.setDiffuse((0.1, 0.1, 0.1, 1))
+			mat.setShininess(0)
+			tree.setMaterial(mat)
+# 			tree.ls()
 # 			tree.getMaterial().setSpecular((0,0,0,1))
 # 			help(tree)
 # 			tree.setDiffuse((0.1, 0.1, 0.1, 1.0))
