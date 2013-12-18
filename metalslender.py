@@ -91,7 +91,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setLight(self.shadeless)
 		
 # 	def setupLighting(self, color = Vec4(0.31, 0.31, 0.31, 1)):
-	def setupLighting(self, color = Vec4(0.1, 0.1, 0.1, 1)):
+	def setupLighting(self, color = Vec4(0.08, 0.08, 0.08, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		alight = self.render.attachNewNode(alight)
@@ -116,7 +116,7 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 		self.props.setFullscreen(True)
-		self.props.setSize(1920, 1080)
+		self.props.setSize(1024, 768)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -183,6 +183,11 @@ class MetalSlender(ShowBase):
 		
 		self.rooms[1].root.detachNode();
 		self.rooms[2].root.hide()
+		
+		alight = AmbientLight("AmbientLight")
+		alight.setColor(Vec4(0.7,0.7,0.7,1))
+		alight = self.rooms[2].root.attachNewNode(alight)
+		self.rooms[2].root.setLight(alight)
 
 		
 		#TODO: adjust code

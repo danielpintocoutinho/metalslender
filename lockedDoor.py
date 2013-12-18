@@ -15,9 +15,9 @@ class LockedDoor(DirectObject):
 		
 		audio3d = Audio3DManager.Audio3DManager(base.sfxManagerList[0], base.cam)
 		
-		self.model = base.loader.loadModel("assets/chicken/porta")
+		self.model = base.loader.loadModel("assets/chicken/porta_entrada_lcg")
 		self.knob  = base.loader.loadModel("assets/chicken/knob")
-		self.knob.setPos(Vec3(17.6,0,8))
+		self.knob.setPos(Vec3(26,0,0))
 		self.knob.reparentTo(self.model)
 		self.room = fatherNode
 		self.model.reparentTo(self.room)

@@ -26,7 +26,7 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.05
-	RUNNING=0.80
+	RUNNING=0.10
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
@@ -56,7 +56,7 @@ class Player(SceneObject):
 		SceneObject.__init__(self, base, name, model, scene, pos, scale)
 		self.getNodePath().setPos(pos)
 
-		self.startPos = pos
+		self.startPos = Vec3(8.12107, 0.624566, 0)
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
@@ -229,8 +229,9 @@ class Player(SceneObject):
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
-				self.footsteps[self.actualstep%4].setPlayRate(self.step_vel * self.speed * self.pace)
+				self.footsteps[self.actualstep%4].setPlayRate(self.speed * 15)
 				self.footsteps[self.actualstep%4].play()
+				print("speed:",self.speed,self.pace)
 		else:
 			self.stopped = 1
 		
@@ -340,6 +341,7 @@ class Player(SceneObject):
 		self.dyingSound.play()
 		fadeOut = render.colorScaleInterval(3, Vec4(1,0,0,1))
 		fadeOut.start()
+		self.life  = 1
 		self.dying = 1
 
 
