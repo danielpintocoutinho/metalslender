@@ -44,12 +44,14 @@ class Player(SceneObject):
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
 	
-	BODY_SOLID = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT / 9)
+	BODY_SOLID = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
 # 	CROUCHED_BODY_SOLID
-	DARK_AURA  = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT / 9)
-	LIGHT_AURA = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT * 5)
-	FEET_SOLID = CollisionRay    (0, 0, HEIGHT / 2, 0, 0, -1)
-	KEEP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
+	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
+	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT * 5)
+	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
+	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
+	
+	DEATH_JUMP_HEIGHT = 3.0
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -70,6 +72,7 @@ class Player(SceneObject):
 		self.getNodePath().setPos(pos)
 
 		self.startPos = pos
+		self.previousHeight = pos.z
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
@@ -134,19 +137,32 @@ class Player(SceneObject):
 		self.setAuraSolid(Player.LIGHT_AURA)
 		self.setBodySolid(Player.BODY_SOLID)
 		self.setFeetSolid(Player.FEET_SOLID)
+		self.setJumpSolid(Player.JUMP_SOLID)
 		
 		self.setAuraCollision(intoMask=Mask.PLAYER)
 		self.setBodyCollision(fromMask=Mask.WALL  )
 		self.setFeetCollision(fromMask=Mask.FLOOR )
+		self.setJumpCollision(fromMask=Mask.FLOOR )
 		
-		self.feetHandler.addInPattern ('Player-Fall')
-		self.feetHandler.addOutPattern('Player-Jump')
+		playerfall = 'Player-Fall'
+		playerjump = 'Player-Jump'
 		
-		self.accept('Player-Fall', self.debug, ['Player-Fall'])
-		self.accept('Player-Jump', self.debug, ['Player-Jump'])
+		self.jumpColHandler.addInPattern (playerfall)
+		self.jumpColHandler.addOutPattern(playerjump)
 		
-	def debug(self, msg, entry):
-		print msg, entry
+		self.accept(playerfall, self.manageFall)
+		self.accept(playerjump, self.manageJump)
+		
+	def manageJump(self, entry):
+		self.previousHeight = entry.getSurfacePoint(self.scene).z
+		
+	def manageFall(self, entry):
+		newHeight = entry.getSurfacePoint(self.scene).z
+		print self.previousHeight, newHeight
+		if self.previousHeight - newHeight > Player.DEATH_JUMP_HEIGHT:
+			self.die()
+			print 'I died'
+		self.previousHeight = newHeight
 		
 	def setupSound(self):
 		#sounds of the player
@@ -252,7 +268,7 @@ class Player(SceneObject):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.feetHandler.isOnGround() and \
+			if (self.feetColHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -315,13 +331,13 @@ class Player(SceneObject):
 			return task.done
 	
 	def jump(self):
-		if self.feetHandler.isOnGround(): 
-			self.feetHandler.addVelocity(Player.JUMP_POWER)
+		if self.feetColHandler.isOnGround(): 
+			self.feetColHandler.addVelocity(Player.JUMP_POWER)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.feetHandler.isOnGround():
+		if self.feetColHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()

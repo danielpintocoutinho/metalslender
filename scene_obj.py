@@ -9,6 +9,7 @@ class SceneObject(DirectObject):
 	AURA_SOLID_SUFIX = 'AuraSolid'
 	BODY_SOLID_SUFIX = 'BodySolid'
 	FEET_SOLID_SUFIX = 'FeetSolid'
+	JUMP_SOLID_SUFIX = 'JumpSolid'
 
 	def __init__(self, base, name, scene, pos=Vec3(0,0,0), scale=1.0):
 
@@ -16,61 +17,72 @@ class SceneObject(DirectObject):
 		self.root.setPos(pos)
 		self.root.setScale(scale)
 	
-		self.auraSolid = self.root.attachNewNode(CollisionNode(name + SceneObject.AURA_SOLID_SUFIX))
-		self.bodySolid = self.root.attachNewNode(CollisionNode(name + SceneObject.BODY_SOLID_SUFIX))
-		self.feetSolid = self.root.attachNewNode(CollisionNode(name + SceneObject.FEET_SOLID_SUFIX))
+		self.auraColNode = self.root.attachNewNode(CollisionNode(name + SceneObject.AURA_SOLID_SUFIX))
+		self.bodyColNode = self.root.attachNewNode(CollisionNode(name + SceneObject.BODY_SOLID_SUFIX))
+		self.feetColNode = self.root.attachNewNode(CollisionNode(name + SceneObject.FEET_SOLID_SUFIX))
+		self.jumpColNode = self.root.attachNewNode(CollisionNode(name + SceneObject.JUMP_SOLID_SUFIX))
 		
-		self.auraHandler = CollisionHandlerEvent()
+		self.auraColHandler = CollisionHandlerEvent()
 		#TODO: If this guy is an actor
-		#self.bodyHandler  = PhysicsCollisionHandler()
-		self.bodyHandler = CollisionHandlerPusher()
-		self.feetHandler = CollisionHandlerGravity()
+		#self.bodyColHandler  = PhysicsCollisionHandler()
+		self.bodyColHandler = CollisionHandlerPusher()
+		self.feetColHandler = CollisionHandlerGravity()
+		self.jumpColHandler = CollisionHandlerEvent()
 		
-# 		self.auraHandler.addInPattern('into-%in')
-# 		self.auraHandler.addAgainPattern('%fn-again-%in')
-# 		self.auraHandler.addOutPattern('out-%in')
+# 		self.auraColHandler.addInPattern('into-%in')
+# 		self.auraColHandler.addAgainPattern('%fn-again-%in')
+# 		self.auraColHandler.addOutPattern('out-%in')
 
-		self.feetHandler.setGravity(9.81)
+		self.feetColHandler.setGravity(9.81)
 # 		self.keepHandler.setGravity(9.81)
-# 		self.feetHandler.setMaxVelocity(1000)
+# 		self.feetColHandler.setMaxVelocity(1000)
 		
-		base.cTrav.addCollider(self.auraSolid, self.auraHandler)
-		base.cTrav.addCollider(self.bodySolid, self.bodyHandler)
-		base.cTrav.addCollider(self.feetSolid, self.feetHandler)
+		base.cTrav.addCollider(self.auraColNode, self.auraColHandler)
+		base.cTrav.addCollider(self.bodyColNode, self.bodyColHandler)
+		base.cTrav.addCollider(self.feetColNode, self.feetColHandler)
+		base.cTrav.addCollider(self.jumpColNode, self.jumpColHandler)
 		
-		self.bodyHandler.addCollider(self.bodySolid, self.root)
-		self.feetHandler.addCollider(self.feetSolid, self.root)
+		self.bodyColHandler.addCollider(self.bodyColNode, self.root)
+		self.feetColHandler.addCollider(self.feetColNode, self.root)
 	
 	def __del__(self):
 #TODO: Verify in Panda documentation that upon removing the root node, all its children are also removed
-# 		self.bodySolid.removeNode()
-# 		self.feetSolid.removeNode()
+# 		self.bodyColNode.removeNode()
+# 		self.feetColNode.removeNode()
 # 		self.keepSolid.removeNode()
 		self.root.removeNode()
 		
 	def setAuraSolid(self, solid = CollisionSphere(0, 0, 0, 1)):
-		self.auraSolid.node().clearSolids()
-		self.auraSolid.node().addSolid(solid)
+		self.auraColNode.node().clearSolids()
+		self.auraColNode.node().addSolid(solid)
 					
 	def setBodySolid(self, solid = CollisionSphere(0, 0, 0, 1)):
-		self.bodySolid.node().clearSolids()
-		self.bodySolid.node().addSolid(solid)
+		self.bodyColNode.node().clearSolids()
+		self.bodyColNode.node().addSolid(solid)
 		
 	def setFeetSolid(self, solid = CollisionRay(0, 0, 1, 0, 0, -1)):
-		self.feetSolid.node().clearSolids()
-		self.feetSolid.node().addSolid(solid)
+		self.feetColNode.node().clearSolids()
+		self.feetColNode.node().addSolid(solid)
+			
+	def setJumpSolid(self, solid = CollisionSegment(0, 0, 1, 0, 0, -1)):
+		self.jumpColNode.node().clearSolids()
+		self.jumpColNode.node().addSolid(solid)
 		
 	def setAuraCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
-		self.auraSolid.node().setFromCollideMask(fromMask)
-		self.auraSolid.node().setIntoCollideMask(intoMask)
+		self.auraColNode.node().setFromCollideMask(fromMask)
+		self.auraColNode.node().setIntoCollideMask(intoMask)
 		
 	def setBodyCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
-		self.bodySolid.node().setFromCollideMask(fromMask)
-		self.bodySolid.node().setIntoCollideMask(intoMask)
+		self.bodyColNode.node().setFromCollideMask(fromMask)
+		self.bodyColNode.node().setIntoCollideMask(intoMask)
 	
 	def setFeetCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
-		self.feetSolid.node().setFromCollideMask(fromMask)
-		self.feetSolid.node().setIntoCollideMask(intoMask)
+		self.feetColNode.node().setFromCollideMask(fromMask)
+		self.feetColNode.node().setIntoCollideMask(intoMask)
+		
+	def setJumpCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
+		self.jumpColNode.node().setFromCollideMask(fromMask)
+		self.jumpColNode.node().setIntoCollideMask(intoMask)
 	
 	def getNodePath(self):
 		return self.root
