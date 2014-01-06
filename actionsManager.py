@@ -23,6 +23,7 @@ class ActionManager(DirectObject):
 		
 		self.center = Vec3(0,0,0)		
 		self.hand   = Vec3(0,0,0)
+
 		self.point0 = loader.loadModel("assets/models/sphere")
 		self.point0.setScale(0.05)
 		self.point0.setPos(Vec3(0,-1,0))
@@ -34,12 +35,13 @@ class ActionManager(DirectObject):
 					  Door(base, room,Vec3(14, -0.077, -0.7), Vec3(0, 0, 0), 90), \
 					  Door(base, room,Vec3(15.36, -0.05, -0.7), Vec3(90, 0, 0), -87), \
 		              Door(base, room,Vec3(15.34, 1.07, -0.7), Vec3(125, 0, 0), -117), \
-		              Gate(base, rooms[1],Vec3(7.49425, -146.543, -0.8158868), Vec3(180, 0, 0), 90), \
-					  Gate(base, rooms[1],Vec3(1.91029, -146.543, -0.8158868), Vec3(0, 0, 0), -90)
+#TODO: Uncomment these
+ 		              Gate(base, rooms[1],Vec3(7.49425, -146.543, -0.8158868), Vec3(180, 0, 0), 90), \
+ 					  Gate(base, rooms[1],Vec3(1.91029, -146.543, -0.8158868), Vec3(0, 0, 0), -90)
 		              ]
 		
+#TODO: Uncomment these
 		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(4.7, -146.3, 0), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
-
 		self.locked_doors = [LockedDoor(base, room,Vec3(5.1, -6.07342, -0.09), Vec3(180, 0, 0), -90, rooms[1], 0)]
 
 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \
@@ -47,6 +49,21 @@ class ActionManager(DirectObject):
 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(2.94139, 3.77321, 6.1), Vec3(90, 0, 0)), \
 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.6, 1.83443, -0.98), Vec3(0, 0, 0))]
 		
+# <<<<<<< HEAD
+		#visualize direction
+# 		self.accept("u", self.hide)
+# 		self.accept("i", self.show)
+# 		
+# 		self.point0.getNodePath().hide()
+# 		
+# 	def __del__(self):
+# 		self.base   = None
+# 		self.player = None
+# 		self.point0 = None
+# 		del self.doors [:]
+# 		del self.locked_doors [:]
+# 		del self.keys [:]
+# =======
 	
 	def update(self):
 		self.center = self.player.getNodePath().getPos()
@@ -96,15 +113,14 @@ class ActionManager(DirectObject):
 	def diff_dist(self, point):	
 		return (point.getPos() - self.point).length()
 
-
 	def addDoors(self, base, room, doors):
-		print "numero de portas: ", len(doors)
+# 		print "numero de portas: ", len(doors)
 		for door in doors:
 			newDoor = Door(base, room, door.getPos(render), Vec3(-90, 0, 0), 90)
 			self.doors.append(newDoor)
 
 	def addKeys(self, base, room, keys):
-		print "numero de chaves: ", len(keys)
+# 		print "numero de chaves: ", len(keys)
 		for key in keys:
 			newKey = Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",key.getPos(render), Vec3(0, 0, 0))
 			self.keys.append(newKey)

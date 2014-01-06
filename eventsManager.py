@@ -11,9 +11,7 @@ import scene_obj
 
 from actionsManager import ActionManager
 
-
 class EventManager(DirectObject):
-	
 	
 	def __init__(self, base, player, itemList, rooms):
 		
@@ -33,7 +31,14 @@ class EventManager(DirectObject):
 		self.point0 = loader.loadModel("assets/models/sphere")
 		self.point0.setScale(0.05)
 		self.point0.setPos(Vec3(0,0,0))
-		#self.point0.reparentTo(render)
+# <<<<<<< HEAD
+		self.point0.reparentTo(render)
+		self.point1 = scene_obj.SceneObject(base, "point1", base.render, Vec3(100,25,10), 1)
+		self.point2 = scene_obj.SceneObject(base, "point2", base.render, Vec3(160,20,15), 1)
+		self.point3 = scene_obj.SceneObject(base, "point3", base.render, Vec3(280,70,15), 1)
+		self.point1.root.detachNode()
+		self.point2.root.detachNode()
+# =======
 		
 		self.scared1 = 0
 		self.scared2 = 0
@@ -48,7 +53,7 @@ class EventManager(DirectObject):
 		self.manScream = base.loader.loadSfx("assets/sounds/ambience/man_scream1.mp3")
 		self.incFear = 0;
 		
-		self.firstEnemy = base.loader.loadModel("vulto")
+		self.firstEnemy = base.loader.loadModel("assets/chicken/vulto")
 		self.firstEnemyScream = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
 		self.firstEnemy.setPos(Vec3(14.3458, -2.58647, -1))
 		self.firstEnemy.setHpr(180,0,0)
@@ -59,6 +64,24 @@ class EventManager(DirectObject):
 		self.enemyInterval2 = None
 		self.enemyInterval3 = None
 		
+# <<<<<<< HEAD
+		#visualize direction
+# 		self.accept("h", self.hide)
+# 		self.accept("j", self.show)
+# 				
+# 	def __del__(self):
+# 		self.player = None
+# 		self.items  = None
+# 		self.base = None
+# 		self.firstEnemy.removeNode()
+# 		self.firstEnemy = None
+# 		self.point0 = None
+# 		self.point1 = None
+# 		self.point2 = None
+# 		self.point3 = None
+# 		self.scare = None
+# 		self.tension = None
+# =======
 		self.accept("p", self.test)	
 	
 	def update(self, task):
@@ -88,8 +111,8 @@ class EventManager(DirectObject):
 		
 		self.point0.setPos(self.vision)
 		
-		
 		#hide blocoH 2-andar
+		#TODO: Uncomment these
 		if (self.player.root.getZ() > 2.3):
 			if (self.rooms[2].root.isHidden()):
 				self.rooms[2].root.show()
@@ -214,6 +237,3 @@ class EventManager(DirectObject):
 		base.loader.unloadSfx(self.scare)
 		base.loader.unloadSfx(self.tension)
 		base.loader.unloadSfx(self.firstEnemyScream)
-
-
-

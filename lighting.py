@@ -1,5 +1,4 @@
 from panda3d.core import PerspectiveLens, Spotlight, Vec4
-from panda3d.core import *
 
 #TODO: Think about it: should all task management be setup in MetalSlender class?
 class Flashlight:
@@ -9,8 +8,8 @@ class Flashlight:
 	POWER_GAIN_RATE  =  1/480.0
 	
 	ATT_CONST = 2
-	ATT_LIN   = 0.04
-	ATT_QUAD  = 0.004
+	ATT_LIN   = 0.01
+	ATT_QUAD  = 0.001
 	
 	def __init__(self, name, owner, scene, pos, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100, resol=(1024,768)):
 		self.owner = owner
@@ -60,6 +59,12 @@ class Flashlight:
 
 		self.scene.setLight(self.node1)
 # 		self.scene.setLight(self.node2)
+
+	def __del__(self):
+		self.owner = None
+		self.scene = None
+		self.node1.removeNode()
+		self.nodepath.removeNode()
 
 	def toggle(self):
 		self.on = not self.on

@@ -28,6 +28,12 @@ class HUD(DirectObject):
 		self.hasKey = False
 
 		self.base.taskMgr.add(self.update, 'hud')
+		
+	def __del__(self):
+		self.base   = None
+		self.player = None
+		self.heartimage.destroy()
+		self.text.destroy()
 
 	def update(self, task):
 		if self.player.isAlive():

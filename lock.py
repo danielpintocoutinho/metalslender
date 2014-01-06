@@ -43,7 +43,7 @@ class Lock(DirectObject):
 
 				
 	def act_dist(self, hand):
-		print ("dist2: ", (hand - self.model.getPos(self.room)).length())
+# 		print ("dist2: ", (hand - self.model.getPos(self.room)).length())
 		return (hand - self.model.getPos(self.room)).length()
 		
 	def wasPicked(self):

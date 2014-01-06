@@ -4,8 +4,7 @@ from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
 from direct.filter.CommonFilters import CommonFilters
 
-from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3, Vec4
-
+from panda3d.core import BitMask32, CollisionRay, CollisionSegment, CollisionSphere, Vec3, Vec4
 
 from random import random
 from collision import CollisionMask as Mask
@@ -25,20 +24,33 @@ class Player(SceneObject):
 	EXHAUSTED=2
 	
 	STOPPED=0.0
-	WALKING=0.05
-	RUNNING=0.10
+	WALKING=0.07
+	RUNNING=0.35
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
 	
 	HEIGHT = 1.8
 	CROUCHED_HEIGHT = 0.5
-	FEAR_RATE = -1.0 / 30
+	
+	FEAR_RATE       = -1.0 / 2.40
+	FEAR_INC        = 0.1
+	FEAR_SCREAM_MIN = 0.0
+	FEAR_FOV_AMP    = 75.0
 	
 	JUMP_POWER = 3.0
 	
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
+	
+	BODY_SOLID = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
+# 	CROUCHED_BODY_SOLID
+	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
+	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT * 5)
+	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
+	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
+	
+	DEATH_JUMP_HEIGHT = 3.0
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -53,10 +65,13 @@ class Player(SceneObject):
 	breathrates[(EXHAUSTED, RUNNING)] =-1.0 /   5
 
 	def __init__(self, base, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObject.__init__(self, base, name, model, scene, pos, scale)
+		SceneObject.__init__(self, base, name, scene, pos, scale)
+		
+		#TODO: load the model
 		self.getNodePath().setPos(pos)
 
-		self.startPos = Vec3(8.12107, 0.624566, 0)
+		self.startPos = pos
+		self.previousHeight = pos.z
 		self.breath  = 1.0
 		self.fear    = 0.0
 		self.speed   = 0.0
@@ -67,6 +82,8 @@ class Player(SceneObject):
 		self.initTimer = True
 		self.attacked = False
 
+		self.paused = False
+		
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
 		
@@ -80,9 +97,14 @@ class Player(SceneObject):
 		self.filters = CommonFilters(base.win, base.cam)
 
 		self.last = 0
+		
 		self.dying = 0
 		self.dyingInterval1 = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
 		self.dyingInterval2 = LerpHprInterval(self.flashlight.nodepath, 0.2, (5, 5, 0), bakeInStart=False)
+			
+	def __del__(self):
+		self.scene = None
+		self.flashlight = None
 		
 	#TODO: add method boo!
 		
@@ -115,11 +137,35 @@ class Player(SceneObject):
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
-		#TODO: Try a Polygon, instead
-		self.addCollisionSolid(CollisionSphere(0, 0, Player.HEIGHT / 2, Player.HEIGHT / 9))
-		self.addCollisionRay(CollisionRay(0, 0, Player.HEIGHT / 2, 0, 0, -1))
-		self.setFloorCollision(fromMask=Mask.FLOOR)
-		self.setWallCollision(fromMask=Mask.WALL, intoMask=Mask.SENTINEL)
+		self.setAuraSolid(Player.LIGHT_AURA)
+		self.setBodySolid(Player.BODY_SOLID)
+		self.setFeetSolid(Player.FEET_SOLID)
+		self.setJumpSolid(Player.JUMP_SOLID)
+		
+		self.setAuraCollision(intoMask=Mask.PLAYER)
+		self.setBodyCollision(fromMask=Mask.WALL  )
+		self.setFeetCollision(fromMask=Mask.FLOOR )
+		self.setJumpCollision(fromMask=Mask.FLOOR )
+		
+		playerfall = 'Player-Fall'
+		playerjump = 'Player-Jump'
+		
+		self.jumpColHandler.addInPattern (playerfall)
+		self.jumpColHandler.addOutPattern(playerjump)
+		
+		self.accept(playerfall, self.manageFall)
+		self.accept(playerjump, self.manageJump)
+		
+	def manageJump(self, entry):
+		self.previousHeight = entry.getSurfacePoint(self.scene).z
+		
+	def manageFall(self, entry):
+		newHeight = entry.getSurfacePoint(self.scene).z
+		print self.previousHeight, newHeight
+		if self.previousHeight - newHeight > Player.DEATH_JUMP_HEIGHT:
+			self.die()
+			print 'I died'
+		self.previousHeight = newHeight
 		
 	def setupSound(self):
 		#sounds of the player
@@ -225,7 +271,7 @@ class Player(SceneObject):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.floorHandler.isOnGround() and \
+			if (self.feetColHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -239,7 +285,7 @@ class Player(SceneObject):
 		self.breathing.setVolume(max(self.breath_vol-1,self.breath_vol - self.breath))
 		if (self.breath == 0):
 			self.breath = 0.01
-		self.breathing.setPlayRate(min(1.0, 0.6 * (1/self.breath)))
+		self.breathing.setPlayRate(min(1.0, 0.6 * (1/(0.1 + self.breath))))
 		
 	def updateBreath(self, elapsed):
 		oldbreath   = self.breath
@@ -282,7 +328,7 @@ class Player(SceneObject):
 				return task.done
 		
 		#TODO: Refactor
-		self.cam.node().getLens().setFov(75 + self.fear * 95)
+		self.cam.node().getLens().setFov(75 + self.fear * Player.FEAR_FOV_AMP)
 		
 		self.updateBreath(elapsed)
 		self.updatePosition(elapsed)
@@ -314,18 +360,23 @@ class Player(SceneObject):
 			return task.done
 	
 	def jump(self):
-		if self.floorHandler.isOnGround(): 
-			self.floorHandler.addVelocity(Player.JUMP_POWER)
+		if self.feetColHandler.isOnGround(): 
+			self.feetColHandler.addVelocity(Player.JUMP_POWER)
 
 	#BUG: Sometimes, player is floating
 	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.floorHandler.isOnGround():
+		if self.feetColHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()
 			else:
 				LerpPosInterval(self.cam, 0.2, (0,0,Player.CROUCHED_HEIGHT)).start()
+	
+	def boo(self):
+		self.fear = min(1.0, self.fear + Player.FEAR_INC)
+		if self.fear > Player.FEAR_SCREAM_MIN:
+			self.scream()
 	
 	def scream(self):
 		self.screams.play()
@@ -339,11 +390,11 @@ class Player(SceneObject):
 	def die(self):
 		self.breathing.stop()
 		self.dyingSound.play()
+
 		fadeOut = render.colorScaleInterval(3, Vec4(1,0,0,1))
 		fadeOut.start()
 		self.life  = 1
 		self.dying = 1
-
 
 	def timer(self):
 		currentTime = time.time()
@@ -374,12 +425,22 @@ class Player(SceneObject):
 		loader.unloadSfx(self.screams)
 		loader.unloadSfx(self.breathing)
 
-	def turnFlashlight(self):
+	def toggleFlashlight(self):
 		self.flashlight.toggle()
-# 		print "on? ", self.flashlight.isOn()
+		
 		if (self.flashlight.isOn()):
-			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 1))
+			self.setAuraSolid(Player.LIGHT_AURA)
 		else:
-			self.removeCollisionSolid()
-			self.addCollisionSolid(CollisionSphere(0, 0, 0, 0.2))
+			self.setAuraSolid(Player.DARK_AURA)
+		
+	def resetLast(self):
+		self.last = 0
+		
+	def pause(self):
+		if (self.paused == True):
+			self.paused = False
+		else:
+			self.paused = True
+			
+	def isPaused(self):
+		return self.paused
