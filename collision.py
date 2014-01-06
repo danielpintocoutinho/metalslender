@@ -10,3 +10,4 @@ class CollisionMask:
 	PLAYER   = BitMask32.bit(4)
 	DOOR     = BitMask32.bit(5)
 	TREE     = BitMask32.bit(6)
+	KEEP     = BitMask32.bit(7)

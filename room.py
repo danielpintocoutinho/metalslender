@@ -61,11 +61,11 @@ class Room(SceneObject):
 			
 	def setupCollision(self):
 		#TODO: Load room objects and triggers
-		self.setCollision("**/=Wall", Mask.WALL)
-		self.setCollision("**/=Floor", Mask.FLOOR)
-		self.setCollision("**/*walls*", Mask.WALL)
-		self.setCollision("**/*floor*", Mask.FLOOR)
-		self.setCollision("**/*escada*", Mask.FLOOR)
+		self.setCollision("**/=Wall"   , Mask.WALL)
+		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.KEEP)
+		self.setCollision("**/*walls*" , Mask.WALL)
+		self.setCollision("**/*floor*" , Mask.FLOOR | Mask.KEEP)
+		self.setCollision("**/*escada*", Mask.FLOOR | Mask.KEEP)
 		
 	def setupLightSources(self, scene):
 		self.lights = []

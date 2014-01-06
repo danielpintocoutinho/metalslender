@@ -4,7 +4,7 @@ from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
 from direct.filter.CommonFilters import CommonFilters
 
-from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3
+from panda3d.core import BitMask32, CollisionRay, CollisionSegment, CollisionSphere, Vec3
 
 
 from random import random
@@ -34,7 +34,7 @@ class Player(SceneObject):
 	HEIGHT = 1.8
 	CROUCHED_HEIGHT = 0.5
 	
-	FEAR_RATE       = -1.0 / 240
+	FEAR_RATE       = -1.0 / 2.40
 	FEAR_INC        = 0.1
 	FEAR_SCREAM_MIN = 0.0
 	FEAR_FOV_AMP    = 75.0
@@ -44,11 +44,12 @@ class Player(SceneObject):
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
 	
-	BODY_SOLID = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
+	BODY_SOLID = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT / 9)
 # 	CROUCHED_BODY_SOLID
-	DARK_AURA  = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
-	LIGHT_AURA = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT * 5)
-	FEET_SOLID = CollisionRay   (0, 0, HEIGHT / 2, 0, 0, -1)
+	DARK_AURA  = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT / 9)
+	LIGHT_AURA = CollisionSphere (0, 0, HEIGHT / 2, HEIGHT * 5)
+	FEET_SOLID = CollisionRay    (0, 0, HEIGHT / 2, 0, 0, -1)
+	KEEP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
 	
 	#TODO: Review this recovery system
 	breathrates = defaultdict(float)
@@ -130,13 +131,22 @@ class Player(SceneObject):
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
-		self.setAuraSolid (Player.LIGHT_AURA)
-		self.setBodySolid (Player.BODY_SOLID)
+		self.setAuraSolid(Player.LIGHT_AURA)
+		self.setBodySolid(Player.BODY_SOLID)
 		self.setFeetSolid(Player.FEET_SOLID)
 		
-		self.setAuraCollision (intoMask=Mask.PLAYER)
-		self.setBodyCollision (fromMask=Mask.WALL  )
+		self.setAuraCollision(intoMask=Mask.PLAYER)
+		self.setBodyCollision(fromMask=Mask.WALL  )
 		self.setFeetCollision(fromMask=Mask.FLOOR )
+		
+		self.feetHandler.addInPattern ('Player-Fall')
+		self.feetHandler.addOutPattern('Player-Jump')
+		
+		self.accept('Player-Fall', self.debug, ['Player-Fall'])
+		self.accept('Player-Jump', self.debug, ['Player-Jump'])
+		
+	def debug(self, msg, entry):
+		print msg, entry
 		
 	def setupSound(self):
 		#sounds of the player

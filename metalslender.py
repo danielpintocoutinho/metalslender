@@ -3,11 +3,12 @@ import gc
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import *
 from panda3d.ai import *
-from panda3d.core import AmbientLight, Vec3, Vec4, Mat4, CollisionTraverser, \
+from panda3d.core import AmbientLight, CollisionNode, CollisionPlane, Plane, Vec3, Vec4, Mat4, CollisionTraverser, \
 	WindowProperties, AntialiasAttrib, Fog, Texture, TextureStage
 
 from MainMenu import MainMenu
 from actionsManager import ActionManager
+from collision import CollisionMask
 from controls import CameraControls, PlayerControls
 from door import Door
 from enemy import Enemy
@@ -60,6 +61,10 @@ class MetalSlender(ShowBase):
 		self.setupFog()
 		self.setupSkydome('assets/chicken/skydome')
 		
+		plane = self.render.attachNewNode(CollisionNode('WorldBottom'))
+		plane.node().addSolid(CollisionPlane(Plane(0, 0, 1, 2)))
+		plane.node().setIntoCollideMask(CollisionMask.FLOOR)
+		
 	def setupFog(self):
 		self.fog = Fog("fog")
 
@@ -99,8 +104,8 @@ class MetalSlender(ShowBase):
 		self.render.setShaderAuto()
 
 		self.props = WindowProperties()
-		self.props.setFullscreen(True)
-		self.props.setSize(1920, 1080)
+# 		self.props.setFullscreen(True)
+		self.props.setSize(1280, 720)
 		self.props.setMouseMode(self.props.M_absolute)
 		
 		self.win.requestProperties(self.props)
