@@ -139,74 +139,75 @@ class EventManager(DirectObject):
 		#TODO: improve player's aiming detection system  
 
 		#1- Susto : corredor para a cozinha
-		if (not self.scared1 and self.player.root.getPos().getX() > 8.31856):
-			self.firstEnemy.setHpr(180,0,0)
-			self.firstEnemy.show()
-			self.enemyInterval = self.firstEnemy.posInterval(1,Vec3(14.3458, 8, 0),startPos = Vec3(14.3458, -2.58647, 0))
-			self.enemyInterval.start()
-			self.scared1 = 1
-			self.scare.play()
-			#self.incFear = 1;
-			
-		#2- Susto : banheiro
-		if (not self.scared2 and self.player.root.getPos().getX() > 15.3 and self.player.root.getPos().getY() > 1.3):
-			self.scared2 = 1
-			self.firstEnemy.setPos(self.vision)
-			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
-			self.firstEnemy.show()
-			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
-			self.enemyInterval2.start()
-			self.scare.play()
-			self.firstEnemyScream.play()
-			self.player.die()
-			
-		#3- Susto : blocoH 2-andar
-		if (not self.scared3 and self.player.root.getPos().getY() > -61 and self.player.root.getPos().getZ() > 5):
-			self.scared3 = 1
-			self.manScream.play()
-			
-		#4- Susto : blocoH 2-andar
-		if (not self.scared4 and self.player.root.getPos().getY() > 2.26749 and self.player.root.getPos().getZ() > 5):
-			self.scared4 = 1
-			self.firstEnemy.setPos(self.vision)
-			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
-			self.firstEnemy.show()
-			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
-			self.enemyInterval2.start()
-			self.scare.play()
-			self.firstEnemyScream.play()
-			self.player.die()
-			
-		#4- Susto : estacionamento
-		if (self.player.root.getPos().getX() < -30):
-			self.firstEnemy.setPos(self.vision)
-			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
-			self.firstEnemy.show()
-			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
-			self.enemyInterval2.start()
-			self.scare.play()
-			self.firstEnemyScream.play()
-			self.player.die()
-			
-		#5- Susto : corredor final
-		if (self.player.root.getPos().getY() < -148):
-			self.firstEnemy.setPos(self.vision)
-			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
-			self.firstEnemy.show()
-			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
-			self.enemyInterval2.start()
-			self.scare.play()
-			self.firstEnemyScream.play()
-			self.player.die()
-			
-		#6- Susto : corredor para a cozinha
-		if (not self.scared6 and self.player.root.getPos().getY() > -25 and self.player.root.getPos().getZ() > 5):
-			self.scared6 = 1
-			self.firstEnemy.setHpr(-90,0,0)
-			self.firstEnemy.show()
-			self.enemyInterval3 = self.firstEnemy.posInterval(1.3,Vec3(-6.57284, 0.596583, 8),startPos = Vec3(4, 2.596583, 8))
-			self.enemyInterval3.start()
-			self.scare.play()
+		#TODO: Review scared events
+# 		if (not self.scared1 and self.player.root.getPos().getX() > 8.31856):
+# 			self.firstEnemy.setHpr(180,0,0)
+# 			self.firstEnemy.show()
+# 			self.enemyInterval = self.firstEnemy.posInterval(1,Vec3(14.3458, 8, 0),startPos = Vec3(14.3458, -2.58647, 0))
+# 			self.enemyInterval.start()
+# 			self.scared1 = 1
+# 			self.scare.play()
+# 			#self.incFear = 1;
+# 			
+# 		#2- Susto : banheiro
+# 		if (not self.scared2 and self.player.root.getPos().getX() > 15.3 and self.player.root.getPos().getY() > 1.3):
+# 			self.scared2 = 1
+# 			self.firstEnemy.setPos(self.vision)
+# 			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
+# 			self.firstEnemy.show()
+# 			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
+# 			self.enemyInterval2.start()
+# 			self.scare.play()
+# 			self.firstEnemyScream.play()
+# 			self.player.die()
+# 			
+# 		#3- Susto : blocoH 2-andar
+# 		if (not self.scared3 and self.player.root.getPos().getY() > -61 and self.player.root.getPos().getZ() > 5):
+# 			self.scared3 = 1
+# 			self.manScream.play()
+# 			
+# 		#4- Susto : blocoH 2-andar
+# 		if (not self.scared4 and self.player.root.getPos().getY() > 2.26749 and self.player.root.getPos().getZ() > 5):
+# 			self.scared4 = 1
+# 			self.firstEnemy.setPos(self.vision)
+# 			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
+# 			self.firstEnemy.show()
+# 			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
+# 			self.enemyInterval2.start()
+# 			self.scare.play()
+# 			self.firstEnemyScream.play()
+# 			self.player.die()
+# 			
+# 		#4- Susto : estacionamento
+# 		if (self.player.root.getPos().getX() < -30):
+# 			self.firstEnemy.setPos(self.vision)
+# 			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
+# 			self.firstEnemy.show()
+# 			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
+# 			self.enemyInterval2.start()
+# 			self.scare.play()
+# 			self.firstEnemyScream.play()
+# 			self.player.die()
+# 			
+# 		#5- Susto : corredor final
+# 		if (self.player.root.getPos().getY() < -148):
+# 			self.firstEnemy.setPos(self.vision)
+# 			self.firstEnemy.setHpr(Vec3(self.player.root.getHpr().getX(), self.base.cam.getHpr().getY(), 0))
+# 			self.firstEnemy.show()
+# 			self.enemyInterval2 = self.firstEnemy.posInterval(1.5,self.back,startPos = self.firstEnemy.getPos())
+# 			self.enemyInterval2.start()
+# 			self.scare.play()
+# 			self.firstEnemyScream.play()
+# 			self.player.die()
+# 			
+# 		#6- Susto : corredor para a cozinha
+# 		if (not self.scared6 and self.player.root.getPos().getY() > -25 and self.player.root.getPos().getZ() > 5):
+# 			self.scared6 = 1
+# 			self.firstEnemy.setHpr(-90,0,0)
+# 			self.firstEnemy.show()
+# 			self.enemyInterval3 = self.firstEnemy.posInterval(1.3,Vec3(-6.57284, 0.596583, 8),startPos = Vec3(4, 2.596583, 8))
+# 			self.enemyInterval3.start()
+# 			self.scare.play()
 			
 		if (self.scared2 and not self.enemyInterval2.isPlaying()):
 			self.firstEnemy.hide()

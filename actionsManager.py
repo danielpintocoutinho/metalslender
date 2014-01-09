@@ -29,25 +29,26 @@ class ActionManager(DirectObject):
 		self.point0.setPos(Vec3(0,-1,0))
 		#self.point0.reparentTo(render)
 		
-		self.doors = [Door(base, room,Vec3(5.0, -0.08, -0.9), Vec3(0, 0, 0), 87), \
-					  Door(base, room,Vec3(7.99263, -0.204471, -0.9), Vec3(-90, 0, 0), 90), \
-					  Door(base, room,Vec3(8.05, -1.5654, -0.9), Vec3(0, 0, 0), -85), \
-					  Door(base, room,Vec3(14, -0.077, -0.7), Vec3(0, 0, 0), 90), \
-					  Door(base, room,Vec3(15.36, -0.05, -0.7), Vec3(90, 0, 0), -87), \
-		              Door(base, room,Vec3(15.34, 1.07, -0.7), Vec3(125, 0, 0), -117), \
+		self.doors = []
+# 		self.doors = [Door(base, room,Vec3(5.0, -0.08, -0.9), Vec3(0, 0, 0), 87), \
+# 					  Door(base, room,Vec3(7.99263, -0.204471, -0.9), Vec3(-90, 0, 0), 90), \
+# 					  Door(base, room,Vec3(8.05, -1.5654, -0.9), Vec3(0, 0, 0), -85), \
+# 					  Door(base, room,Vec3(14, -0.077, -0.7), Vec3(0, 0, 0), 90), \
+# 					  Door(base, room,Vec3(15.36, -0.05, -0.7), Vec3(90, 0, 0), -87), \
+# 		              Door(base, room,Vec3(15.34, 1.07, -0.7), Vec3(125, 0, 0), -117), \
 #TODO: Uncomment these
- 		              Gate(base, rooms[1],Vec3(7.49425, -146.543, -0.8158868), Vec3(180, 0, 0), 90), \
- 					  Gate(base, rooms[1],Vec3(1.91029, -146.543, -0.8158868), Vec3(0, 0, 0), -90)
-		              ]
+#  		              Gate(base, rooms[1],Vec3(7.49425, -146.543, -0.8158868), Vec3(180, 0, 0), 90), \
+#  					  Gate(base, rooms[1],Vec3(1.91029, -146.543, -0.8158868), Vec3(0, 0, 0), -90)
+# 		              ]
 		
 #TODO: Uncomment these
-		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(4.7, -146.3, 0), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
-		self.locked_doors = [LockedDoor(base, room,Vec3(5.1, -6.07342, -0.09), Vec3(180, 0, 0), -90, rooms[1], 0)]
+# 		self.lock = Lock(base, rooms[1].root,"assets/chicken/cadeado","assets/sounds/items/keys.mp3",Vec3(4.7, -146.3, 0), Vec3(0, 0, 0), [self.doors[6],self.doors[7]])
+# 		self.locked_doors = [LockedDoor(base, room,Vec3(5.1, -6.07342, -0.09), Vec3(180, 0, 0), -90, rooms[1], 0)]
 
-		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \
-		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(-4.57284, 0.596583, 8), Vec3(180, 0, -90)), \
-		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(2.94139, 3.77321, 6.1), Vec3(90, 0, 0)), \
-		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.6, 1.83443, -0.98), Vec3(0, 0, 0))]
+# 		self.keys = [Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.31,-2.7,-0.31), Vec3(0, 0, 0)), \
+# 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(-4.57284, 0.596583, 8), Vec3(180, 0, -90)), \
+# 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(2.94139, 3.77321, 6.1), Vec3(90, 0, 0)), \
+# 		             Collectible(base, room,"assets/chicken/key","assets/sounds/items/keys.mp3",Vec3(16.6, 1.83443, -0.98), Vec3(0, 0, 0))]
 		
 # <<<<<<< HEAD
 		#visualize direction

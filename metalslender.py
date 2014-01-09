@@ -96,16 +96,16 @@ class MetalSlender(ShowBase):
 		self.rooms = []
 		
 # 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/teste-pedro" , self.render))
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg" , self.render))
+		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg-pedro" , self.render))
 		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
-		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar", self.render))
+		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar-pedro", self.render))
 
 	def initConfig(self):
 		self.render.setShaderAuto()
 
 		self.props = WindowProperties()
 # 		self.props.setFullscreen(True)
-		self.props.setSize(850, 480)
+		self.props.setSize(832, 468)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -120,6 +120,10 @@ class MetalSlender(ShowBase):
 		self.accept('i', self.actionKeys, ['i'])
 		self.accept('p', self.pauseGame)
 		self.accept('z', self.restartGame)
+		
+		#TODO: Remove this or move to console
+		self.cTrav.setRespectPrevTransform(True)
+# 		self.cTrav.showCollisions(self.render)
 		
 	def addTasks(self):
 		self.taskMgr.add(self.camctrl.update, "camera/control")
@@ -185,7 +189,7 @@ class MetalSlender(ShowBase):
 			enemy.addDynamicObjects(self.render.findAllMatches('**/LCG_porta*'))
 		
 		#TODO: Support multiple rooms
-		self.player  = Player(self, name = "player", model='assets/chicken/coelho', scene=self.render)
+		self.player  = Player(self, name="player", model='assets/chicken/coelho', scene=self.render)
 		self.actions = ActionManager(self, self.rooms[0].model, self.player,self.rooms)
 # 		self.actions.addDoors(self, self.rooms[1].model, self.doors)
 # 		self.actions.addKeys(self, self.rooms[1].model, self.keys)
@@ -334,7 +338,7 @@ class MetalSlender(ShowBase):
 	def playerUpdate(self, task):
 		reached = self.checkGoal()
 		if (reached):
-			self.player.die()
+# 			self.player.die()
 			self.endGame()
 			return task.done
 		someKey = False

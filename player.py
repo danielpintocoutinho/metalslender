@@ -163,7 +163,7 @@ class Player(SceneObject):
 		newHeight = entry.getSurfacePoint(self.scene).z
 		print self.previousHeight, newHeight
 		if self.previousHeight - newHeight > Player.DEATH_JUMP_HEIGHT:
-			self.die()
+# 			self.die()
 			print 'I died'
 		self.previousHeight = newHeight
 		

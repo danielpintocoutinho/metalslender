@@ -1,5 +1,7 @@
 from panda3d.core import BitMask32, CullFaceAttrib, DirectionalLight, Material, NodePath, PerspectiveLens, PointLight, Spotlight, TransparencyAttrib, Vec3, Vec4
+from direct.actor.Actor import Actor
 
+from constants import *
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
 from enemy import Enemy
@@ -18,6 +20,9 @@ class Room(SceneObject):
 		self.root.setPos(pos)
 		self.root.setScale(scale)
 		
+		self.lights = []
+		self.doors  = []
+		
 		self.setupDoors(base)
 		self.setupKeys(base)
 		self.setupLightSources(scene)
@@ -29,17 +34,24 @@ class Room(SceneObject):
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
 			
+		for np in self.model.findAllMatches('**/=Barrier'):
+			np.hide()
+			
 	def __del__(self):
 		self.root.removeNode()
-		del self.lights [:]
+# 		del self.lights [:]
 			
 	#TODO: Find out what is missing in the scenario
 	def setupEnemies(self, base):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
-	 		base.enemies.append(Enemy(base, 'Hooded.' + str(len(base.enemies)), self.root, patrol, np.getPos()))
+			#TODO: AI commands commented
+			actor = Actor(EGG_HOODED)
+			actor.setPos(np.getPos())
+			actor.reparentTo(self.root)
+# 	 		base.enemies.append(Enemy(base, 'Hooded.' + str(len(base.enemies)), self.root, patrol, np.getPos()))
 # 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
-			base.enemies[-1].addDynamicObjects(self.doors)
+# 			base.enemies[-1].addDynamicObjects(self.doors)
 
 	def setupGoal(self, base):
 		np = self.model.find('**/Goal')
@@ -61,15 +73,15 @@ class Room(SceneObject):
 			
 	def setupCollision(self):
 		#TODO: Load room objects and triggers
+		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
+		self.setCollision("**/=Door"   , Mask.WALL)
 		self.setCollision("**/=Wall"   , Mask.WALL)
-		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.KEEP)
+		self.setCollision("**/=Floor"  , Mask.FLOOR)
 		self.setCollision("**/*walls*" , Mask.WALL)
-		self.setCollision("**/*floor*" , Mask.FLOOR | Mask.KEEP)
-		self.setCollision("**/*escada*", Mask.FLOOR | Mask.KEEP)
+		self.setCollision("**/*floor*" , Mask.FLOOR)
+		self.setCollision("**/*escada*", Mask.FLOOR)
 		
 	def setupLightSources(self, scene):
-		self.lights = []
-		
 		for np in self.model.findAllMatches('**/=Light'):
 			if np.getTag('Light') == 'Point':
 				light = PointLight('PointLight.%d' % (len(self.lights) + 1,))
