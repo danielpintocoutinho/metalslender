@@ -49,6 +49,7 @@ class Player(SceneObject):
 	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT * 5)
 	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
 	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
+	HAND_SOLID = CollisionSegment(0, 0, 0, 0, HEIGHT / 2, 0)
 	
 	DEATH_JUMP_HEIGHT = 3.0
 	

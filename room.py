@@ -2,6 +2,7 @@ from panda3d.core import BitMask32, CullFaceAttrib, DirectionalLight, Material, 
 from direct.actor.Actor import Actor
 
 from constants import *
+from door import Door
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
 from enemy import Enemy
@@ -58,8 +59,22 @@ class Room(SceneObject):
 		base.goal = np
 
 	def setupDoors(self, base):
-		self.doors  = self.model.findAllMatches('**/Door*')
- 		base.doors += self.doors
+		for door in self.model.findAllMatches('**/=Door'):
+			anim = { 
+				'Open'  : EGG_DIRECTORY + MODEL_DOOR + '-Open'  + door.getTag('DoorAmp'),
+				'Close' : EGG_DIRECTORY + MODEL_DOOR + '-Close' + door.getTag('DoorAmp')
+			}
+			key = door.getTag('Door')
+			pos = door.getPos()
+			hpr = door.getHpr()
+			scale = door.getScale()
+			door.removeNode()
+			door = Door(base, EGG_DOOR, anim)
+			door.setPos(pos)
+			door.setHpr(hpr)
+			door.setScale(scale)
+			door.reparentTo(self.root)
+			self.doors += [door]
 
 	def setupKeys(self, base):
 		for np in self.model.findAllMatches('**/Key*'):

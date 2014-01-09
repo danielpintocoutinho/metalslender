@@ -163,8 +163,9 @@ class MetalSlender(ShowBase):
 		self.AIworld = AIWorld(self.render)
 		
 		self.introSound.stop()
-		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
-		initialSound.play()
+		#TODO: Play creepy sound
+# 		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
+# 		initialSound.play()
 
 		self.enemies = []
 		self.doors = []
@@ -184,7 +185,7 @@ class MetalSlender(ShowBase):
 		self.rooms[2].root.setLight(alight)
 
 		
-		#TODO: adjust code
+		#w
 		for enemy in self.enemies:
 			enemy.addDynamicObjects(self.render.findAllMatches('**/LCG_porta*'))
 		
