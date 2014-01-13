@@ -48,7 +48,7 @@ class Player(SceneObject):
 	SIGHT_FAR  = 100
 	
 	#TODO: Refactor constants
-	#TODO: Improve collision solids (specially, the feet)
+	#TODO: Improve collision solids (specially, the feet) and switch between light and dark auras when appropriate
 	BODY_SOLID = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
 # 	CROUCHED_BODY_SOLID
 	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
@@ -98,6 +98,7 @@ class Player(SceneObject):
 		
 		self.setupCamera(base)
 		self.setupFlashlight()
+		self.toggleFlashlight()
 		self.setupKeys()
 		self.setupCollistion()
 		self.setupSound()
@@ -144,13 +145,13 @@ class Player(SceneObject):
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
-		self.setAuraSolid(Player.LIGHT_AURA)
+		self.setAuraSolid(Player.DARK_AURA)
 		self.setBodySolid(Player.BODY_SOLID)
 		self.setFeetSolid(Player.FEET_SOLID)
 		self.setJumpSolid(Player.JUMP_SOLID)
 		self.setHandSolid(Player.HAND_SOLID)
 		
-		self.setAuraCollision(fromMask=Mask.PLAYER)
+		self.setAuraCollision(intoMask=Mask.PLAYER)
 		self.setBodyCollision(fromMask=(Mask.WALL|Mask.FLOOR))
 		self.setFeetCollision(fromMask=Mask.FLOOR )
 		self.setJumpCollision(fromMask=Mask.FLOOR )
@@ -404,6 +405,7 @@ class Player(SceneObject):
 		self.breathing.stop()
 		self.dyingSound.play()
 
+#TODO: Refactor effects
 		fadeOut = render.colorScaleInterval(3, Vec4(1,0,0,1))
 		fadeOut.start()
 		self.life  = 1
@@ -427,9 +429,6 @@ class Player(SceneObject):
 			self.interval = interval
 			self.initTimer = False
 			self.time = time.time()
-
-	def start(self):
-		self.getNodePath().setPos(self.startPos)
 
 	def clean(self):
 		for step in self.footsteps:

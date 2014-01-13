@@ -14,7 +14,7 @@ class Hooded(AICharacter):
 	SIGHT=30.0
 	FOV=60.0
 
-	def __init__(self, name, root, mass, movforce, maxforce):
+	def __init__(self, name, root, route, mass, movforce, maxforce):
 		AICharacter.__init__(self, name, root, mass, movforce, maxforce)
 		
 		self.initTimer = True
@@ -55,12 +55,14 @@ class Hooded(AICharacter):
 		sentinelRay = self.get_node_path().attachNewNode(CollisionNode('sentinelray'))
 		sentinelRay.node().addSolid(sentraygeom)
 		# we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
-		sentinelRay.node().setFromCollideMask(CollisionMask.PLAYER | CollisionMask.WALL | CollisionMask.DOOR | CollisionMask.TREE)
+		sentinelRay.node().setFromCollideMask(CollisionMask.PLAYER | CollisionMask.WALL | CollisionMask.HAND)
 		sentinelRay.node().setIntoCollideMask(CollisionMask.NONE)
 		# we add the ray to the sentinel collider and now it is ready to go
 		base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
 		
 		self.screechsound = loader.loadSfx("assets/sounds/enemies/nazgul_scream.mp3")
+		
+		self.setPatrolPos(route)
 		
 	def __del__(self):
 		self.slnp.removeNode()
@@ -120,10 +122,11 @@ class Hooded(AICharacter):
 			self.Attacked = False
 			return True
 		return False
-
  
 	def patrol(self):
+# 		print 'fix me'
 		distance = self.distance(self.get_node_path().getPos(render), self.PatrolPos[self.currentTarget].getPos(render))
+		distance = 2.0
 		self.goingBack = False
 		if (distance < 1.0):
 			self.startTimer(3)
@@ -247,7 +250,7 @@ class Hooded(AICharacter):
 			colliderNode = entry.getIntoNode()
 			# if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
 			#for i in self.sentinelHandler.getEntries():
-			if colliderNode.getName() == 'player' + SceneObject.AURA_SOLID_SUFIX:
+			if colliderNode.getName() == 'Player' + SceneObject.AURA_SOLID_SUFIX:
 				self.isProtected = False
 				if self.detected == False:
 					self.detected = True
@@ -266,7 +269,8 @@ class Hooded(AICharacter):
 	#** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
    
 	def sent_detect(self):
-		intruders=base.render.findAllMatches("**/player*")
+		#TODO: Instead of making a search, add intruder list somehow
+		intruders=base.render.findAllMatches("**/Player*")
 		for o in intruders:
 		# query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
 			if self.slnp.node().isInView(o.getPos(self.slnp)):

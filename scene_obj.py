@@ -36,7 +36,7 @@ class SceneObject(DirectObject):
 
 		self.feetHandler.setGravity(9.81)
 		
-		base.cTrav.addCollider(self.auraCollider, self.auraHandler)
+# 		base.cTrav.addCollider(self.auraCollider, self.auraHandler)
 		base.cTrav.addCollider(self.bodyCollider, self.bodyHandler)
 		base.cTrav.addCollider(self.feetCollider, self.feetHandler)
 		base.cTrav.addCollider(self.jumpCollider, self.jumpHandler)

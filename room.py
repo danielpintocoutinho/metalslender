@@ -11,7 +11,7 @@ from enemy import Enemy
 #TODO: things instantiated inside setup*() functions may all be enclosed in classes likewise Key and Door
 class Room(SceneObject):
 
-	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
+	def __init__(self, base, scene, name, model, pos=Vec3(0,0,0), scale=1.0):
 		self.root = scene.attachNewNode(name)
 		
 		self.model = base.loader.loadModel(model)
@@ -27,13 +27,13 @@ class Room(SceneObject):
 		self.doors  = []
 		self.keys   = []
 		
-		self.setupDoors(base)
-		self.setupKeys(base)
-		self.setupLightSources(scene)
-		self.setupCollision()
-		self.setupEnemies(base)
-		self.setupGoal(base)
-		self.setupTrees()
+		self.setupDoors(base, scene)
+		self.setupKeys(base, scene)
+		self.setupLightSources(base, scene)
+		self.setupCollision(base, scene)
+		self.setupEnemies(base, scene)
+		self.setupGoal(base, scene)
+		self.setupTrees(base, scene)
 		
 		for np in self.model.findAllMatches('**/=Hide'):
 			np.hide()
@@ -46,41 +46,42 @@ class Room(SceneObject):
 		#TODO: A lot of secondary objects to delete, such as doors and keys
 # 		del self.lights [:]
 			
-	def setupEnemies(self, base):
+	def setupEnemies(self, base, scene):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
-			#TODO: AI commands commented
-			actor = Actor(EGG_HOODED)
-			actor.setPos(np.getPos())
-			actor.reparentTo(self.root)
-# 	 		base.enemies.append(Enemy(base, 'Hooded.' + str(len(base.enemies)), self.root, patrol, np.getPos()))
-# 			base.AIworld.addAiChar(base.enemies[-1].getHooded())
-# 			base.enemies[-1].addDynamicObjects(self.doors)
+# 			TODO: AI commands commented
+# 			actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
+# 			actor.setPos(np.getPos())
+# 			actor.reparentTo(self.root)
+# 			actor.loop('Hover')
+	 		base.enemies.append(Enemy(base, scene, np.getName(), patrol, np.getPos()))
+			base.AIworld.addAiChar(base.enemies[-1].getHooded())
+			base.enemies[-1].addDynamicObjects(self.doors)
 
-	def setupGoal(self, base):
+	def setupGoal(self, base, scene):
 		np = self.model.find('**/Goal')
 		base.goal = np
 
-	def setupDoors(self, base):
+	def setupDoors(self, base, scene):
 		for np in self.model.findAllMatches('**/=Door'):
 			self.doors.append(Door(base, np))
 
-	def setupKeys(self, base):
+	def setupKeys(self, base, scene):
 		for np in self.model.findAllMatches('**/=Key'):
 	 		self.keys.append(Key(base, np))
 	 		
-	def setupTrees(self):
+	def setupTrees(self, base, scene):
 		for tree in self.model.findAllMatches('**/=Tree'):
 			tree.setTwoSided(True)
 			tree.setBillboardAxis()
 			tree.setTransparency(TransparencyAttrib.MAlpha)
 			
-	def setupCollision(self):
+	def setupCollision(self, base, scene):
 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
 		self.setCollision("**/=Wall"   , Mask.WALL)
 		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.HAND)
 		
-	def setupLightSources(self, scene):
+	def setupLightSources(self, base, scene):
 		for np in self.model.findAllMatches('**/=Light'):
 			if np.getTag('Light') == 'Point':
 				light = PointLight('PointLight.%d' % (len(self.lights) + 1,))

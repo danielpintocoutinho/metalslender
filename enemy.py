@@ -12,20 +12,26 @@ class Enemy(SceneObject):
 	SIGHT_FAR  = 100
 	
 	BODY_SOLID = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
-	FEET_SOLID = CollisionRay   (0, 0, HEIGHT * 9, 0, 0, -1)
+	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
 # 	BODY_SOLID = CollisionSphere(0, 0, 0, HEIGHT / 9)
 # 	FEET_SOLID = CollisionRay   (0, 0, 0, 0, 0, -1)
 
 	def __init__(self, base, scene, name, route=[], pos=Vec3(0,0,0), scale=1.0):
 		SceneObject.__init__(self, base, scene, name, pos, scale)
 		
-		self.seeker = Actor("assets/chicken/vulto-pedro")
+# 		self.root = scene.attachNewNode(name)
+# 		self.root.setPos(pos)
+# 		self.root.setScale(scale)
+		
+		self.seeker = Actor("assets/chicken/vulto-pedro", { 'Hover' : 'assets/chicken/vulto-pedro-Hover' })
+		self.seeker.reparentTo(self.root)
+		
+		self.hooded = Hooded(name + 'Hooded', self.seeker, route, 60, 5, 2)
 		#self.seeker = Actor("models/ralph",{"run":"models/ralph-run", "walk":"models/ralph-walk"})
 # 		self.seeker.setCollideMask(BitMask32.allOff())
 # 		self.pos = pos
 # 		self.pos.z += 10
 # 		self.seeker.setPos(self.pos)
-		self.seeker.reparentTo(self.root)
 		#self.seeker.setScale(6)
 		
 		self.setBodySolid(Enemy.BODY_SOLID)
@@ -46,8 +52,7 @@ class Enemy(SceneObject):
 		return self.hooded
 
 	def update(self):
-		pass
-# 		return self.hooded.update()
+		return self.hooded.update()
 
 	def addDynamicObjects(self, objects):
 		for o in objects:
@@ -57,8 +62,8 @@ class Enemy(SceneObject):
 		self.hooded.hear(noisePos)
 
 	def start(self):
-		pass
-# 		self.hooded.start()
+		self.seeker.loop('Hover')
+		self.hooded.start()
 
 	def stop(self):
 		self.hooded.stop()

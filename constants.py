@@ -1,3 +1,5 @@
+from panda3d.core import Vec4
+
 EGG_DIRECTORY = 'assets/chicken/'
 
 MODEL_HOODED = 'vulto-pedro'
@@ -10,3 +12,8 @@ MODEL_KNOB = 'knob'
 EGG_KNOB   =EGG_DIRECTORY + MODEL_KNOB
 
 SOUND_DIRECTORY = 'assets/sounds'
+
+MODEL_SKYDOME = 'skydome'
+EGG_SKYDOME   = EGG_DIRECTORY + MODEL_SKYDOME
+
+AMBIENT_LIGHT = Vec4(0.3, 0.3, 0.3, 1)

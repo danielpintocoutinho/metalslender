@@ -10,6 +10,7 @@ from MainMenu import MainMenu
 from actionsManager import ActionManager
 from collision import CollisionMask
 from controls import CameraControls, PlayerControls
+from constants import *
 from door import Door
 from enemy import Enemy
 from eventsManager import EventManager
@@ -33,13 +34,25 @@ class MetalSlender(ShowBase):
 	
 	def __init__(self):
 		ShowBase.__init__(self)
-		self.cTrav = CollisionTraverser()
-		self.initConfig()
+		self.initVideo()
 		self.initGame()
+	
+	def initVideo(self):
+		self.render.setShaderAuto()
+		#TODO: Not working
+		self.render.setAntialias(AntialiasAttrib.MMultisample)
+
+		self.props = WindowProperties()
+
+		self.props.setSize(1366, 768)
+		self.props.setCursorHidden(False)
+		self.props.setMouseMode(self.props.M_absolute)
+		
+		self.win.requestProperties(self.props)
+		self.win.movePointer(0, 100, 100)
 
 	def initGame(self):
-		self.initConfig()
-
+		self.paused = False
 		self.initTimer = True
 		self.time = 0
 		self.gameOver = True
@@ -48,21 +61,18 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.menuDisplay, "menuDisplay")
 
 		self.mainMenu = MainMenu(self)
+		
 		self.introSound = self.loader.loadSfx('assets/sounds/intro.mp3')
 		self.introSound.setLoop(True)
 		self.introSound.play()
 		
+	#TODO: Refactor environment into a class that inherits from nodepath
 	def setupEnvironment(self):
-		#TODO: Not working
-# 		self.render.setAntialias(AntialiasAttrib.MMultisample)
 		self.setBackgroundColor(0,0,0)
 		self.setupLighting()
 		self.setupFog()
-		self.setupSkydome('assets/chicken/skydome')
-		
-		plane = self.render.attachNewNode(CollisionNode('WorldBottom'))
-		plane.node().addSolid(CollisionPlane(Plane(0, 0, 1, 30)))
-		plane.node().setIntoCollideMask(CollisionMask.FLOOR)
+		self.setupSkydome()
+		self.setupPhysics()
 		
 	def setupFog(self):
 		self.fog = Fog("fog")
@@ -72,46 +82,37 @@ class MetalSlender(ShowBase):
 
 		self.render.setFog(self.fog)
 		
-	def setupSkydome(self, model):
-		self.skydome = self.loader.loadModel(model)
+	def setupSkydome(self):
+		self.skydome = self.loader.loadModel(EGG_SKYDOME)
 		self.skydome.setBin('background', 0)
 		self.skydome.setDepthWrite(False)
 		self.skydome.reparentTo(self.cam)
 		self.skydome.setCompass()
 		self.skydome.setLight(self.shadeless)
 		
-	def setupLighting(self, color = Vec4(0.3, 0.3, 0.3, 1)):
+	def setupLighting(self):
 		alight = AmbientLight("AmbientLight")
-		alight.setColor(color)
+		alight.setColor(AMBIENT_LIGHT)
 		self.amblight = self.render.attachNewNode(alight)
 		self.render.setLight(self.amblight)
 		
-		#This light may be used by shadeless materials
 		alight = AmbientLight("ShadelessLight")
-		alight.setColor((1.0,1.0,1.0,1.0))
+		alight.setColor((1.0, 1.0, 1.0, 1.0))
 		self.shadeless = self.render.attachNewNode(alight)
+		
+	def setupPhysics(self):
+		self.cTrav = CollisionTraverser()
+		
+		plane = self.render.attachNewNode(CollisionNode('WorldBottom'))
+		plane.node().addSolid(CollisionPlane(Plane(0, 0, 1, 30)))
+		plane.node().setIntoCollideMask(CollisionMask.FLOOR)
 		
 	def loadScenario(self):
 		self.rooms = []
 		
-# 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/teste-pedro" , self.render))
-		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg-pedro" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
-# 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar-pedro", self.render))
-
-	def initConfig(self):
-		self.render.setShaderAuto()
-
-		self.props = WindowProperties()
-# 		self.props.setFullscreen(True)
-		self.props.setSize(1366, 768)
-		self.props.setCursorHidden(False)
-		self.props.setMouseMode(self.props.M_absolute)
-		
-		self.win.requestProperties(self.props)
-		self.win.movePointer(0, 100, 100)
-		
-		self.paused = False
+		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
+		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
+		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh_2andar-pedro"))
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
@@ -127,7 +128,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.player.updateAll, "player/update")
 		self.taskMgr.add(self.hud.update, 'hud')
 		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-# 		self.taskMgr.add(self.AIUpdate,"AIUpdate")
+		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
 
 	def actionKeys(self, key):
@@ -141,7 +142,7 @@ class MetalSlender(ShowBase):
 			hasAttacked.append(attack)
 		for i in hasAttacked:
 			if (i == True):
-				self.player.hurt()
+				self.player.hurt()#TODO:The enemy itself should hurt the player
 				#attack
 		self.AIworld.update()
 		if (not self.taskMgr.hasTaskNamed("player/update")):
@@ -179,7 +180,6 @@ class MetalSlender(ShowBase):
 		self.em = EventManager(self, self.player, self.actions, self.rooms)
 		self.em.start()
 
-		self.player.start()
 		for enemy in self.enemies:
 			enemy.start()
 
@@ -205,7 +205,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.add(self.player.updateAll, "player/update")
 			self.taskMgr.add(self.hud.update, 'hud')
 			self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
-# 			self.taskMgr.add(self.AIUpdate,"AIUpdate")
+			self.taskMgr.add(self.AIUpdate,"AIUpdate")
 			self.taskMgr.add(self.camctrl.update, "camera/control")
 			self.accept('p', self.pauseGame)
 		else:
@@ -217,7 +217,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.remove('hud')
 			self.player.resetLast()
 			self.taskMgr.remove('player/flashlight/update')
-# 			self.taskMgr.remove("AIUpdate")
+			self.taskMgr.remove("AIUpdate")
 			self.props.setCursorHidden(False)
 			self.win.requestProperties(self.props)
 			self.mainMenu.showPauseGame()
@@ -289,7 +289,7 @@ class MetalSlender(ShowBase):
 				self.props.setCursorHidden(False)
 				self.props.setMouseMode(self.props.M_absolute)
 				self.win.requestProperties(self.props)
-				self.mainMenu.show()
+				self.mainMenu.showNewGame()
 
 		return task.cont
 
@@ -330,6 +330,7 @@ class MetalSlender(ShowBase):
 		return task.cont
 
 	def checkGoal(self):
+		print 'To be continued...'
 # 		dist = self.distance(self.player.getNodePath().getPos(), self.goal.getPos())
 # 		radius = 40
 # 		if (dist < radius):

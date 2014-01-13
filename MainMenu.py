@@ -2,6 +2,7 @@ from direct.gui.DirectGui import *
 from panda3d.core import TransparencyAttrib
 
 class MainMenu:
+	#TODO: Refactor names
 	def __init__(self, parent):
 		logoimg = ("assets/images/metalslender.png")
 		playimg = ("assets/images/PlayButton.png")
