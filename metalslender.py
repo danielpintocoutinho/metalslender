@@ -20,8 +20,7 @@ from room import Room
 import time
 import math
 
-# loadPrcFileData("", "prefer-parasite-buffer #f")
-#TODO: Review these files
+#TODO: Review game state transitions
 CAM_NEAR=0.1
 CAM_FAR =1000
 
@@ -121,9 +120,7 @@ class MetalSlender(ShowBase):
 		self.accept('p', self.pauseGame)
 		self.accept('z', self.restartGame)
 		
-		#TODO: Remove this or move to console
 		self.cTrav.setRespectPrevTransform(True)
-# 		self.cTrav.showCollisions(self.render)
 		
 	def addTasks(self):
 		self.taskMgr.add(self.camctrl.update, "camera/control")
@@ -172,24 +169,12 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.loadScenario()
-		
-#TODO: Uncomment these
-# 		self.rooms[1].root.detachNode()
-# 		self.rooms[2].root.hide()
-		
-# 		alight = AmbientLight("AmbientLight")
-# 		alight.setColor(Vec4(0.03,0.03,0.03,1))
-# 		alight = self.rooms[2].root.attachNewNode(alight)
-# 		self.rooms[2].root.setLight(alight)
 
 		for enemy in self.enemies:
 			enemy.addDynamicObjects(self.render.findAllMatches('**/LCG_porta*'))
 		
-		#TODO: Support multiple rooms
-		self.player  = Player(self, name="player", model='assets/chicken/coelho', scene=self.render)
+		self.player  = Player(self, self.render, 'Player')
 		self.actions = ActionManager(self, self.player, self.rooms)
-# 		self.actions.addDoors(self, self.rooms[1].model, self.items)
-# 		self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
 		self.em = EventManager(self, self.player, self.actions, self.rooms)
 		self.em.start()

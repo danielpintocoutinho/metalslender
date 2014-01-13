@@ -1,20 +1,15 @@
 from panda3d.core import CollisionNode, CollisionSphere
-
 from direct.showbase.DirectObject import DirectObject
-from direct.showbase import Audio3DManager
-from direct.task import Task
-from direct.interval.IntervalGlobal import Sequence
 
 from collision import CollisionMask
 
-class Collectible(DirectObject):
+class Collectible:
 	
-	def __init__(self,base, np, pickSound):
-		#TODO: Bad variable naming
-		self.model = np
+	def __init__(self, base, model, pickSound):
+		self.model = model
 		
 		#TODO: Refactor constants and collision solid
-		self.collisionNd = CollisionNode(np.getName() + 'ItemSolid')
+		self.collisionNd = CollisionNode(model.getName())
 		self.collisionNP = self.model.attachNewNode(self.collisionNd)
 		self.collisionNd.addSolid(CollisionSphere(0, 0, 0, 0.3))
 		self.collisionNd.setIntoCollideMask(CollisionMask.HAND)
@@ -26,10 +21,13 @@ class Collectible(DirectObject):
 		self.model.removeNode()
 		self.pickedSound = None
 		
+	def reset(self):
+		self.picked = False
+		self.model.show()
+		
 	#TODO: Make Collectible a subclass of NodePath?
-	#TODO: The CollisionSolid might also be named after the nodepath
 	def getName(self):
-		return self.collisionNP.getName()
+		return self.model.getName()
 		
 	def act(self, player):
 		if (not self.picked):

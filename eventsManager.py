@@ -33,9 +33,9 @@ class EventManager(DirectObject):
 # 		self.point0.setPos(Vec3(0,0,0))
 # <<<<<<< HEAD
 # 		self.point0.reparentTo(render)
-		self.point1 = scene_obj.SceneObject(base, "point1", base.render, Vec3(100,25,10), 1)
-		self.point2 = scene_obj.SceneObject(base, "point2", base.render, Vec3(160,20,15), 1)
-		self.point3 = scene_obj.SceneObject(base, "point3", base.render, Vec3(280,70,15), 1)
+		self.point1 = scene_obj.SceneObject(base, base.render, "point0", Vec3(100,25,10), 1)
+		self.point2 = scene_obj.SceneObject(base, base.render, "point1", Vec3(160,20,15), 1)
+		self.point3 = scene_obj.SceneObject(base, base.render, "point2", Vec3(280,70,15), 1)
 		self.point1.root.detachNode()
 		self.point2.root.detachNode()
 # =======

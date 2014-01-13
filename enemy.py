@@ -16,8 +16,8 @@ class Enemy(SceneObject):
 # 	BODY_SOLID = CollisionSphere(0, 0, 0, HEIGHT / 9)
 # 	FEET_SOLID = CollisionRay   (0, 0, 0, 0, 0, -1)
 
-	def __init__(self, base, name, scene, route=[], pos=Vec3(0,0,0), scale=1.0):
-		SceneObject.__init__(self, base, name, scene, pos, scale)
+	def __init__(self, base, scene, name, route=[], pos=Vec3(0,0,0), scale=1.0):
+		SceneObject.__init__(self, base, scene, name, pos, scale)
 		
 		self.seeker = Actor("assets/chicken/vulto-pedro")
 		#self.seeker = Actor("models/ralph",{"run":"models/ralph-run", "walk":"models/ralph-walk"})

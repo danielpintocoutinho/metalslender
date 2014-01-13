@@ -71,11 +71,10 @@ class Player(SceneObject):
 	breathrates[(EXHAUSTED, WALKING)] = 1.0 / 160
 	breathrates[(EXHAUSTED, RUNNING)] =-1.0 /   5
 
-	def __init__(self, base, name, scene, model='', pos=Vec3(0,0,0), scale=1.0):
-		SceneObject.__init__(self, base, name, scene, pos, scale)
+	def __init__(self, base, scene, name, model='', pos=Vec3(0,0,0), scale=1.0):
+		SceneObject.__init__(self, base, scene, name, pos, scale)
 		
 		#TODO: load the model
-		self.getNodePath().setPos(pos)
 
 		self.startPos = pos
 		self.previousHeight = pos.z
@@ -116,8 +115,6 @@ class Player(SceneObject):
 		self.scene = None
 		self.flashlight = None
 		
-	#TODO: add method boo!
-		
 	#TODO: Move this to flashlight class?
 	#TODO: Refactor constant values
 	def setupFlashlight(self):
@@ -140,11 +137,10 @@ class Player(SceneObject):
 	def setupKeys(self):
 		self.keys = [Player.STOPPED] * 4
 
-	#TODO: Create my own camera and put it into base.cam
 	def setupCamera(self, base):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
-		self.cam.setPos(Vec3(0,0,Player.HEIGHT + Player.HEIGHT/2))
+		self.cam.setPos(Vec3(0,0,Player.HEIGHT + Player.HEIGHT / 2))
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
@@ -154,7 +150,7 @@ class Player(SceneObject):
 		self.setJumpSolid(Player.JUMP_SOLID)
 		self.setHandSolid(Player.HAND_SOLID)
 		
-		self.setAuraCollision(intoMask=Mask.PLAYER)
+		self.setAuraCollision(fromMask=Mask.PLAYER)
 		self.setBodyCollision(fromMask=(Mask.WALL|Mask.FLOOR))
 		self.setFeetCollision(fromMask=Mask.FLOOR )
 		self.setJumpCollision(fromMask=Mask.FLOOR )
@@ -167,12 +163,12 @@ class Player(SceneObject):
 		playerfall = 'Player-Fall'
 		playerjump = 'Player-Jump'
 		
-		self.handColNode.reparentTo(self.cam)
-		self.handColHandler.addInPattern (playerhandson )
-		self.handColHandler.addOutPattern (playerhandsoff)
+		self.handCollider.reparentTo(self.cam)
+		self.handHandler.addInPattern (playerhandson )
+		self.handHandler.addOutPattern (playerhandsoff)
 		
-		self.jumpColHandler.addInPattern (playerfall)
-		self.jumpColHandler.addOutPattern(playerjump)
+		self.jumpHandler.addInPattern (playerfall)
+		self.jumpHandler.addOutPattern(playerjump)
 		
 		self.accept(playerfall, self.recordFall)
 		self.accept(playerjump, self.recordJump)
@@ -191,6 +187,7 @@ class Player(SceneObject):
 		
 	def setupSound(self):
 		#sounds of the player
+		#TODO: Refactor whole sound system?
 		self.actualstep = 0;
 		self.step_vel = 0.7
 		step1 = loader.loadSfx("assets/sounds/player/step1.mp3")
@@ -219,8 +216,6 @@ class Player(SceneObject):
 	def isAlive(self):
 		#return self.breath > -1
 		return self.life > 0.0
-
-	#TODO: Other methods like isDead()
 	
 	#TODO: If movement validation is enabled, the player must stop once it is
 	# exhausted, which means it cannot run and die of fear. But if it isn't, the
@@ -293,7 +288,7 @@ class Player(SceneObject):
 		#Step sound
 		if (any(self.keys)):
 			self.stopped = 0
-			if (self.feetColHandler.isOnGround() and \
+			if (self.feetHandler.isOnGround() and \
 				self.footsteps[self.actualstep%4].status() != self.footsteps[self.actualstep%4].PLAYING):
 				
 				self.actualstep += 1
@@ -380,18 +375,16 @@ class Player(SceneObject):
 			return task.done
 	
 	def jump(self):
-		if self.feetColHandler.isOnGround(): 
-			self.feetColHandler.addVelocity(Player.JUMP_POWER)
+		if self.feetHandler.isOnGround(): 
+			self.feetHandler.addVelocity(Player.JUMP_POWER)
 
-	#BUG: Sometimes, player is floating
-	#TODO: Model must also be adjusted to get shorter / taller
 	def crouch(self, pace):
-		if self.feetColHandler.isOnGround():
+		if self.feetHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
-				LerpPosInterval(self.cam, 0.2, (0,0,Player.HEIGHT)).start()
+				LerpPosInterval(self.cam, 0.2, (0, 0, Player.HEIGHT)).start()
 			else:
-				LerpPosInterval(self.cam, 0.2, (0,0,Player.CROUCHED_HEIGHT)).start()
+				LerpPosInterval(self.cam, 0.2, (0, 0, Player.CROUCHED_HEIGHT)).start()
 	
 	def boo(self):
 		self.fear = min(1.0, self.fear + Player.FEAR_INC)
@@ -401,8 +394,8 @@ class Player(SceneObject):
 	def scream(self):
 		self.screams.play()
 
+	#TODO: Review damage / life system
 	def hurt(self):
-		#print "vou ser hurt"
 		self.attacked = True
 		self.life -= 1.0
 		self.startTimer(5)

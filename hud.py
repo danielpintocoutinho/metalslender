@@ -7,8 +7,6 @@ from direct.gui.OnscreenImage import OnscreenImage
 
 class HUD(DirectObject):
 	#TODO: Preload all images
-	#TODO: Find out how many sprites are available
-	#TODO: Parameters to againrol screen resolution?
 	def __init__(self, base, player):
 		self.base   = base
 		self.player = player

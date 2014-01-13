@@ -43,9 +43,9 @@ class Room(SceneObject):
 			
 	def __del__(self):
 		self.root.removeNode()
+		#TODO: A lot of secondary objects to delete, such as doors and keys
 # 		del self.lights [:]
 			
-	#TODO: Find out what is missing in the scenario
 	def setupEnemies(self, base):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
@@ -76,8 +76,6 @@ class Room(SceneObject):
 			tree.setTransparency(TransparencyAttrib.MAlpha)
 			
 	def setupCollision(self):
-		#TODO: Load room objects and triggers
-		#TODO: All but invisible objects must also have the AURA mask turned on
 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
 		self.setCollision("**/=Wall"   , Mask.WALL)
 		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.HAND)
