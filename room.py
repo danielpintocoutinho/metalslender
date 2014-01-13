@@ -2,11 +2,13 @@ from panda3d.core import BitMask32, CullFaceAttrib, DirectionalLight, Material, 
 from direct.actor.Actor import Actor
 
 from constants import *
+from key import Key
 from door import Door
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
 from enemy import Enemy
 
+#TODO: things instantiated inside setup*() functions may all be enclosed in classes likewise Key and Door
 class Room(SceneObject):
 
 	def __init__(self, base, name, model, scene, pos=Vec3(0,0,0), scale=1.0):
@@ -23,6 +25,7 @@ class Room(SceneObject):
 		
 		self.lights = []
 		self.doors  = []
+		self.keys   = []
 		
 		self.setupDoors(base)
 		self.setupKeys(base)
@@ -59,26 +62,12 @@ class Room(SceneObject):
 		base.goal = np
 
 	def setupDoors(self, base):
-		for door in self.model.findAllMatches('**/=Door'):
-			anim = { 
-				'Open'  : EGG_DIRECTORY + MODEL_DOOR + '-Open'  + door.getTag('DoorAmp'),
-				'Close' : EGG_DIRECTORY + MODEL_DOOR + '-Close' + door.getTag('DoorAmp')
-			}
-			key = door.getTag('Door')
-			pos = door.getPos()
-			hpr = door.getHpr()
-			scale = door.getScale()
-			door.removeNode()
-			door = Door(base, EGG_DOOR, anim)
-			door.setPos(pos)
-			door.setHpr(hpr)
-			door.setScale(scale)
-			door.reparentTo(self.root)
-			self.doors += [door]
+		for np in self.model.findAllMatches('**/=Door'):
+			self.doors.append(Door(base, np))
 
 	def setupKeys(self, base):
-		for np in self.model.findAllMatches('**/Key*'):
-	 		base.keys.append(np)
+		for np in self.model.findAllMatches('**/=Key'):
+	 		self.keys.append(Key(base, np))
 	 		
 	def setupTrees(self):
 		for tree in self.model.findAllMatches('**/=Tree'):
@@ -88,13 +77,10 @@ class Room(SceneObject):
 			
 	def setupCollision(self):
 		#TODO: Load room objects and triggers
+		#TODO: All but invisible objects must also have the AURA mask turned on
 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
-		self.setCollision("**/=Door"   , Mask.WALL)
 		self.setCollision("**/=Wall"   , Mask.WALL)
-		self.setCollision("**/=Floor"  , Mask.FLOOR)
-		self.setCollision("**/*walls*" , Mask.WALL)
-		self.setCollision("**/*floor*" , Mask.FLOOR)
-		self.setCollision("**/*escada*", Mask.FLOOR)
+		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.HAND)
 		
 	def setupLightSources(self, scene):
 		for np in self.model.findAllMatches('**/=Light'):

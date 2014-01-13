@@ -28,11 +28,11 @@ class EventManager(DirectObject):
 		self.back   = Vec3(0,-4,0)
 		
 		#Pontos chave para os sustos
-		self.point0 = loader.loadModel("assets/models/sphere")
-		self.point0.setScale(0.05)
-		self.point0.setPos(Vec3(0,0,0))
+# 		self.point0 = loader.loadModel("assets/models/sphere")
+# 		self.point0.setScale(0.05)
+# 		self.point0.setPos(Vec3(0,0,0))
 # <<<<<<< HEAD
-		self.point0.reparentTo(render)
+# 		self.point0.reparentTo(render)
 		self.point1 = scene_obj.SceneObject(base, "point1", base.render, Vec3(100,25,10), 1)
 		self.point2 = scene_obj.SceneObject(base, "point2", base.render, Vec3(160,20,15), 1)
 		self.point3 = scene_obj.SceneObject(base, "point3", base.render, Vec3(280,70,15), 1)
@@ -109,16 +109,16 @@ class EventManager(DirectObject):
 		self.back = rot2 + self.center
 		self.back.setZ(self.back.getZ() + self.base.cam.getPos().getZ())
 		
-		self.point0.setPos(self.vision)
+# 		self.point0.setPos(self.vision)
 		
 		#hide blocoH 2-andar
 		#TODO: Uncomment these
-		if (self.player.root.getZ() > 2.3):
-			if (self.rooms[2].root.isHidden()):
-				self.rooms[2].root.show()
-		else:
-			if (not self.rooms[2].root.isHidden()):
-				self.rooms[2].root.hide()
+# 		if (self.player.root.getZ() > 2.3):
+# 			if (self.rooms[2].root.isHidden()):
+# 				self.rooms[2].root.show()
+# 		else:
+# 			if (not self.rooms[2].root.isHidden()):
+# 				self.rooms[2].root.hide()
 		
 		if (self.center.getX() > 9):
 			if (self.tension.status() != self.tension.PLAYING):
@@ -232,9 +232,9 @@ class EventManager(DirectObject):
 		self.base.taskMgr.add(self.update, "update-task")
 
 	def destroy(self):
-		self.point0.root.removeNode()
+# 		self.point0.root.removeNode()
 		self.firstEnemy.removeNode()
 
-		base.loader.unloadSfx(self.scare)
-		base.loader.unloadSfx(self.tension)
-		base.loader.unloadSfx(self.firstEnemyScream)
+		self.base.loader.unloadSfx(self.scare)
+		self.base.loader.unloadSfx(self.tension)
+		self.base.loader.unloadSfx(self.firstEnemyScream)

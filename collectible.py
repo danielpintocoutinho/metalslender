@@ -1,44 +1,42 @@
-from panda3d.core import *
-from math import *
-import sys,os
+from panda3d.core import CollisionNode, CollisionSphere
 
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase import Audio3DManager
 from direct.task import Task
 from direct.interval.IntervalGlobal import Sequence
 
-import scene_obj
+from collision import CollisionMask
 
 class Collectible(DirectObject):
 	
-	def __init__(self,base, fatherNode,path,pathSound, pos, hpr):
+	def __init__(self,base, np, pickSound):
+		#TODO: Bad variable naming
+		self.model = np
 		
-		self.model = base.loader.loadModel(path)
-
-		self.room = fatherNode
-		self.model.reparentTo(self.room)
-		self.model.setPos(pos)
-		self.model.setHpr(hpr)
-		self.model.setScale(0.05)
+		#TODO: Refactor constants and collision solid
+		self.collisionNd = CollisionNode(np.getName() + 'ItemSolid')
+		self.collisionNP = self.model.attachNewNode(self.collisionNd)
+		self.collisionNd.addSolid(CollisionSphere(0, 0, 0, 0.3))
+		self.collisionNd.setIntoCollideMask(CollisionMask.HAND)
 		
-		self.pickedSound = loader.loadSfx(pathSound)
-		
+		self.pickedSound = base.loader.loadSfx(pickSound)
 		self.picked = False
 		
 	def __del__(self):
-		self.room = None
 		self.model.removeNode()
 		self.pickedSound = None
 		
-	def act(self):
+	#TODO: Make Collectible a subclass of NodePath?
+	#TODO: The CollisionSolid might also be named after the nodepath
+	def getName(self):
+		return self.collisionNP.getName()
+		
+	def act(self, player):
 		if (not self.picked):
 			self.pickedSound.play()
-			self.model.detachNode()
+			self.model.hide()
 			self.picked = True
-				
-	def act_dist(self, hand):
-# 		print ("hand: ",hand," -> ", (hand - self.model.getPos(self.room)).length())
-		return (hand - self.model.getPos(self.room)).length()
+			player.inventory.append(self)
 		
 	def wasPicked(self):
 		return self.picked

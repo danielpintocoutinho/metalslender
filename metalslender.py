@@ -49,7 +49,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.menuDisplay, "menuDisplay")
 
 		self.mainMenu = MainMenu(self)
-		self.introSound = loader.loadSfx('assets/sounds/intro.mp3')
+		self.introSound = self.loader.loadSfx('assets/sounds/intro.mp3')
 		self.introSound.setLoop(True)
 		self.introSound.play()
 		
@@ -81,7 +81,7 @@ class MetalSlender(ShowBase):
 		self.skydome.setCompass()
 		self.skydome.setLight(self.shadeless)
 		
-	def setupLighting(self, color = Vec4(0.22, 0.22, 0.22, 1)):
+	def setupLighting(self, color = Vec4(0.3, 0.3, 0.3, 1)):
 		alight = AmbientLight("AmbientLight")
 		alight.setColor(color)
 		self.amblight = self.render.attachNewNode(alight)
@@ -97,15 +97,15 @@ class MetalSlender(ShowBase):
 		
 # 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/teste-pedro" , self.render))
 		self.rooms.append(Room(self, "LCG"    , "assets/chicken/lcg-pedro" , self.render))
-		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh", self.render))
-		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar-pedro", self.render))
+		self.rooms.append(Room(self, "Bloco H", "assets/chicken/blocoh-pedro", self.render))
+# 		self.rooms.append(Room(self, "Bloco H2", "assets/chicken/blocoh_2andar-pedro", self.render))
 
 	def initConfig(self):
 		self.render.setShaderAuto()
 
 		self.props = WindowProperties()
 # 		self.props.setFullscreen(True)
-		self.props.setSize(832, 468)
+		self.props.setSize(1366, 768)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -142,10 +142,8 @@ class MetalSlender(ShowBase):
 		for enemy in self.enemies:
 			attack = enemy.update()
 			hasAttacked.append(attack)
-		#print "novo ciclo"
 		for i in hasAttacked:
 			if (i == True):
-				#print "vai chamar o hurt"
 				self.player.hurt()
 				#attack
 		self.AIworld.update()
@@ -168,7 +166,7 @@ class MetalSlender(ShowBase):
 # 		initialSound.play()
 
 		self.enemies = []
-		self.doors = []
+		self.items = []
 		self.keys = []
 
 		#TODO: Many things are only done once the game is started
@@ -176,23 +174,21 @@ class MetalSlender(ShowBase):
 		self.loadScenario()
 		
 #TODO: Uncomment these
-		self.rooms[1].root.detachNode()
-		self.rooms[2].root.hide()
+# 		self.rooms[1].root.detachNode()
+# 		self.rooms[2].root.hide()
 		
-		alight = AmbientLight("AmbientLight")
-		alight.setColor(Vec4(0.7,0.7,0.7,1))
-		alight = self.rooms[2].root.attachNewNode(alight)
-		self.rooms[2].root.setLight(alight)
+# 		alight = AmbientLight("AmbientLight")
+# 		alight.setColor(Vec4(0.03,0.03,0.03,1))
+# 		alight = self.rooms[2].root.attachNewNode(alight)
+# 		self.rooms[2].root.setLight(alight)
 
-		
-		#w
 		for enemy in self.enemies:
 			enemy.addDynamicObjects(self.render.findAllMatches('**/LCG_porta*'))
 		
 		#TODO: Support multiple rooms
 		self.player  = Player(self, name="player", model='assets/chicken/coelho', scene=self.render)
-		self.actions = ActionManager(self, self.rooms[0].model, self.player,self.rooms)
-# 		self.actions.addDoors(self, self.rooms[1].model, self.doors)
+		self.actions = ActionManager(self, self.player, self.rooms)
+# 		self.actions.addDoors(self, self.rooms[1].model, self.items)
 # 		self.actions.addKeys(self, self.rooms[1].model, self.keys)
 		
 		self.em = EventManager(self, self.player, self.actions, self.rooms)
@@ -330,9 +326,7 @@ class MetalSlender(ShowBase):
 			self.initTimer = False
 			self.time = time.time()
 
-	def distance(self, p1, p2):
-		#print "p1: ", p1
-		#print "p2: ", p2    
+	def distance(self, p1, p2):  
 		d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
 		return math.sqrt(d)
 

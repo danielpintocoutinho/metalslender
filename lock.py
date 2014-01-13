@@ -21,7 +21,7 @@ class Lock(DirectObject):
 		self.model.setHpr(hpr)
 		self.model.setScale(0.05)
 		
-		self.doors = doors 
+		self.items = doors 
 		
 		self.pickedSound = loader.loadSfx(pathSound)
 		
@@ -38,12 +38,11 @@ class Lock(DirectObject):
 			self.model.detachNode()
 			self.picked = True
 					
-			for i in range(len(self.doors)):
-				self.doors[i].unlock()
+			for i in range(len(self.items)):
+				self.items[i].unlock()
 
 				
 	def act_dist(self, hand):
-# 		print ("dist2: ", (hand - self.model.getPos(self.room)).length())
 		return (hand - self.model.getPos(self.room)).length()
 		
 	def wasPicked(self):

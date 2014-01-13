@@ -17,6 +17,9 @@ import time
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 1.2
 
+#TODO: Restrict Player's movements after death
+#TODO: Create one animation for each type of death
+#TODO: The class is somewhat long coded. Consider refactoring things as health management, inventory and action management, collisions and movement to separate classes and make Player, mostly, a container for these classes
 class Player(SceneObject):
 	
 	RESTFUL=0
@@ -25,13 +28,14 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.07
-	RUNNING=0.35
+	RUNNING=0.14
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
 	
 	HEIGHT = 1.8
 	CROUCHED_HEIGHT = 0.5
+	ARM_LENGTH = HEIGHT = 1.0
 	
 	FEAR_RATE       = -1.0 / 2.40
 	FEAR_INC        = 0.1
@@ -43,13 +47,15 @@ class Player(SceneObject):
 	SIGHT_NEAR = HEIGHT/18
 	SIGHT_FAR  = 100
 	
+	#TODO: Refactor constants
+	#TODO: Improve collision solids (specially, the feet)
 	BODY_SOLID = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
 # 	CROUCHED_BODY_SOLID
 	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
 	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT * 5)
 	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
-	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT/2)
-	HAND_SOLID = CollisionSegment(0, 0, 0, 0, HEIGHT / 2, 0)
+	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT / 2)
+	HAND_SOLID = CollisionSegment(0, 0, 0, 0, ARM_LENGTH, 0)
 	
 	DEATH_JUMP_HEIGHT = 3.0
 	
@@ -85,6 +91,9 @@ class Player(SceneObject):
 
 		self.paused = False
 		
+		#TODO: Refactor to another class?
+		self.inventory = []
+		
 		#TODO: Should be moved to SceneObj
 		self.scene = scene
 		
@@ -110,6 +119,7 @@ class Player(SceneObject):
 	#TODO: add method boo!
 		
 	#TODO: Move this to flashlight class?
+	#TODO: Refactor constant values
 	def setupFlashlight(self):
 		self.flashlight = Flashlight('spot', self, self.scene, (Player.HEIGHT / 7, -Player.HEIGHT / 17.5, -Player.HEIGHT / 7), near=Player.SIGHT_NEAR, far=Player.SIGHT_FAR)
 		
@@ -134,7 +144,7 @@ class Player(SceneObject):
 	def setupCamera(self, base):
 		self.cam = base.cam
 		self.cam.reparentTo(self.getNodePath())
-		self.cam.setPos(Vec3(0,0,Player.HEIGHT))
+		self.cam.setPos(Vec3(0,0,Player.HEIGHT + Player.HEIGHT/2))
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollistion(self):
@@ -142,30 +152,41 @@ class Player(SceneObject):
 		self.setBodySolid(Player.BODY_SOLID)
 		self.setFeetSolid(Player.FEET_SOLID)
 		self.setJumpSolid(Player.JUMP_SOLID)
+		self.setHandSolid(Player.HAND_SOLID)
 		
 		self.setAuraCollision(intoMask=Mask.PLAYER)
-		self.setBodyCollision(fromMask=Mask.WALL  )
+		self.setBodyCollision(fromMask=(Mask.WALL|Mask.FLOOR))
 		self.setFeetCollision(fromMask=Mask.FLOOR )
 		self.setJumpCollision(fromMask=Mask.FLOOR )
+		self.setHandCollision(fromMask=Mask.HAND  )
+		
+		#TODO: Refactor names
+		playerhandson  = 'Player-HandsOn'
+		playerhandsoff = 'Player-HandsOff'
 		
 		playerfall = 'Player-Fall'
 		playerjump = 'Player-Jump'
 		
+		self.handColNode.reparentTo(self.cam)
+		self.handColHandler.addInPattern (playerhandson )
+		self.handColHandler.addOutPattern (playerhandsoff)
+		
 		self.jumpColHandler.addInPattern (playerfall)
 		self.jumpColHandler.addOutPattern(playerjump)
 		
-		self.accept(playerfall, self.manageFall)
-		self.accept(playerjump, self.manageJump)
+		self.accept(playerfall, self.recordFall)
+		self.accept(playerjump, self.recordJump)
 		
-	def manageJump(self, entry):
+	def handsOn(self, entry):
+		print entry
+	
+	def recordJump(self, entry):
 		self.previousHeight = entry.getSurfacePoint(self.scene).z
 		
-	def manageFall(self, entry):
+	def recordFall(self, entry):
 		newHeight = entry.getSurfacePoint(self.scene).z
-		print self.previousHeight, newHeight
 		if self.previousHeight - newHeight > Player.DEATH_JUMP_HEIGHT:
-# 			self.die()
-			print 'I died'
+			self.die()
 		self.previousHeight = newHeight
 		
 	def setupSound(self):
@@ -237,7 +258,7 @@ class Player(SceneObject):
 		focus = self.getNodePath().getPos()
 		
 		np = self.getNodePath()
-		#print np.getPos(render)
+
 		if (self.keys[0]):
 			dir = np.getMat().getRow3(1) #0 is x, 1 is y, 2 is z,
 			dir.setZ(0)
@@ -278,7 +299,6 @@ class Player(SceneObject):
 				self.actualstep += 1
 				self.footsteps[self.actualstep%4].setPlayRate(self.speed * 15)
 				self.footsteps[self.actualstep%4].play()
-				print("speed:",self.speed,self.pace)
 		else:
 			self.stopped = 1
 		
@@ -337,7 +357,6 @@ class Player(SceneObject):
 		self.updateSound()
 
 		if (self.attacked):
-			#print "Atacado"
 			timeFinished = self.timer()
 			if (timeFinished):
 				self.life += 1.0
