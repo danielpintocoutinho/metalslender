@@ -31,7 +31,7 @@ class Room(SceneObject):
 		self.setupKeys(base, scene)
 		self.setupLightSources(base, scene)
 		self.setupCollision(base, scene)
-# 		self.setupEnemies(base, scene)
+		self.setupEnemies(base, scene)
 		self.setupGoal(base, scene)
 		self.setupTrees(base, scene)
 		
@@ -49,6 +49,7 @@ class Room(SceneObject):
 	def setupEnemies(self, base, scene):
 		for np in self.model.findAllMatches('**/=Patrol'):
 			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
+			print 'Patrol: ', np.getName(), patrol
 # 			TODO: AI commands commented
 # 			actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
 # 			actor.setPos(np.getPos())
@@ -79,7 +80,7 @@ class Room(SceneObject):
 	def setupCollision(self, base, scene):
 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
 		self.setCollision("**/=Wall"   , Mask.WALL)
-		self.setCollision("**/=Floor"  , Mask.FLOOR | Mask.HAND)
+		self.setCollision("**/=Floor"  , Mask.FLOOR)
 		
 	def setupLightSources(self, base, scene):
 		for np in self.model.findAllMatches('**/=Light'):

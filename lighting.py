@@ -8,10 +8,10 @@ class Flashlight:
 	POWER_GAIN_RATE  =  1/480.0
 	
 	ATT_CONST = 2
-	ATT_LIN   = 0.01
-	ATT_QUAD  = 0.001
+	ATT_LIN   = 0.5
+	ATT_QUAD  = 0.05
 	
-	def __init__(self, name, owner, scene, pos, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100, resol=(1024,768)):
+	def __init__(self, name, owner, scene, pos, color = Vec4(1.0, 1.0, 0.9, 1), fov=60, near=0.01, far=100, resol=(1920, 1080)):
 		self.owner = owner
 		self.scene = scene
 		self.color = color
@@ -39,6 +39,7 @@ class Flashlight:
 		self.light1 = Spotlight(name + '/wide')
 # 		self.light2 = Spotlight(name + '/narrow')
 		
+		#TODO: Shadows don't work anymore
 # 		self.light1.setShadowCaster(True, resol[0], resol[1], 1)
 # 		self.light1.setShadowCaster(True)
 # 		self.light2.setShadowCaster(False)
