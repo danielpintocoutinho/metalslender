@@ -31,7 +31,7 @@ class Room(SceneObject):
 		self.setupKeys(base, scene)
 		self.setupLightSources(base, scene)
 		self.setupCollision(base, scene)
-		self.setupEnemies(base, scene)
+# 		self.setupEnemies(base, scene)
 		self.setupGoal(base, scene)
 		self.setupTrees(base, scene)
 		

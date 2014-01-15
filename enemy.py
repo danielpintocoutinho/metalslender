@@ -23,7 +23,7 @@ class Enemy(SceneObject):
 # 		self.root.setPos(pos)
 # 		self.root.setScale(scale)
 		
-		self.seeker = Actor("assets/chicken/vulto-pedro", { 'Hover' : 'assets/chicken/vulto-pedro-Hover' })
+		self.seeker = Actor("assets/chicken/vulto-pedro")#, { 'Hover' : 'assets/chicken/vulto-pedro-Hover' })
 		self.seeker.reparentTo(self.root)
 		
 		self.hooded = Hooded(name + 'Hooded', self.seeker, route, 60, 5, 2)
@@ -62,7 +62,7 @@ class Enemy(SceneObject):
 		self.hooded.hear(noisePos)
 
 	def start(self):
-		self.seeker.loop('Hover')
+# 		self.seeker.loop('Hover')
 		self.hooded.start()
 
 	def stop(self):
