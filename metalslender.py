@@ -2,7 +2,9 @@
 import gc
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import *
-from panda3d.ai import *
+
+from panda3d.ai import AIWorld
+
 from panda3d.core import AmbientLight, CollisionNode, CollisionPlane, Plane, Vec3, Vec4, Mat4, CollisionTraverser, \
 	WindowProperties, AntialiasAttrib, Fog, Texture, TextureStage
 
@@ -90,6 +92,7 @@ class MetalSlender(ShowBase):
 		self.skydome.reparentTo(self.cam)
 		self.skydome.setCompass()
 		self.skydome.setLight(self.shadeless)
+		self.skydome.setScale(20)
 		
 	def setupLighting(self):
 		alight = AmbientLight("AmbientLight")
@@ -137,6 +140,7 @@ class MetalSlender(ShowBase):
 			self.player.fear = min(self.player.fear + 0.1, 1.0)
 
 	def AIUpdate(self,task):
+		pass
 		hasAttacked = []
 		for enemy in self.enemies:
 			attack = enemy.update()
@@ -171,9 +175,6 @@ class MetalSlender(ShowBase):
 		#TODO: Many things are only done once the game is started
 		# Load the scene.
 		self.loadScenario()
-
-		for enemy in self.enemies:
-			enemy.addDynamicObjects(self.render.findAllMatches('**/LCG_porta*'))
 		
 		self.player  = Player(self, self.render, 'Player')
 		self.actions = ActionManager(self, self.player, self.rooms)
