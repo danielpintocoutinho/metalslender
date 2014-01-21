@@ -1,10 +1,10 @@
 #!/usr/bin/ppython
-import panda3d
 from panda3d.core import TransparencyAttrib
 from direct.showbase.DirectObject import DirectObject
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.OnscreenImage import OnscreenImage
 
+#TODO: Add the update task in MetalSlender class, turning it no more into a subclass of DirectObject
 class HUD(DirectObject):
 	#TODO: Preload all images
 	def __init__(self, base, player):

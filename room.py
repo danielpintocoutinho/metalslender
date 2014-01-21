@@ -9,7 +9,7 @@ from collision import CollisionMask as Mask
 from enemy import Enemy
 
 #TODO: things instantiated inside setup*() functions may all be enclosed in classes likewise Key and Door
-class Room(SceneObject):
+class Room:
 
 	def __init__(self, base, scene, name, model, pos=Vec3(0,0,0), scale=1.0):
 		self.root = scene.attachNewNode(name)
@@ -35,7 +35,11 @@ class Room(SceneObject):
 		self.setupGoal(base, scene)
 		self.setupTrees(base, scene)
 		
-		for np in self.model.findAllMatches('**/=Hide'):
+		#TODO: Actually, they should be removed
+# 		for np in self.model.findAllMatches('**/=Hide'):
+# 			np.hide()
+
+		for np in self.model.findAllMatches('**/=Nav'):
 			np.hide()
 			
 		for np in self.model.findAllMatches('**/=Barrier'):
@@ -47,17 +51,16 @@ class Room(SceneObject):
 # 		del self.lights [:]
 			
 	def setupEnemies(self, base, scene):
-		for np in self.model.findAllMatches('**/=Patrol'):
-			patrol = [self.model.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
-			print 'Patrol: ', np.getName(), patrol
-# 			TODO: AI commands commented
-# 			actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
-# 			actor.setPos(np.getPos())
-# 			actor.reparentTo(self.root)
-# 			actor.loop('Hover')
-	 		base.enemies.append(Enemy(base, scene, np.getName(), patrol, np.getPos()))
-			base.AIworld.addAiChar(base.enemies[-1].getHooded())
-			base.enemies[-1].addDynamicObjects(self.doors)
+		#TODO: remove this once enemies are optimized
+# 		actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
+# 		actor.reparentTo(self.root)
+# 		actor.loop('Hover')
+# 		for np in self.model.findAllMatches('**/=Patrol'):
+# 			enemy = self.root.attachNewNode(np.getName())
+# 			enemy.setPos(np.getPos())
+# 			actor.instanceTo(enemy)
+			np = self.model.find('**/=Patrol')
+	 		base.enemies.append(Enemy(base, scene, np))
 
 	def setupGoal(self, base, scene):
 		np = self.model.find('**/Goal')
@@ -112,9 +115,9 @@ class Room(SceneObject):
 			if len(attenuation) > 0 and not isinstance(light, DirectionalLight):
 				light.setAttenuation(tuple([float(a) for a in attenuation]))
 				
-			if np.getTag('Shadow'):
+# 			if np.getTag('Shadow'):
 # 				self.model.setShaderAuto()
-				light.setShadowCaster(True)
+# 				light.setShadowCaster(True)
 			
 			self.lights.append(light)
 			

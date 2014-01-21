@@ -1,69 +1,66 @@
 from panda3d.core import BitMask32, CollisionRay, CollisionSphere, Vec3
+from direct.actor.Actor import Actor
 
+from constants import *
 from hooded import *
 from scene_obj import SceneObject
 from collision import CollisionMask as Mask
 
 class Enemy(SceneObject):
 	
-	HEIGHT = 1.8
-	
-	SIGHT_NEAR = HEIGHT/18
+	SIGHT_NEAR = Hooded.HEIGHT/18
 	SIGHT_FAR  = 100
 	
-	BODY_SOLID = CollisionSphere(0, 0, HEIGHT / 2, HEIGHT / 9)
-	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
-# 	BODY_SOLID = CollisionSphere(0, 0, 0, HEIGHT / 9)
-# 	FEET_SOLID = CollisionRay   (0, 0, 0, 0, 0, -1)
+	BODY_SOLID = CollisionSphere(0, 0, Hooded.HEIGHT / 2, Hooded.HEIGHT / 9)
+	FEET_SOLID = CollisionRay    (0, 0,  Hooded.HEIGHT / 2, 0, 0, -1)
 
-	def __init__(self, base, scene, name, route=[], pos=Vec3(0,0,0), scale=1.0):
-		SceneObject.__init__(self, base, scene, name, pos, scale)
+	actor = None
+
+	def __init__(self, base, scene, np):
+		SceneObject.__init__(self, base, scene, np.getName(), np.getPos(), np.getScale())
 		
-# 		self.root = scene.attachNewNode(name)
-# 		self.root.setPos(pos)
-# 		self.root.setScale(scale)
+		if Enemy.actor is None:
+			Enemy.actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
+			Enemy.actor.setPos(0, 0, 0)
+			Enemy.actor.reparentTo(self.root)
+			Enemy.actor.loop('Hover')
+			
+		patrol = [scene.find('**/Waypoint.' + w) for w in np.getTag('Patrol').split(',')]
 		
-		self.seeker = Actor("assets/chicken/vulto-pedro")#, { 'Hover' : 'assets/chicken/vulto-pedro-Hover' })
-		self.seeker.reparentTo(self.root)
+		Enemy.actor.instanceTo(self.root)
 		
-		self.hooded = Hooded(name + 'Hooded', self.seeker, route, 60, 5, 2)
-		#self.seeker = Actor("models/ralph",{"run":"models/ralph-run", "walk":"models/ralph-walk"})
-# 		self.seeker.setCollideMask(BitMask32.allOff())
-# 		self.pos = pos
-# 		self.pos.z += 10
-# 		self.seeker.setPos(self.pos)
-		#self.seeker.setScale(6)
+		self.hooded = Hooded(np.getName() + 'Hooded', self.root, patrol, 60, 5, 2)
+		for o in scene.findAllMatches('**/=Door'):
+			self.hooded.addDynamicObject(o)
+
+		base.AIworld.addAiChar(self.hooded)
 		
 		self.setBodySolid(Enemy.BODY_SOLID)
 		self.setFeetSolid(Enemy.FEET_SOLID)
 	
 		self.setBodyCollision (fromMask=Mask.WALL  )
-		self.setFeetCollision (fromMask=Mask.FLOOR )
-
-# 		self.hooded = Hooded("seeker", self.seeker, 60, 2, 2)
-# 		self.hooded.setPatrolPos(route)
-		
-	def __del__(self):
-		self.seeker.removeNode()
-		self.hooded = None
-		self.model.removeNode()		
+		self.setFeetCollision (fromMask=Mask.FLOOR )	
 
 	def getHooded(self):
 		return self.hooded
+	
+	def hear(self, noisePos):
+		self.hooded.hear(noisePos)
 
 	def update(self):
 		return self.hooded.update()
 
-	def addDynamicObjects(self, objects):
-		for o in objects:
-			self.hooded.addDynamicObject(o)
-
-	def hear(self, noisePos):
-		self.hooded.hear(noisePos)
-
 	def start(self):
-# 		self.seeker.loop('Hover')
 		self.hooded.start()
 
 	def stop(self):
 		self.hooded.stop()
+
+# 	def update(self):
+# 		pass
+# 
+# 	def start(self):
+# 		pass
+# 
+# 	def stop(self):
+# 		pass

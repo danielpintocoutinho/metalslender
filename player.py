@@ -45,7 +45,7 @@ class Player(SceneObject):
 	JUMP_POWER = 3.0
 	
 	SIGHT_NEAR = HEIGHT/18
-	SIGHT_FAR  = 100
+	SIGHT_FAR  = 500
 	
 	#TODO: Refactor constants
 	#TODO: Improve collision solids (specially, the feet) and switch between light and dark auras when appropriate
@@ -282,7 +282,7 @@ class Player(SceneObject):
 			hprx = 5 * (1 + FLASH_FEAR_AMP * self.fear * random())
 			hpry = 5 * (1 + FLASH_FEAR_AMP * self.fear * random())
 			hpr = (hprx, hpry, 0)
-			self.flashfearbang = LerpHprInterval(self.flashlight.node1, FLASH_FEAR_TIME, hpr, bakeInStart=False)
+			self.flashfearbang = LerpHprInterval(self.flashlight.nodepath, FLASH_FEAR_TIME, hpr, bakeInStart=False)
 			self.flashfearbang.start()
 			
 	def updateSound(self):
