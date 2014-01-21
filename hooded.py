@@ -125,6 +125,7 @@ class Hooded(AICharacter):
 				self.pursueTarget = self.TargetPos
 			else:
 				self.lostTarget = False
+		#print "Status: ", self.state
 				
 		if self.state == Hooded.STATE_PATROL:
 			self.patrol()
@@ -147,6 +148,7 @@ class Hooded(AICharacter):
  	PATROL_DISTANCE = 1.0
 	def patrol(self):
 		distance = self.get_node_path().getDistance(self.route[self.currentTarget])
+		#print "distance: ", distance, " < ", Hooded.PATROL_DISTANCE
 		if (distance < Hooded.PATROL_DISTANCE):
 			self.startTimer(Hooded.PATROL_PAUSE)
 			self.getAiBehaviors().pauseAi("all")
@@ -159,9 +161,10 @@ class Hooded(AICharacter):
 
 	def pathfind(self):
 		if (not self.getAiBehaviors().behaviorStatus("pathfollow") in ["active", "done"]):
-			self.getAiBehaviors().initPathFind("assets/navmesh.csv")
+			self.getAiBehaviors().initPathFind("assets/lcg.csv")
 			self.getAiBehaviors().pauseAi("all")
 			self.getAiBehaviors().pathFindTo(self.pursueTarget)
+			#print "alvo: ", self.pursueTarget
 			for i in self.dynamicObstacles:
 				self.getAiBehaviors().addDynamicObstacle(i)
 
@@ -173,11 +176,15 @@ class Hooded(AICharacter):
 		else:
 			self.TargetPos = self.pursueTarget
 
-
+		#print "pos alvo: ", self.TargetPos
+		#print "minha pos: ", currentPos
 		distance = self.distance(currentPos, self.TargetPos)
-			
+
+		#print "distance to target: ", distance
+		#print self.getAiBehaviors().behaviorStatus("pathfollow")			
 
 		if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
+			#print "Ja donei?"
 			if (distance > 5):
 				self.getAiBehaviors().pauseAi("all")
 				return
@@ -241,13 +248,15 @@ class Hooded(AICharacter):
 			self.attacked = True
 			self.attackTimer = False
 			self.startTimer(3)
-			self.state = Hooded.STATE_PAUSED
-			#self.pause()
+			#self.state = Hooded.STATE_PAUSED
+			self.pause()
 		else:
 			hasFinished = self.timer()
 			if (hasFinished):
 				self.attackTimer = True
 				self.resetTimer()
+				self.state = Hooded.STATE_PATROL
+				self.getAiBehaviors().resumeAi("seek")
 			else:
 				self.attacked = False
 
@@ -294,6 +303,7 @@ class Hooded(AICharacter):
 	def timer(self):
 		currentTime = time.time()
 		diff = currentTime - self.time
+		#print "tempo: ", diff
 		if (diff > self.interval):
 			self.initTimer = True
 			return True

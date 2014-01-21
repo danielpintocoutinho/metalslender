@@ -51,8 +51,8 @@ class Player(SceneObject):
 	#TODO: Improve collision solids (specially, the feet) and switch between light and dark auras when appropriate
 	BODY_SOLID = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
 # 	CROUCHED_BODY_SOLID
-	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT / 9)
-	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT * 5)
+	DARK_AURA  = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT)
+	LIGHT_AURA = CollisionSphere (0, 0,  HEIGHT / 2, HEIGHT)
 	FEET_SOLID = CollisionRay    (0, 0,  HEIGHT / 2, 0, 0, -1)
 	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT / 2)
 	HAND_SOLID = CollisionSegment(0, 0, 0, 0, ARM_LENGTH, 0)
@@ -82,7 +82,7 @@ class Player(SceneObject):
 		self.fear    = 0.0
 		self.speed   = 0.0
 		self.stopped = 1.0
-		self.life = 1.0
+		self.life = 10.0
 		self.pace = Player.NORMAL
 
 		self.initTimer = True
