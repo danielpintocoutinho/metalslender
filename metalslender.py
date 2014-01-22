@@ -46,7 +46,7 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
-		self.props.setFullscreen(False)
+		self.props.setFullscreen(True)
  		self.props.setSize(1280, 720)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
@@ -115,8 +115,8 @@ class MetalSlender(ShowBase):
 		self.rooms = []
 		
 		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
-# 		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
-# 		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
+		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
+		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)

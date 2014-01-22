@@ -36,8 +36,8 @@ class Room:
 		self.setupTrees(base, scene)
 		
 		#TODO: Actually, they should be removed
-# 		for np in self.model.findAllMatches('**/=Hide'):
-# 			np.hide()
+		for np in self.model.findAllMatches('**/=Hide'):
+			np.hide()
 
 		for np in self.model.findAllMatches('**/=Nav'):
 			np.hide()
@@ -55,11 +55,11 @@ class Room:
 # 		actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
 # 		actor.reparentTo(self.root)
 # 		actor.loop('Hover')
-# 		for np in self.model.findAllMatches('**/=Patrol'):
+		for np in self.model.findAllMatches('**/=Patrol'):
 # 			enemy = self.root.attachNewNode(np.getName())
 # 			enemy.setPos(np.getPos())
 # 			actor.instanceTo(enemy)
-			np = self.model.find('**/=Patrol')
+# 			np = self.model.find('**/=Patrol')
 	 		base.enemies.append(Enemy(base, scene, np))
 
 	def setupGoal(self, base, scene):

@@ -100,7 +100,7 @@ class Player(SceneObject):
 		self.setupFlashlight()
 		self.toggleFlashlight()
 		self.setupKeys()
-		self.setupCollistion()
+		self.setupCollision()
 		self.setupSound()
 		self.updateState(Player.RESTFUL)
 		
@@ -144,7 +144,7 @@ class Player(SceneObject):
 		self.cam.setPos(Vec3(0,0,Player.HEIGHT + Player.HEIGHT / 2))
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
-	def setupCollistion(self):
+	def setupCollision(self):
 		self.setAuraSolid(Player.DARK_AURA)
 		self.setBodySolid(Player.BODY_SOLID)
 		self.setFeetSolid(Player.FEET_SOLID)
