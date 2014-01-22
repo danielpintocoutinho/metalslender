@@ -28,7 +28,7 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.07
-	RUNNING=0.14
+	RUNNING=0.34
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
@@ -173,9 +173,6 @@ class Player(SceneObject):
 		
 		self.accept(playerfall, self.recordFall)
 		self.accept(playerjump, self.recordJump)
-		
-	def handsOn(self, entry):
-		print entry
 	
 	def recordJump(self, entry):
 		self.previousHeight = entry.getSurfacePoint(self.scene).z

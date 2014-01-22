@@ -36,12 +36,6 @@ class SceneObject(DirectObject):
 
 		self.feetHandler.setGravity(9.81)
 		
-# 		base.cTrav.addCollider(self.auraCollider, self.auraHandler)
-		base.cTrav.addCollider(self.bodyCollider, self.bodyHandler)
-		base.cTrav.addCollider(self.feetCollider, self.feetHandler)
-		base.cTrav.addCollider(self.jumpCollider, self.jumpHandler)
-		base.cTrav.addCollider(self.handCollider, self.handHandler)
-		
 		self.bodyHandler.addCollider(self.bodyCollider, self.root)
 		self.feetHandler.addCollider(self.feetCollider, self.root)
 	
@@ -72,21 +66,36 @@ class SceneObject(DirectObject):
 		self.auraCollider.node().setFromCollideMask(fromMask)
 		self.auraCollider.node().setIntoCollideMask(intoMask)
 		
+		if fromMask != Mask.NONE:
+			self.base.cTrav.addCollider(self.auraCollider, self.auraHandler)
+		
 	def setBodyCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
 		self.bodyCollider.node().setFromCollideMask(fromMask)
 		self.bodyCollider.node().setIntoCollideMask(intoMask)
+		
+		if fromMask != Mask.NONE:
+			self.base.cTrav.addCollider(self.bodyCollider, self.bodyHandler)
 	
 	def setFeetCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
 		self.feetCollider.node().setFromCollideMask(fromMask)
 		self.feetCollider.node().setIntoCollideMask(intoMask)
 		
+		if fromMask != Mask.NONE:
+			self.base.cTrav.addCollider(self.feetCollider, self.feetHandler)
+		
 	def setJumpCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
 		self.jumpCollider.node().setFromCollideMask(fromMask)
 		self.jumpCollider.node().setIntoCollideMask(intoMask)
+		
+		if fromMask != Mask.NONE:
+			self.base.cTrav.addCollider(self.jumpCollider, self.jumpHandler)
 				
 	def setHandCollision(self, fromMask=Mask.NONE, intoMask=Mask.NONE):
 		self.handCollider.node().setFromCollideMask(fromMask)
 		self.handCollider.node().setIntoCollideMask(intoMask)
+		
+		if fromMask != Mask.NONE:
+			self.base.cTrav.addCollider(self.handCollider, self.handHandler)
 	
 	def getNodePath(self):
 		return self.root

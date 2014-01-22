@@ -20,7 +20,7 @@ class Enemy(SceneObject):
 		SceneObject.__init__(self, base, scene, np.getName(), np.getPos(), np.getScale())
 		
 		if Enemy.actor is None:
-			Enemy.actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
+			Enemy.actor = Actor(EGG_HOODED, {})#{'Hover' : EGG_HOODED + '-Hover'})
 			Enemy.actor.setPos(0, 0, 0)
 			Enemy.actor.reparentTo(self.root)
 			Enemy.actor.loop('Hover')
@@ -38,8 +38,8 @@ class Enemy(SceneObject):
 		self.setBodySolid(Enemy.BODY_SOLID)
 		self.setFeetSolid(Enemy.FEET_SOLID)
 	
-		self.setBodyCollision (fromMask=Mask.WALL  )
-		self.setFeetCollision (fromMask=Mask.FLOOR )	
+# 		self.setBodyCollision (fromMask=Mask.WALL  )
+# 		self.setFeetCollision (fromMask=Mask.FLOOR )	
 
 	def getHooded(self):
 		return self.hooded
@@ -55,12 +55,3 @@ class Enemy(SceneObject):
 
 	def stop(self):
 		self.hooded.stop()
-
-# 	def update(self):
-# 		pass
-# 
-# 	def start(self):
-# 		pass
-# 
-# 	def stop(self):
-# 		pass

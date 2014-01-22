@@ -52,7 +52,7 @@ class Room:
 			
 	def setupEnemies(self, base, scene):
 		#TODO: remove this once enemies are optimized
-# 		actor = Actor(EGG_HOODED, {'Hover' : 'assets/chicken/vulto-pedro-Hover'})
+# 		actor = Actor(EGG_HOODED, {})#{'Hover' : 'assets/chicken/vulto-pedro-Hover'})
 # 		actor.reparentTo(self.root)
 # 		actor.loop('Hover')
 		for np in self.model.findAllMatches('**/=Patrol'):
@@ -81,8 +81,8 @@ class Room:
 			tree.setTransparency(TransparencyAttrib.MAlpha)
 			
 	def setupCollision(self, base, scene):
-		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
-		self.setCollision("**/=Wall"   , Mask.WALL)
+# 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
+# 		self.setCollision("**/=Wall"   , Mask.WALL)
 		self.setCollision("**/=Floor"  , Mask.FLOOR)
 		
 	def setupLightSources(self, base, scene):

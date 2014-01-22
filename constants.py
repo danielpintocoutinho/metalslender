@@ -2,7 +2,7 @@ from panda3d.core import Vec4
 
 EGG_DIRECTORY = 'assets/chicken/'
 
-MODEL_HOODED = 'vulto-pedro'
+MODEL_HOODED = 'vulto'
 EGG_HOODED   = EGG_DIRECTORY + MODEL_HOODED
 
 MODEL_DOOR = 'door'

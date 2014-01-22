@@ -72,7 +72,7 @@ class Hooded(AICharacter):
 		sentinelRay = self.get_node_path().attachNewNode(CollisionNode('sentinelray'))
 		sentinelRay.node().addSolid(sentraygeom)
 		# we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
-		sentinelRay.node().setFromCollideMask(CollisionMask.PLAYER | CollisionMask.WALL | CollisionMask.HAND)
+		sentinelRay.node().setFromCollideMask(CollisionMask.PLAYER)
 		sentinelRay.node().setIntoCollideMask(CollisionMask.NONE)
 		# we add the ray to the sentinel collider and now it is ready to go
 		base.cTrav.addCollider(sentinelRay, self.sentinelHandler)
@@ -253,7 +253,7 @@ class Hooded(AICharacter):
 
 	def sent_traverse(self, o):
 		# start the ray traverse
-		base.cTrav.traverse(render)
+# 		base.cTrav.traverse(render)
 		# align the colliders by order of piercing
 		if (self.sentinelHandler.getNumEntries() > 0):
 			self.sentinelHandler.sortEntries()
