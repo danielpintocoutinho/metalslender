@@ -114,9 +114,19 @@ class MetalSlender(ShowBase):
 	def loadScenario(self):
 		self.rooms = []
 		
-		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
-		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
-		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
+# 		self.rooms.append(Room(self, self.render, "BlocoH"   , "desert" ))
+# 		self.rooms.append(Room(self, self.render, "BlocoH.8" , "desert8"))
+		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
+# 		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
+# 		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
+		
+		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
+# 		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
+# 		self.rooms.append(Room(self, self.render, "LCG"      , "lcg"      ))
+		
+# 		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
+# 		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
+# 		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
@@ -176,7 +186,7 @@ class MetalSlender(ShowBase):
 		# Load the scene.
 		self.loadScenario()
 		
-		self.player  = Player(self, self.render, 'Player')
+		self.player  = Player(self, self.render, 'Player', pos=Vec3(2.8, -63, 7.54))
 		self.actions = ActionManager(self, self.player, self.rooms)
 		
 		self.em = EventManager(self, self.player, self.actions, self.rooms)

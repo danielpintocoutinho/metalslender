@@ -30,8 +30,8 @@ class Room:
 		self.setupDoors(base, scene)
 		self.setupKeys(base, scene)
 		self.setupLightSources(base, scene)
-		self.setupCollision(base, scene)
-		self.setupEnemies(base, scene)
+# 		self.setupCollision(base, scene)
+# 		self.setupEnemies(base, scene)
 		self.setupGoal(base, scene)
 		self.setupTrees(base, scene)
 		
@@ -81,8 +81,8 @@ class Room:
 			tree.setTransparency(TransparencyAttrib.MAlpha)
 			
 	def setupCollision(self, base, scene):
-# 		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
-# 		self.setCollision("**/=Wall"   , Mask.WALL)
+		self.setCollision("**/=Barrier", Mask.WALL | Mask.FLOOR)
+		self.setCollision("**/=Wall"   , Mask.WALL)
 		self.setCollision("**/=Floor"  , Mask.FLOOR)
 		
 	def setupLightSources(self, base, scene):
