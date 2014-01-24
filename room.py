@@ -61,7 +61,7 @@ class Room:
 # 			actor.instanceTo(enemy)
 # 			np = self.model.find('**/=Patrol')
 	 		base.enemies.append(Enemy(base, scene, np))
-	 		break
+# 	 		break
 
 	def setupGoal(self, base, scene):
 		np = self.model.find('**/Goal')

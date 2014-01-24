@@ -96,10 +96,6 @@ class Hooded(AICharacter):
 		self.numTargets = len(route)
 		self.increment = 1
 		self.getAiBehaviors().seek(self.route[0])
-
-	def distance(self, p1, p2): 
-		d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
-		return math.sqrt(d)
 		
 	#to update the AIWorld	  
    
@@ -167,7 +163,10 @@ class Hooded(AICharacter):
 		if (not self.getAiBehaviors().behaviorStatus("pathfollow") in ["active", "done"]):
 			self.getAiBehaviors().initPathFind("assets/navmesh.csv")
 			self.getAiBehaviors().pauseAi("all")
-			self.getAiBehaviors().pathFindTo(self.pursueTarget)
+			if isinstance(self.pursueTarget, NodePath):
+				self.getAiBehaviors().pathFindTo(self.pursueTarget)
+			else:
+				self.getAiBehaviors().pathFindTo(self.pursueTarget.getNodePath())
 			for i in self.dynamicObstacles:
 				self.getAiBehaviors().addDynamicObstacle(i)
 
@@ -175,14 +174,13 @@ class Hooded(AICharacter):
 		currentPos = self.get_node_path().getPos(render)
 
 		if (isinstance(self.pursueTarget, NodePath)):
-			self.TargetPos = self.pursueTarget.getPos(render)
-		else:
 			self.TargetPos = self.pursueTarget
+		else:
+			self.TargetPos = self.pursueTarget.getNodePath()
 
-
-		distance = self.distance(currentPos, self.TargetPos)
+# 		print currentPos, self.TargetPos
+		distance = self.get_node_path().getDistance(self.TargetPos)
 			
-
 		if (self.getAiBehaviors().behaviorStatus("pathfollow") == "done"):
 			if (distance > 5):
 				self.getAiBehaviors().pauseAi("all")
@@ -261,16 +259,12 @@ class Hooded(AICharacter):
 	def sent_traverse(self, suspect):
 		if (self.sentinelHandler.getNumEntries() > 0):
 			self.sentinelHandler.sortEntries()
-			for i in range(self.sentinelHandler.getNumEntries()):
-				print self.sentinelHandler.getEntry(i)
-# 			entry = self.sentinelHandler.getEntry(0)
-# 			self.sentinelHandler.clearEntries()
-# 			colliderNP = entry.getIntoNodePath()
-# 			print colliderNP, suspect.getNodePath()
-			# if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
-			#for i in self.sentinelHandler.getEntries():
-			return
-			if colliderNP == suspect.getNodePath():
+# 			for i in range(self.sentinelHandler.getNumEntries()):
+# 				print self.sentinelHandler.getEntry(i)
+			entry = self.sentinelHandler.getEntry(0)
+			self.sentinelHandler.clearEntries()
+			colliderNP = entry.getIntoNodePath()
+			if colliderNP.getParent() == suspect.getNodePath():
 # 				self = False
 				if self.detected == False:
 					self.detected = True
@@ -321,7 +315,7 @@ class Hooded(AICharacter):
 		self.dynamicObstacles.append(dynamicObject)
 
 	def hear(self, noisePos):
-		dist = distance(self.get_node_path().getPos(), noisePos)
+		dist = self.get_node_path().getDistance(noisePos)
 		if (dist <= self.hearing):
 			self.heard = True
 			self.hearingPos = noisePos

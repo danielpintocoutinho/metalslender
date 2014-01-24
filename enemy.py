@@ -11,8 +11,8 @@ class Enemy(SceneObject):
 	SIGHT_NEAR = Hooded.HEIGHT/18
 	SIGHT_FAR  = 100
 	
-	BODY_SOLID = CollisionSphere(0, 0, Hooded.HEIGHT / 2, Hooded.HEIGHT / 9)
-	FEET_SOLID = CollisionRay    (0, 0,  Hooded.HEIGHT / 2, 0, 0, -1)
+	BODY_SOLID = CollisionSphere (0, 0, Hooded.HEIGHT / 2, Hooded.HEIGHT / 9)
+	FEET_SOLID = CollisionRay    (0, 0, Hooded.HEIGHT / 2, 0, 0, -1)
 
 	actor = None
 
