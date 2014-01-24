@@ -30,12 +30,16 @@ CAM_FAR =1000
 CAM_NEAR = 0.1
 CAM_FAR  = 1000
 
+#TODO: refactor out a World class
 class MetalSlender(ShowBase):
 	
 	VERSION=0.1
 	
+	GRAVITY = 9.81
+	
 	def __init__(self):
 		ShowBase.__init__(self)
+		
 		self.initVideo()
 		self.initGame()
 	
@@ -109,7 +113,7 @@ class MetalSlender(ShowBase):
 		
 		plane = self.render.attachNewNode(CollisionNode('WorldBottom'))
 		plane.node().addSolid(CollisionPlane(Plane(0, 0, 1, 30)))
-		plane.node().setIntoCollideMask(CollisionMask.FLOOR)
+		plane.node().setIntoCollideMask(CollisionMask.SCENE)
 	#TODO: Set the scenario's into collide mask to a special value		
 	def loadScenario(self):
 		self.rooms = []
@@ -119,17 +123,17 @@ class MetalSlender(ShowBase):
 
 		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
 		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
-		self.rooms[-1].root.setCollideMask(CollisionMask.WALL | CollisionMask.FLOOR)
+		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 
 		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
 		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
-		self.rooms[-1].root.setCollideMask(CollisionMask.WALL | CollisionMask.FLOOR)
+		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
 		self.rooms.append(Room(self, self.render, "LCG"      , "lcg"      ))
 		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
-		self.rooms[-1].root.setCollideMask(CollisionMask.WALL | CollisionMask.FLOOR)
+		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
-# 		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
+# 		self.rooms.append(Room(self, self.wwrender, "LCG"     , "assets/chicken/lcg-pedro"))
 # 		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
 # 		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
 		

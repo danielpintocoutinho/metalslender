@@ -52,7 +52,7 @@ class Door(Actor):
 # 			np.node().setIntoCollideMask(Mask.WALL | Mask.HAND)
 #   		self.find('**/__Actor_Door/-GeomNode').node().setIntoCollideMask(Mask.WALL | Mask.HAND)
 		self.np = np
-		self.np.node().setIntoCollideMask(CollisionMask.WALL | CollisionMask.HAND)
+		self.np.node().setIntoCollideMask(CollisionMask.SCENE | CollisionMask.HAND)
 		self.np.hide()
 		
 		#TODO: Different sounds for different amplitudes
@@ -88,6 +88,6 @@ class Door(Actor):
 				self.sounds[Door.SOUND_DOOR_CLOSE].play()
 				self.play('Close', 'Door')
 				self.play('Close', 'Knob')
-				self.np.node().setIntoCollideMask(CollisionMask.WALL | CollisionMask.HAND)
+				self.np.node().setIntoCollideMask(CollisionMask.SCENE | CollisionMask.HAND)
 				
 			self.closed = not self.closed

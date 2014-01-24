@@ -1,18 +1,18 @@
 from collections import defaultdict
-
+from direct.filter.CommonFilters import CommonFilters
 from direct.interval.IntervalGlobal import Sequence
 from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
-from direct.filter.CommonFilters import CommonFilters
-
-from panda3d.core import BitMask32, CollisionRay, CollisionSegment, CollisionSphere, Vec3, Vec4
-
 from random import random
+import time
+
 from collision import CollisionMask as Mask
 from hud import HUD
 from lighting import Flashlight
+from panda3d.core import BitMask32, CollisionHandlerEvent, \
+	CollisionHandlerGravity, CollisionHandlerPhysical, CollisionHandlerPusher, \
+	CollisionNode, CollisionSegment, CollisionSphere, CollisionRay, Vec3, Vec4
 from scene_obj import SceneObject
 
-import time
 
 FLASH_FEAR_TIME = 0.03
 FLASH_FEAR_AMP  = 1.2
@@ -57,6 +57,12 @@ class Player(SceneObject):
 	JUMP_SOLID = CollisionSegment(0, 0, -HEIGHT / 2, 0, 0, HEIGHT / 2)
 	HAND_SOLID = CollisionSegment(0, 0, 0, 0, ARM_LENGTH, 0)
 	
+	AURA_NODE = 'AuraNode'
+	BODY_NODE = 'BodyNode'
+	FEET_NODE = 'FeetNode'
+	JUMP_NODE = 'JumpNode'
+	HAND_NODE = 'HandNode'
+	
 	DEATH_JUMP_HEIGHT = 3.0
 	
 	#TODO: Review this recovery system
@@ -97,10 +103,10 @@ class Player(SceneObject):
 		self.scene = scene
 		
 		self.setupCamera(base)
+		self.setupCollision()
 		self.setupFlashlight()
 		self.toggleFlashlight()
 		self.setupKeys()
-		self.setupCollision()
 		self.setupSound()
 		self.updateState(Player.RESTFUL)
 		
@@ -145,17 +151,14 @@ class Player(SceneObject):
 		self.cam.node().getLens().setNearFar(Player.SIGHT_NEAR, Player.SIGHT_FAR)
 		
 	def setupCollision(self):
-		self.setAuraSolid(Player.DARK_AURA)
-		self.setBodySolid(Player.BODY_SOLID)
-		self.setFeetSolid(Player.FEET_SOLID)
-		self.setJumpSolid(Player.JUMP_SOLID)
-		self.setHandSolid(Player.HAND_SOLID)
+		self.addCollisionGroup(Player.AURA_NODE, [Player.DARK_AURA ], CollisionHandlerEvent  (), (Mask.NONE , Mask.PLAYER))
+		self.addCollisionGroup(Player.BODY_NODE, [Player.BODY_SOLID], CollisionHandlerPusher (), (Mask.SCENE, Mask.PLAYER))
+		self.addCollisionGroup(Player.FEET_NODE, [Player.FEET_SOLID], CollisionHandlerGravity(), (Mask.SCENE, Mask.NONE  ))
+		self.addCollisionGroup(Player.JUMP_NODE, [Player.JUMP_SOLID], CollisionHandlerEvent  (), (Mask.SCENE, Mask.NONE  ))
+		self.addCollisionGroup(Player.HAND_NODE, [Player.HAND_SOLID], CollisionHandlerEvent  (), (Mask.HAND , Mask.NONE  ))
 		
-		self.setAuraCollision(intoMask=Mask.PLAYER)
-		self.setBodyCollision(intoMask=Mask.PLAYER, fromMask=(Mask.WALL|Mask.FLOOR))
-		self.setFeetCollision(fromMask=Mask.FLOOR )
-		self.setJumpCollision(fromMask=Mask.FLOOR )
-		self.setHandCollision(fromMask=Mask.HAND  )
+		self.feetHandler = self.getCollisionHandler(Player.FEET_NODE)
+		self.feetHandler.setGravity(self.base.GRAVITY)
 		
 		#TODO: Refactor names
 		playerhandson  = 'Player-HandsOn'
@@ -164,12 +167,16 @@ class Player(SceneObject):
 		playerfall = 'Player-Fall'
 		playerjump = 'Player-Jump'
 		
-		self.handCollider.reparentTo(self.cam)
-		self.handHandler.addInPattern (playerhandson )
-		self.handHandler.addOutPattern (playerhandsoff)
+		handCollider = self.getCollisionNode   (Player.HAND_NODE )
+		handHandler  = self.getCollisionHandler(Player.HAND_NODE)
 		
-		self.jumpHandler.addInPattern (playerfall)
-		self.jumpHandler.addOutPattern(playerjump)
+		handCollider.reparentTo(self.cam)
+		handHandler.addInPattern (playerhandson )
+		handHandler.addOutPattern(playerhandsoff)
+		
+		jumpHandler = self.getCollisionHandler(Player.JUMP_NODE)
+		jumpHandler.addInPattern (playerfall)
+		jumpHandler.addOutPattern(playerjump)
 		
 		self.accept(playerfall, self.recordFall)
 		self.accept(playerjump, self.recordJump)
@@ -438,9 +445,9 @@ class Player(SceneObject):
 		self.flashlight.toggle()
 		
 		if (self.flashlight.isOn()):
-			self.setAuraSolid(Player.LIGHT_AURA)
+			self.setCollisionSolid(Player.AURA_NODE, Player.LIGHT_AURA)
 		else:
-			self.setAuraSolid(Player.DARK_AURA)
+			self.setCollisionSolid(Player.AURA_NODE, Player.DARK_AURA )
 		
 	def resetLast(self):
 		self.last = 0
