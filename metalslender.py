@@ -122,16 +122,22 @@ class MetalSlender(ShowBase):
 # 		self.rooms.append(Room(self, self.render, "Desert-8" , "desert8"))
 
 		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
-		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
-		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+# 		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
+# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 
 		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
-		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
-		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+# 		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
+# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
 		self.rooms.append(Room(self, self.render, "LCG"      , "lcg"      ))
-		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
+# 		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
+# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+
+		self.rooms.append(Room(self, self.render, 'Scene8', 'scene-8-124'))
 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+		
+		#0 4 2,1 6,5,3 7
+		#222 = 333 < 444 > 666 > 888
 		
 # 		self.rooms.append(Room(self, self.wwrender, "LCG"     , "assets/chicken/lcg-pedro"))
 # 		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))

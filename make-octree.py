@@ -9,7 +9,7 @@ if len(argv) < 4:
 	print 'Usage: %s <input.input> <x,y,z> <output.input>' % (argv[1],)
 	exit(1)
 	
-print 'Reading input file %s' % (argv[0],)
+print 'Reading input file %s' % (argv[1],)
 input = EggData()
 input.read(Filename(argv[1]))
 # sourceNode = toplevel.getFirstChild()
