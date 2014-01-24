@@ -38,8 +38,8 @@ class Enemy(SceneObject):
 		self.setBodySolid(Enemy.BODY_SOLID)
 		self.setFeetSolid(Enemy.FEET_SOLID)
 	
-# 		self.setBodyCollision (fromMask=Mask.WALL  )
-# 		self.setFeetCollision (fromMask=Mask.FLOOR )	
+		self.setBodyCollision (fromMask=Mask.WALL  )
+		self.setFeetCollision (fromMask=Mask.FLOOR )	
 
 	def getHooded(self):
 		return self.hooded

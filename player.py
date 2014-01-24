@@ -152,7 +152,7 @@ class Player(SceneObject):
 		self.setHandSolid(Player.HAND_SOLID)
 		
 		self.setAuraCollision(intoMask=Mask.PLAYER)
-		self.setBodyCollision(fromMask=(Mask.WALL|Mask.FLOOR))
+		self.setBodyCollision(intoMask=Mask.PLAYER, fromMask=(Mask.WALL|Mask.FLOOR))
 		self.setFeetCollision(fromMask=Mask.FLOOR )
 		self.setJumpCollision(fromMask=Mask.FLOOR )
 		self.setHandCollision(fromMask=Mask.HAND  )

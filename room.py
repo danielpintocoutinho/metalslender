@@ -31,7 +31,7 @@ class Room:
 		self.setupKeys(base, scene)
 		self.setupLightSources(base, scene)
 # 		self.setupCollision(base, scene)
-# 		self.setupEnemies(base, scene)
+		self.setupEnemies(base, scene)
 		self.setupGoal(base, scene)
 		self.setupTrees(base, scene)
 		
@@ -61,6 +61,7 @@ class Room:
 # 			actor.instanceTo(enemy)
 # 			np = self.model.find('**/=Patrol')
 	 		base.enemies.append(Enemy(base, scene, np))
+	 		break
 
 	def setupGoal(self, base, scene):
 		np = self.model.find('**/Goal')

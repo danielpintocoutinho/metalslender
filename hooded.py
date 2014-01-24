@@ -46,7 +46,7 @@ class Hooded(AICharacter):
 		
 		self.slight.setLens(lens)
 		self.slnp = self.get_node_path().attachNewNode(self.slight)
-		#TODO: Debugging option
+		#TODO: Substitute for a collision polygon, so that the player class alerts an enemy of its presence
 		self.slight.showFrustum()
 		
 		self.slnp.setH(self.slnp.getH()-180)
@@ -66,6 +66,9 @@ class Hooded(AICharacter):
 		self.started = False
 
 		self.sentinelHandler = CollisionHandlerQueue()
+		
+		#TODO: Intruders should be added via an external method
+		self.intruders = []
 
 		# this is important: as we said the inView method don't cull geometry but take everything is in sight frustum - therefore to simulate an hide and seek feature we gotta cheat a little: this ray is masked to collide with walls and so if the avatar is behind a wall the ray will be 'deflected' (we'll see how later in the sent_traverse function) - so we know who's behind a wall but we fake we can't see it.
 		sentraygeom = CollisionRay(0, 0, Hooded.HEIGHT, 0, 1, 0)
@@ -83,6 +86,9 @@ class Hooded(AICharacter):
 		
 	def __del__(self):
 		self.slnp.removeNode()
+		
+	def addIntruder(self, intruder):
+		self.intruders.append(intruder)
 
 	def setPatrolPos(self, route):
 		self.currentTarget = 0
@@ -251,24 +257,28 @@ class Hooded(AICharacter):
 			else:
 				self.attacked = False
 
-	def sent_traverse(self, o):
-		# start the ray traverse
-# 		base.cTrav.traverse(render)
-		# align the colliders by order of piercing
+	#TODO: Use event handling, instead?
+	def sent_traverse(self, suspect):
 		if (self.sentinelHandler.getNumEntries() > 0):
 			self.sentinelHandler.sortEntries()
-			entry = self.sentinelHandler.getEntry(0)
-			colliderNode = entry.getIntoNode()
+			for i in range(self.sentinelHandler.getNumEntries()):
+				print self.sentinelHandler.getEntry(i)
+# 			entry = self.sentinelHandler.getEntry(0)
+# 			self.sentinelHandler.clearEntries()
+# 			colliderNP = entry.getIntoNodePath()
+# 			print colliderNP, suspect.getNodePath()
 			# if the name of the 1st collider is our avatar then we say GOTCHA! the rest of the stuff is just for the show
 			#for i in self.sentinelHandler.getEntries():
-			if colliderNode.getName() == 'Player' + SceneObject.AURA_SOLID_SUFIX:
+			return
+			if colliderNP == suspect.getNodePath():
 # 				self = False
 				if self.detected == False:
 					self.detected = True
 					self.screechsound.play()
-					base.player.boo()
+					suspect.boo()
 				return True
-			elif colliderNode.getName() == 'lightarea':
+			#TODO: This was meant for the implementation of safe areas, where the player could not be reached
+			elif colliderNP.getName() == 'lightarea':
 				newEntry = self.sentinelHandler.getEntry(1)
 				newColliderNode = newEntry.getIntoNode()
 				if (newColliderNode.getName() == 'playercol'):
@@ -280,12 +290,10 @@ class Hooded(AICharacter):
 	#** Here then we'll unleash the power of isInView method - this function is just a query if a 3D point is inside its frustum so it works for objects with lens, such as cameras or even, as in this case, a spotlight. But to make this happen, we got cheat a little, knowing in advance who we're going to seek, to query its position afterwards, and that's what the next line is about: to collect all the references for objects named 'smiley'
    
 	def sent_detect(self):
-		#TODO: Instead of making a search, add intruder list somehow
-		intruders=base.render.findAllMatches("**/Player*")
-		for o in intruders:
+		for o in self.intruders:
 		# query the spotlight if something listed as 'intruders' is-In-View at its position and if this is the case we'll call the traverse function above to see if is open air or hidden from the sentinel's sight
-			if self.slnp.node().isInView(o.getPos(self.slnp)):
-				self.get_node_path().lookAt(o)
+			if self.slnp.node().isInView(o.getNodePath().getPos(self.slnp)):
+				self.get_node_path().lookAt(o.getNodePath())
 				if self.sent_traverse(o):
 					self.pursueTarget = o
 					return True

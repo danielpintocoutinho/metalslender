@@ -46,8 +46,8 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
-		self.props.setFullscreen(True)
- 		self.props.setSize(1920, 1080)
+# 		self.props.setFullscreen(True)
+ 		self.props.setSize(1280, 720)
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -114,14 +114,16 @@ class MetalSlender(ShowBase):
 	def loadScenario(self):
 		self.rooms = []
 		
-# 		self.rooms.append(Room(self, self.render, "BlocoH"   , "desert" ))
-# 		self.rooms.append(Room(self, self.render, "BlocoH.8" , "desert8"))
-		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
-# 		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
+# 		self.rooms.append(Room(self, self.render, "Desert"   , "desert" ))
+# 		self.rooms.append(Room(self, self.render, "Desert-8" , "desert8"))
+
+#TODO: Set the scenario's into collide mask to a special value
+# 		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
+		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
 # 		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
 		
-		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
-# 		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
+# 		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
+		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
 # 		self.rooms.append(Room(self, self.render, "LCG"      , "lcg"      ))
 		
 # 		self.rooms.append(Room(self, self.render, "LCG"     , "assets/chicken/lcg-pedro"))
@@ -186,13 +188,14 @@ class MetalSlender(ShowBase):
 		# Load the scene.
 		self.loadScenario()
 		
-		self.player  = Player(self, self.render, 'Player', pos=Vec3(2.8, -63, 7.54))
+		self.player  = Player(self, self.render, 'Player')#, pos=Vec3(2.8, -63, 7.54))
 		self.actions = ActionManager(self, self.player, self.rooms)
 		
 		self.em = EventManager(self, self.player, self.actions, self.rooms)
 		self.em.start()
 
 		for enemy in self.enemies:
+			enemy.getHooded().addIntruder(self.player)
 			enemy.start()
 
 		self.hud      = HUD(self, self.player)
