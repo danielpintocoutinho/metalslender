@@ -117,31 +117,17 @@ class MetalSlender(ShowBase):
 	#TODO: Set the scenario's into collide mask to a special value		
 	def loadScenario(self):
 		self.rooms = []
-		
-# 		self.rooms.append(Room(self, self.render, "Desert"   , "desert" ))
-# 		self.rooms.append(Room(self, self.render, "Desert-8" , "desert8"))
 
-		self.rooms.append(Room(self, self.render, "BlocoH2"  , "blocoh2"  ))
-# 		self.rooms.append(Room(self, self.render, "BlocoH2-8", "blocoh2-8"))
-# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+		self.rooms.append(Room(self, self.render, "BlocoH2"  , "assets/chicken/blocoh2"  ))
+		self.rooms.append(Room(self, self.render, "BlocoH"   , "assets/chicken/blocoh"   ))
+		self.rooms.append(Room(self, self.render, "LCG"      , "assets/chicken/lcg"      ))
 
-		self.rooms.append(Room(self, self.render, "BlocoH"   , "blocoh"   ))
-# 		self.rooms.append(Room(self, self.render, "BlocoH-8" , "blocoh-8" ))
-# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
-		
-		self.rooms.append(Room(self, self.render, "LCG"      , "lcg"      ))
-# 		self.rooms.append(Room(self, self.render, "LCG-8"    , "lcg-8"    ))
-# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
-
-		self.rooms.append(Room(self, self.render, 'Scene8', 'scene-8-124'))
+		self.rooms.append(Room(self, self.render, 'Scene8', 'assets/chicken/collision'))
 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
-		#0 4 2,1 6,5,3 7
-		#222 = 333 < 444 > 666 > 888
-		
-# 		self.rooms.append(Room(self, self.wwrender, "LCG"     , "assets/chicken/lcg-pedro"))
-# 		self.rooms.append(Room(self, self.render, "Bloco H" , "assets/chicken/blocoh-pedro"))
-# 		self.rooms.append(Room(self, self.render, "Bloco H2", "assets/chicken/blocoh2-pedro"))
+# 		self.rooms.append(Room(self, self.render, 'ScenarioR', 'cenario'   ))
+# 		self.rooms.append(Room(self, self.render, 'ScenarioC', 'collision'))
+# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
@@ -190,8 +176,8 @@ class MetalSlender(ShowBase):
 		
 		self.introSound.stop()
 		#TODO: Play creepy sound
-# 		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
-# 		initialSound.play()
+		initialSound = loader.loadSfx('assets/sounds/enemies/nazgul_scream.mp3')
+		initialSound.play()
 
 		self.enemies = []
 		self.items = []
