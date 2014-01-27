@@ -3,7 +3,7 @@
 # from direct.task import Task
 # from direct.actor.Actor import Actor
 
-from panda3d.core import CollisionHandlerQueue, CollisionNode, CollisionRay, NodePath, PerspectiveLens, Spotlight
+from panda3d.core import CollisionHandlerQueue, CollisionNode, CollisionRay, CollisionSegment, NodePath, PerspectiveLens, Spotlight
 from panda3d.ai import AICharacter
 
 import math
@@ -14,7 +14,7 @@ from scene_obj import SceneObject
 
 class Hooded(AICharacter):
 	
-	SIGHT=30.0
+	SIGHT=7.5
 	FOV=60.0
 	
 	HEIGHT = 1.3
@@ -71,7 +71,7 @@ class Hooded(AICharacter):
 		self.intruders = []
 
 		# this is important: as we said the inView method don't cull geometry but take everything is in sight frustum - therefore to simulate an hide and seek feature we gotta cheat a little: this ray is masked to collide with walls and so if the avatar is behind a wall the ray will be 'deflected' (we'll see how later in the sent_traverse function) - so we know who's behind a wall but we fake we can't see it.
-		sentraygeom = CollisionRay(0, 0, Hooded.HEIGHT, 0, 1, 0)
+		sentraygeom = CollisionSegment(0, 0, Hooded.HEIGHT, 0, Hooded.SIGHT, Hooded.HEIGHT)
 		sentinelRay = self.get_node_path().attachNewNode(CollisionNode('sentinelray'))
 		sentinelRay.node().addSolid(sentraygeom)
 		# we set to the ray a cumulative masking using the or operator to detect either the avatar's body and the wall geometry
