@@ -50,14 +50,9 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
-<<<<<<< HEAD
 # 		self.props.setFullscreen(True)
 #  		self.props.setSize(1920, 1080)
  		self.props.setSize(1280, 720)
-=======
-		self.props.setFullscreen(True)
- 		self.props.setSize(1920, 1080)
->>>>>>> origin/master
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		

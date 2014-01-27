@@ -88,7 +88,7 @@ class Player(SceneObject):
 		self.fear    = 0.0
 		self.speed   = 0.0
 		self.stopped = 1.0
-		self.life = 1.0
+		self.life = 20.0
 		self.pace = Player.NORMAL
 
 		self.initTimer = True
