@@ -47,7 +47,7 @@ class Hooded(AICharacter):
 		self.slight.setLens(lens)
 		self.slnp = self.get_node_path().attachNewNode(self.slight)
 		#TODO: Substitute for a collision polygon, so that the player class alerts an enemy of its presence
-		self.slight.showFrustum()
+		#self.slight.showFrustum()
 		
 		self.slnp.setH(self.slnp.getH()-180)
 		self.slnp.setPos(0, 0, Hooded.HEIGHT)
@@ -112,7 +112,7 @@ class Hooded(AICharacter):
 			self.lostTarget = False
 			self.heard = False
 			self.resetTimer()
-		elif (self.heard):
+		"""elif (self.heard):
 			self.heard = False
 			self.pursueTarget = self.hearingPos
 			self.getAiBehaviors().pauseAi("all")
@@ -126,18 +126,22 @@ class Hooded(AICharacter):
 				#self.state = 4
 				self.pursueTarget = self.TargetPos
 			else:
-				self.lostTarget = False
+				self.lostTarget = False"""
 				
 		if self.state == Hooded.STATE_PATROL:
 			self.patrol()
 		elif self.state == Hooded.STATE_SEARCH:
-			self.pathfind()
+			self.pursue()
 		elif self.state == Hooded.STATE_WANDER:
 			self.wander()
 		elif self.state == Hooded.STATE_ATTACK:
 			self.kill()
 		elif self.state == Hooded.STATE_PAUSED:
 			self.pause()
+
+
+		#elif self.state == Hooded.STATE_SEARCH:
+			#self.pathfind()
 			
 		if (self.attacked):
 			self.attacked = False
@@ -245,13 +249,13 @@ class Hooded(AICharacter):
 			self.attacked = True
 			self.attackTimer = False
 			self.startTimer(3)
-			self.state = Hooded.STATE_PAUSED
-			#self.pause()
+			self.pause()
 		else:
 			hasFinished = self.timer()
 			if (hasFinished):
 				self.attackTimer = True
 				self.resetTimer()
+				self.state = Hooded.STATE_SEARCH
 			else:
 				self.attacked = False
 
@@ -322,6 +326,7 @@ class Hooded(AICharacter):
 
 	def pause(self):
 		self.getAiBehaviors().pauseAi("all")
+		#print "nao pausei?"
 
 	def start(self):
 		self.started = True
@@ -331,3 +336,8 @@ class Hooded(AICharacter):
 
 	def clean(self):
 		loader.unloadSfx(self.screechsound)
+
+	def pursue(self):
+		self.getAiBehaviors().pursue(self.pursueTarget.getNodePath())
+		if (self.get_node_path().getDistance(self.pursueTarget.getNodePath()) < 1):
+			self.state = Hooded.STATE_ATTACK

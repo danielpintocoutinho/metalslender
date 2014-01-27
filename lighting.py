@@ -33,7 +33,7 @@ class Flashlight:
 		self.light = Spotlight(name + '/wide')
 		self.light.setLens(lens)
 		#TODO: Shadows don't work well anymore
-		self.light.setShadowCaster(True, resol[0], resol[1])
+		#self.light.setShadowCaster(True, resol[0], resol[1])
 		self.light.setColor(Flashlight.COLOR)
 		self.light.setExponent(40)
 		

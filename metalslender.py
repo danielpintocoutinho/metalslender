@@ -161,7 +161,7 @@ class MetalSlender(ShowBase):
 				self.player.hurt()#TODO:The enemy itself should hurt the player
 				#attack
 		self.AIworld.update()
-		if (not self.taskMgr.hasTaskNamed("player/update")):
+		if (self.player.isDead()):
 			for enemy in self.enemies:
 				enemy.stop()
 			self.endGame()

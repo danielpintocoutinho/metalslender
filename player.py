@@ -88,13 +88,14 @@ class Player(SceneObject):
 		self.fear    = 0.0
 		self.speed   = 0.0
 		self.stopped = 1.0
-		self.life = 10.0
+		self.life = 1.0
 		self.pace = Player.NORMAL
 
 		self.initTimer = True
 		self.attacked = False
 
 		self.paused = False
+		self.dead = False
 		
 		#TODO: Refactor to another class?
 		self.inventory = []
@@ -322,7 +323,6 @@ class Player(SceneObject):
 	def updateAll(self, task):
 		elapsed = task.time - self.last
 		self.last = task.time
-		
 		if (self.dying):
 			self.life -= 0.005
 			self.filters.setBlurSharpen(self.life-0.2)
@@ -346,7 +346,13 @@ class Player(SceneObject):
 				self.filters.delBlurSharpen()
 				fadeIn = render.colorScaleInterval(0.1, Vec4(1,1,1,1))
 				fadeIn.start()
+				self.dying = False
+				self.dead = True
 				return task.done
+		elif (self.life <= 0):
+			self.die()
+			return task.cont
+
 		
 		#TODO: Refactor
 		self.cam.node().getLens().setFov(75 + self.fear * Player.FEAR_FOV_AMP)
@@ -356,11 +362,11 @@ class Player(SceneObject):
 		self.updateFlashBang()
 		self.updateSound()
 
-		if (self.attacked):
+		"""if (self.attacked):
 			timeFinished = self.timer()
 			if (timeFinished):
 				self.life += 1.0
-				self.attacked = False
+				self.attacked = False"""	
 		#print "life: ", self.life
 
 		#TODO: Review player logic
@@ -403,7 +409,7 @@ class Player(SceneObject):
 	def hurt(self):
 		self.attacked = True
 		self.life -= 1.0
-		self.startTimer(5)
+		#self.startTimer(5)
 		
 	def die(self):
 		self.breathing.stop()
@@ -460,3 +466,6 @@ class Player(SceneObject):
 			
 	def isPaused(self):
 		return self.paused
+
+	def isDead(self):
+		return self.dead
