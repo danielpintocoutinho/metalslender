@@ -35,7 +35,7 @@ class Enemy(SceneObject):
 		
 		Enemy.actor.instanceTo(self.root)
 		
-		self.hooded = Hooded(np.getName() + 'Hooded', self.root, patrol, 60, 5, 2)
+		self.hooded = Hooded(np.getName() + 'Hooded', self.root, patrol, 60, 4, 4)
 		for o in scene.findAllMatches('**/=Door'):
 			self.hooded.addDynamicObject(o)
 

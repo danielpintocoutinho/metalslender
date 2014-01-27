@@ -12,7 +12,7 @@ class Flashlight:
 	COLOR = Vec4(1.0, 1.0, 0.9, 1)
 	
 	ATT_CONST = 0
-	ATT_LIN   = 0.5
+	ATT_LIN   = 0.3
 	ATT_QUAD  = 0.05
 	
 	def __init__(self, name, owner, scene, pos, fov=60, near=0.01, far=100, resol=(1920, 1080)):

@@ -42,8 +42,9 @@ class Room:
 
 	#TODO: Should be a tag, not a name
 	def setupGoal(self, base, scene):
-		np = self.model.find('**/Goal')
-		base.goal = np
+		np = self.model.find('**/=Goal')
+		if not np.isEmpty():
+			base.goal = np
 
 	def setupDoors(self, base, scene):
 		for np in self.model.findAllMatches('**/=Door'):

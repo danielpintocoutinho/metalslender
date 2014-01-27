@@ -50,8 +50,14 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
+<<<<<<< HEAD
 # 		self.props.setFullscreen(True)
+#  		self.props.setSize(1920, 1080)
  		self.props.setSize(1280, 720)
+=======
+		self.props.setFullscreen(True)
+ 		self.props.setSize(1920, 1080)
+>>>>>>> origin/master
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -64,7 +70,7 @@ class MetalSlender(ShowBase):
 		self.time = 0
 		self.gameOver = True
 
-		self.setFrameRateMeter(True)
+# 		self.setFrameRateMeter(True)
 		self.taskMgr.add(self.menuDisplay, "menuDisplay")
 
 		self.mainMenu = MainMenu(self)
@@ -117,17 +123,12 @@ class MetalSlender(ShowBase):
 	#TODO: Set the scenario's into collide mask to a special value		
 	def loadScenario(self):
 		self.rooms = []
-
-		self.rooms.append(Room(self, self.render, "BlocoH2"  , "assets/chicken/blocoh2"  ))
-		self.rooms.append(Room(self, self.render, "BlocoH"   , "assets/chicken/blocoh"   ))
-		self.rooms.append(Room(self, self.render, "LCG"      , "assets/chicken/lcg"      ))
-
-		self.rooms.append(Room(self, self.render, 'Scene8', 'assets/chicken/collision'))
-		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
-# 		self.rooms.append(Room(self, self.render, 'ScenarioR', 'cenario'   ))
-# 		self.rooms.append(Room(self, self.render, 'ScenarioC', 'collision'))
-# 		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
+		self.rooms.append(Room(self, self.render, "LCG"      , "assets/chicken/lcg"    ))
+		self.rooms.append(Room(self, self.render, "Bloco H"  , "assets/chicken/blocoh" ))
+		self.rooms.append(Room(self, self.render, "Bloco H2" , "assets/chicken/blocoh2"))
+		self.rooms.append(Room(self, self.render, "Collision", "assets/chicken/collision"    ))
+		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)
@@ -145,6 +146,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
 		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
+		self.taskMgr.add(self.checkGoal, 'CheckGoal')
 
 	def actionKeys(self, key):
 		if key == 'i':
@@ -187,7 +189,7 @@ class MetalSlender(ShowBase):
 		# Load the scene.
 		self.loadScenario()
 		
-		self.player  = Player(self, self.render, 'Player')#, pos=Vec3(2.8, -63, 7.54))
+		self.player  = Player(self, self.render, 'Player', pos=Vec3(6, 1.44, -1.5))
 		self.actions = ActionManager(self, self.player, self.rooms)
 		
 		self.em = EventManager(self, self.player, self.actions, self.rooms)
@@ -223,6 +225,7 @@ class MetalSlender(ShowBase):
 			self.taskMgr.add(self.player.flashlight.updatePower, 'player/flashlight/update')
 			self.taskMgr.add(self.AIUpdate,"AIUpdate")
 			self.taskMgr.add(self.camctrl.update, "camera/control")
+			self.taskMgr.add(self.checkGoal, 'CheckGoal')
 			self.accept('p', self.pauseGame)
 		else:
 			self.events.stop()
@@ -234,6 +237,7 @@ class MetalSlender(ShowBase):
 			self.player.resetLast()
 			self.taskMgr.remove('player/flashlight/update')
 			self.taskMgr.remove("AIUpdate")
+			self.taskMgr.remove('CheckGoal')
 			self.props.setCursorHidden(False)
 			self.win.requestProperties(self.props)
 			self.mainMenu.showPauseGame()
@@ -246,6 +250,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.remove('hud')
 		self.taskMgr.remove('player/flashlight/update')
 		self.taskMgr.remove("AIUpdate")
+		self.taskMgr.remove('CheckGoal')
 		self.cleanResources()
 		self.props.setCursorHidden(False)
 		self.win.requestProperties(self.props)
@@ -285,6 +290,7 @@ class MetalSlender(ShowBase):
 		self.taskMgr.add(self.AIUpdate,"AIUpdate")
 		self.taskMgr.add(self.camctrl.update, "camera/control")
 		self.taskMgr.add(self.playerUpdate, "playerUpdate")
+		self.taskMgr.add(self.checkGoal, 'CheckGoal')
 
 	def endGame(self):
 		self.hud.hide()
@@ -327,10 +333,6 @@ class MetalSlender(ShowBase):
 			self.initTimer = False
 			self.time = time.time()
 
-	def distance(self, p1, p2):  
-		d = (p1.x - p2.x)**2  + (p1.y - p2.y)**2 + (p1.z - p2.z)**2
-		return math.sqrt(d)
-
 	def playerUpdate(self, task):
 		reached = self.checkGoal()
 		if (reached):
@@ -345,13 +347,12 @@ class MetalSlender(ShowBase):
 
 		return task.cont
 
-	def checkGoal(self):
-		print 'To be continued...'
-# 		dist = self.distance(self.player.getNodePath().getPos(), self.goal.getPos())
-# 		radius = 40
-# 		if (dist < radius):
-# 			self.gameOver = False
-# 			return True
-		return False
+	def checkGoal(self, task):
+		close = not self.goal.isEmpty() and self.player.getNodePath().getDistance(self.goal) < 2
+		hasKey = 'goal' in [key.lock for key in self.player.inventory]
+		if (close and hasKey):
+			self.gameOver = False
+			self.endGame()
+		return task.cont
 
 MetalSlender().run()
