@@ -50,9 +50,14 @@ class MetalSlender(ShowBase):
 
 		self.props = WindowProperties()
 
+<<<<<<< HEAD
 # 		self.props.setFullscreen(True)
 #  		self.props.setSize(1920, 1080)
  		self.props.setSize(1280, 720)
+=======
+		self.props.setFullscreen(True)
+ 		self.props.setSize(1920, 1080)
+>>>>>>> origin/master
 		self.props.setCursorHidden(False)
 		self.props.setMouseMode(self.props.M_absolute)
 		
@@ -123,6 +128,7 @@ class MetalSlender(ShowBase):
 		self.rooms.append(Room(self, self.render, "Bloco H"  , "assets/chicken/blocoh" ))
 		self.rooms.append(Room(self, self.render, "Bloco H2" , "assets/chicken/blocoh2"))
 		self.rooms.append(Room(self, self.render, "Collision", "assets/chicken/collision"    ))
+		self.rooms[-1].root.setCollideMask(CollisionMask.SCENE)
 		
 	def addCommands(self):
 		self.accept('escape', self.userExit)

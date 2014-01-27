@@ -28,7 +28,7 @@ class Player(SceneObject):
 	
 	STOPPED=0.0
 	WALKING=0.07
-	RUNNING=0.34
+	RUNNING=0.14
 	
 	NORMAL   = 1.0
 	CRAWLING = 0.5
