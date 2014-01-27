@@ -5,27 +5,36 @@ from octree import EggOctree
 
 from sys import argv, exit
 
-if len(argv) < 4:
-	print 'Usage: %s <input.input> <x,y,z> <output.input>' % (argv[1],)
+if len(argv) < 6:
+	print 'Usage: % <input.egg> <x,y,z> <render.egg> <x,y,z> <collision.egg>' % (argv[1],)
 	exit(1)
 	
 print 'Reading input file %s' % (argv[1],)
 input = EggData()
 input.read(Filename(argv[1]))
-# sourceNode = toplevel.getFirstChild()
-# print type(toplevel)
-# print type(sourceNode)
 
-output = EggData()
-output.setCoordinateSystem(input.getCoordinateSystem())
+try:
+	resol = argv[2].split(',')
+	resol = Vec3D(float(resol[0]), float(resol[1]), float(resol[2]))
 
-resol = argv[2].split(',')
-resol = Vec3D(float(resol[0]), float(resol[1]), float(resol[2]))
+	print 'Building render octree'
+	output = EggOctree().build(input, resol, False)
 
-print 'Building octree'
-EggOctree().build(input, output, resol, True)
+	print 'Writing %s' % (argv[3],)
+	output.writeEgg(Filename(argv[3]))
+except AssertionError:
+	pass
 
-print 'Writing output file %s' % (argv[3],)
-output.writeEgg(Filename(argv[3]))
+try:
+	resol = argv[4].split(',')
+	resol = Vec3D(float(resol[0]), float(resol[1]), float(resol[2]))
+
+	print 'Building collision octree'
+	output = EggOctree().build(input, resol, True)
+
+	print 'Writing %s' % (argv[5],)
+	output.writeEgg(Filename(argv[5]))
+except AssertionError:
+	pass
 
 print 'Done'

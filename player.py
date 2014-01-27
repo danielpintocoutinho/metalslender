@@ -387,7 +387,7 @@ class Player(SceneObject):
 		if self.feetHandler.isOnGround():
 			self.pace = pace
 			if pace == Player.NORMAL:
-				LerpPosInterval(self.cam, 0.2, (0, 0, Player.HEIGHT)).start()
+				LerpPosInterval(self.cam, 0.2, (0, 0, Player.HEIGHT + Player.HEIGHT / 2)).start()
 			else:
 				LerpPosInterval(self.cam, 0.2, (0, 0, Player.CROUCHED_HEIGHT)).start()
 	

@@ -1,38 +1,40 @@
-from pandac.PandaModules import *
+from pandac.PandaModules import EggData, EggGroup, EggPolygon, EggVertexPool, Point3D, Vec3D
 
 import math
 
 class EggOctree(object):
 
-	def build(self, input, destNode, cellSize, collide=False):
+	def build(self, input, cellSize, collide=False):
+		destNode = EggData()
+		destNode.setCoordinateSystem(input.getCoordinateSystem())
+		
 		snode = input.getFirstChild()
-		while type(snode) != EggGroup:
+		while not isinstance(snode, EggGroup) and snode is not None:
+			#destNode.addChild(snode)
 			snode = input.getNextChild()
 		
 		snode.triangulatePolygons(0xff)
 		
 		# First, extract the <VertexPool>
 		vpool = snode.getFirstChild()
-		while type(vpool) != EggVertexPool:
+		while not isinstance(vpool, EggVertexPool):
 			vpool = snode.getNextChild()
 		
 		# Loop on the vertices determine the bounding box
 		minBB = Point3D()
 		maxBB = Point3D()
 		
-		nverts = vpool.getHighestIndex()
-		for iv in range(nverts + 1) :
-			vtx = vpool[iv]
-			vtxPos = vtx.getPos3()
+		for vertex in vpool:
+			vtxPos = vertex.getPos3()
 			
 			# Sets the X, Y or Z components
 			i = 0
-			for set in [Point3D.setX, Point3D.setY, Point3D.setZ]  :
+			for setter in [Point3D.setX, Point3D.setY, Point3D.setZ]  :
 				if vtxPos[i] < minBB[i] :
-					set(minBB, vtxPos[i])
+					setter(minBB, vtxPos[i])
 				
 				if vtxPos[i] > maxBB[i] :
-					set(maxBB, vtxPos[i])
+					setter(maxBB, vtxPos[i])
 				i += 1
 		
 		minBB -= Vec3D(0.001, 0.001, 0.001)
@@ -49,7 +51,6 @@ class EggOctree(object):
 		self.depthY = math.ceil(math.log(self.ncy) / math.log(2))
 		self.depthZ = math.ceil(math.log(self.ncz) / math.log(2))
 		self.depth = max(self.depthX, self.depthY, self.depthZ)
-
 		
 		self.cells = [[[
 				{'min':
@@ -65,7 +66,6 @@ class EggOctree(object):
 				for z in range(self.ncz)]
 				for y in range(self.ncy)]
 				for x in range(self.ncx)]
-		
 		
 		print 'Cell grid is %dx%dx%d' % (len(self.cells), len(self.cells[0]), len(self.cells[0][0]))
 		
@@ -95,14 +95,14 @@ class EggOctree(object):
 				
 			poly = snode.getNextChild()
 		
-		
 		# Add the vertex data
 		destNode.addChild(vpool)
 		
-		
 		self.nleaves = self.recur(destNode, 0, 0,0,0)
 		
-		print self.nleaves, 'leaves added'	
+		print self.nleaves, 'leaves added'
+		
+		return destNode
 
 	def recur(self, node, depth, x, y, z) :
 		
